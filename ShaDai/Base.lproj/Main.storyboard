@@ -34,6 +34,7 @@
                             </textView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstItem="FAS-lZ-lPU" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="40" id="Gi4-uf-FGr"/>
                             <constraint firstAttribute="leadingMargin" secondItem="FAS-lZ-lPU" secondAttribute="leading" constant="-20" id="Snf-YH-2Yn"/>
