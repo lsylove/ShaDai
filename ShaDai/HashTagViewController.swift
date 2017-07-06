@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  HashTagViewController.swift
 //  ShaDai
 //
 //  Created by chicpark7 on 06/07/2017.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class HashTagViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,3 +23,13 @@ class ViewController: UIViewController {
 
 }
 
+
+extension HashTagViewController: UITextViewDelegate {
+
+    func textViewDidChange(_ textView: UITextView) {
+        
+        print(textView.text)
+        
+    }
+
+}
