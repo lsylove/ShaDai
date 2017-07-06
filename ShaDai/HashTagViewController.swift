@@ -35,7 +35,8 @@ extension HashTagViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         
         let ranges = textView.text.hashTagRange
-        let attributedText = NSMutableAttributedString(string: textView.text)
+        let attribute = [ NSForegroundColorAttributeName: UIColor.white ]
+        let attributedText = NSMutableAttributedString(string: textView.text, attributes: attribute)
         
         ranges.forEach{attributedText.addAttribute(NSForegroundColorAttributeName, value: UIColor.blue, range: $0)}
         
