@@ -9,7 +9,7 @@
 import UIKit
 
 class HashTagViewController: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -17,6 +17,7 @@ class HashTagViewController: UIViewController {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(HashTagViewController.cancelEdit))
         
         view.addGestureRecognizer(tap)
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -27,7 +28,7 @@ class HashTagViewController: UIViewController {
     func cancelEdit() {
         view.endEditing(true)
     }
-
+    
 }
 
 extension HashTagViewController: UITextViewDelegate {

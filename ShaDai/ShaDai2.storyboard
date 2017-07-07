@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="c5m-8W-u6u">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="PlE-dY-yeO">
+            <objects>
+                <viewController id="c5m-8W-u6u" customClass="AVViewController" customModule="ShaDai" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Tz8-af-HcQ"/>
+                        <viewControllerLayoutGuide type="bottom" id="1mE-ar-OOl"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="vJk-Io-Xqy">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zSO-4L-V0B" customClass="PlayerView" customModule="ShaDai" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Yo-6w-c7A">
+                                        <rect key="frame" x="172" y="600" width="30" height="30"/>
+                                        <state key="normal" title="Play"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BKm-GL-SeS">
+                                        <rect key="frame" x="95" y="600" width="57" height="30"/>
+                                        <state key="normal" title="&lt;&lt;&lt;&lt;&lt;&lt;"/>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yb0-zX-PC2">
+                                        <rect key="frame" x="222" y="600" width="57" height="30"/>
+                                        <state key="normal" title="&gt;&gt;&gt;&gt;&gt;&gt;"/>
+                                    </button>
+                                    <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="SuE-3r-y9x">
+                                        <rect key="frame" x="18" y="562" width="339" height="31"/>
+                                    </slider>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="Yb0-zX-PC2" firstAttribute="centerY" secondItem="1Yo-6w-c7A" secondAttribute="centerY" id="Hp9-3h-jD1"/>
+                                    <constraint firstItem="BKm-GL-SeS" firstAttribute="centerY" secondItem="1Yo-6w-c7A" secondAttribute="centerY" id="T1a-3E-URz"/>
+                                    <constraint firstItem="1Yo-6w-c7A" firstAttribute="centerX" secondItem="zSO-4L-V0B" secondAttribute="centerX" id="Td7-cT-n3R"/>
+                                    <constraint firstItem="1Yo-6w-c7A" firstAttribute="leading" secondItem="BKm-GL-SeS" secondAttribute="trailing" constant="20" id="WCW-bH-wF0"/>
+                                    <constraint firstItem="1Yo-6w-c7A" firstAttribute="top" secondItem="SuE-3r-y9x" secondAttribute="bottom" constant="8" id="geN-Dt-ePM"/>
+                                    <constraint firstItem="Yb0-zX-PC2" firstAttribute="leading" secondItem="1Yo-6w-c7A" secondAttribute="trailing" constant="20" id="hgE-ML-kGo"/>
+                                    <constraint firstAttribute="bottom" secondItem="1Yo-6w-c7A" secondAttribute="bottom" constant="17" id="lVR-J2-lKE"/>
+                                    <constraint firstAttribute="trailing" secondItem="SuE-3r-y9x" secondAttribute="trailing" constant="20" id="ro6-FZ-IGe"/>
+                                    <constraint firstItem="SuE-3r-y9x" firstAttribute="leading" secondItem="zSO-4L-V0B" secondAttribute="leading" constant="20" id="xdy-M8-Ifl"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="zSO-4L-V0B" firstAttribute="top" secondItem="Tz8-af-HcQ" secondAttribute="bottom" id="IYJ-f5-O9l"/>
+                            <constraint firstItem="zSO-4L-V0B" firstAttribute="leading" secondItem="vJk-Io-Xqy" secondAttribute="leading" id="KFo-Ea-YBA"/>
+                            <constraint firstItem="1mE-ar-OOl" firstAttribute="top" secondItem="zSO-4L-V0B" secondAttribute="bottom" id="d2R-wk-sXP"/>
+                            <constraint firstAttribute="trailing" secondItem="zSO-4L-V0B" secondAttribute="trailing" id="rwa-9p-0ow"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="playerView" destination="zSO-4L-V0B" id="uQc-MY-lI6"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mfg-LO-Hmt" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="116" y="119.1904047976012"/>
+        </scene>
+    </scenes>
+</document>
