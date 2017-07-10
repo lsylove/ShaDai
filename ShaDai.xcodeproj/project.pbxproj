@@ -18,6 +18,11 @@
 		672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 672555FA1F131B99008D88C2 /* nasmo.mp4 */; };
 		672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672555FC1F131BBF008D88C2 /* NasmoController.swift */; };
 		672555FF1F131BF2008D88C2 /* Nasmo.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 672555FE1F131BF2008D88C2 /* Nasmo.storyboard */; };
+		672556011F134535008D88C2 /* pic.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 672556001F134535008D88C2 /* pic.jpg */; };
+		672556031F134BEC008D88C2 /* pic2.png in Resources */ = {isa = PBXBuildFile; fileRef = 672556021F134BEC008D88C2 /* pic2.png */; };
+		672556051F134C59008D88C2 /* pic3.png in Resources */ = {isa = PBXBuildFile; fileRef = 672556041F134C59008D88C2 /* pic3.png */; };
+		672556081F134ECA008D88C2 /* pic2-2.png in Resources */ = {isa = PBXBuildFile; fileRef = 672556061F134ECA008D88C2 /* pic2-2.png */; };
+		672556091F134ECA008D88C2 /* pic3-2.png in Resources */ = {isa = PBXBuildFile; fileRef = 672556071F134ECA008D88C2 /* pic3-2.png */; };
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
 		675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675775511F0F07AB00270E3F /* HashTag.storyboard */; };
 		675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675775531F0F0A3B00270E3F /* AVViewController.swift */; };
@@ -37,6 +42,11 @@
 		672555FA1F131B99008D88C2 /* nasmo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = nasmo.mp4; sourceTree = SOURCE_ROOT; };
 		672555FC1F131BBF008D88C2 /* NasmoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NasmoController.swift; sourceTree = "<group>"; };
 		672555FE1F131BF2008D88C2 /* Nasmo.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Nasmo.storyboard; sourceTree = "<group>"; };
+		672556001F134535008D88C2 /* pic.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pic.jpg; sourceTree = SOURCE_ROOT; };
+		672556021F134BEC008D88C2 /* pic2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pic2.png; sourceTree = SOURCE_ROOT; };
+		672556041F134C59008D88C2 /* pic3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pic3.png; sourceTree = SOURCE_ROOT; };
+		672556061F134ECA008D88C2 /* pic2-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pic2-2.png"; sourceTree = SOURCE_ROOT; };
+		672556071F134ECA008D88C2 /* pic3-2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "pic3-2.png"; sourceTree = SOURCE_ROOT; };
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
 		675775511F0F07AB00270E3F /* HashTag.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = HashTag.storyboard; sourceTree = "<group>"; };
 		675775531F0F0A3B00270E3F /* AVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVViewController.swift; sourceTree = "<group>"; };
@@ -58,6 +68,11 @@
 			children = (
 				671BBF101F0E29720088B84C /* video.mp4 */,
 				672555FA1F131B99008D88C2 /* nasmo.mp4 */,
+				672556001F134535008D88C2 /* pic.jpg */,
+				672556021F134BEC008D88C2 /* pic2.png */,
+				672556041F134C59008D88C2 /* pic3.png */,
+				672556061F134ECA008D88C2 /* pic2-2.png */,
+				672556071F134ECA008D88C2 /* pic3-2.png */,
 				3B4B05E91F0E1086006EE5F1 /* ShaDai */,
 				3B4B05E81F0E1086006EE5F1 /* Products */,
 			);
@@ -152,10 +167,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B4B05F51F0E1086006EE5F1 /* LaunchScreen.storyboard in Resources */,
+				672556031F134BEC008D88C2 /* pic2.png in Resources */,
+				672556081F134ECA008D88C2 /* pic2-2.png in Resources */,
 				675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */,
 				3B4B05F21F0E1086006EE5F1 /* Assets.xcassets in Resources */,
+				672556011F134535008D88C2 /* pic.jpg in Resources */,
 				3B4B05F01F0E1086006EE5F1 /* Main.storyboard in Resources */,
 				672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */,
+				672556051F134C59008D88C2 /* pic3.png in Resources */,
+				672556091F134ECA008D88C2 /* pic3-2.png in Resources */,
 				672555FF1F131BF2008D88C2 /* Nasmo.storyboard in Resources */,
 				671BBF111F0E29720088B84C /* video.mp4 in Resources */,
 				675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */,

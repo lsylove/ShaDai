@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="TgA-5H-1FJ">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Nasmo Controller-->
+        <scene sceneID="ude-je-VWJ">
+            <objects>
+                <viewController id="TgA-5H-1FJ" customClass="NasmoController" customModule="ShaDai" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="nCD-nP-yIb"/>
+                        <viewControllerLayoutGuide type="bottom" id="HSr-Zg-8Nv"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="sPB-b0-FTN">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8m-KQ-3el" customClass="PlayerView" customModule="ShaDai" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wv1-H3-Qky">
+                                        <rect key="frame" x="172" y="622" width="30" height="30"/>
+                                        <state key="normal" title="Play"/>
+                                        <connections>
+                                            <action selector="onPlay:" destination="TgA-5H-1FJ" eventType="touchUpInside" id="5it-Cc-3g7"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zct-Gf-lIv">
+                                        <rect key="frame" x="93" y="622" width="57" height="30"/>
+                                        <state key="normal" title="&lt;&lt;&lt;&lt;&lt;&lt;"/>
+                                        <connections>
+                                            <action selector="onPrev:" destination="TgA-5H-1FJ" eventType="touchUpInside" id="NdP-vN-oZw"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jiV-Rp-feH">
+                                        <rect key="frame" x="221" y="622" width="57" height="30"/>
+                                        <state key="normal" title="&gt;&gt;&gt;&gt;&gt;&gt;"/>
+                                        <connections>
+                                            <action selector="onNext:" destination="TgA-5H-1FJ" eventType="touchUpInside" id="1uJ-3q-eUf"/>
+                                        </connections>
+                                    </button>
+                                    <slider opaque="NO" contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="h8z-oH-Aup">
+                                        <rect key="frame" x="34" y="577" width="307" height="31"/>
+                                        <connections>
+                                            <action selector="onSlide:forEvent:" destination="TgA-5H-1FJ" eventType="valueChanged" id="o4b-RZ-xP4"/>
+                                        </connections>
+                                    </slider>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="jiV-Rp-feH" firstAttribute="leading" secondItem="wv1-H3-Qky" secondAttribute="trailing" constant="20" id="Obp-h6-Pz7"/>
+                                    <constraint firstItem="h8z-oH-Aup" firstAttribute="leading" secondItem="Y8m-KQ-3el" secondAttribute="leading" constant="20" id="OzB-hb-laC"/>
+                                    <constraint firstAttribute="trailing" secondItem="h8z-oH-Aup" secondAttribute="trailing" constant="20" id="WUg-bl-dom"/>
+                                    <constraint firstItem="wv1-H3-Qky" firstAttribute="centerX" secondItem="Y8m-KQ-3el" secondAttribute="centerX" id="hUO-ZO-GJL"/>
+                                    <constraint firstItem="wv1-H3-Qky" firstAttribute="leading" secondItem="zct-Gf-lIv" secondAttribute="trailing" constant="20" id="lXn-bG-ugx"/>
+                                    <constraint firstItem="wv1-H3-Qky" firstAttribute="centerY" secondItem="jiV-Rp-feH" secondAttribute="centerY" id="orQ-1U-FLu"/>
+                                    <constraint firstItem="wv1-H3-Qky" firstAttribute="top" secondItem="h8z-oH-Aup" secondAttribute="bottom" constant="15" id="x7v-JH-WTt"/>
+                                    <constraint firstItem="wv1-H3-Qky" firstAttribute="centerY" secondItem="zct-Gf-lIv" secondAttribute="centerY" id="y2A-Fw-IZg"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Y8m-KQ-3el" firstAttribute="width" secondItem="sPB-b0-FTN" secondAttribute="width" id="MKf-aU-I81"/>
+                            <constraint firstItem="HSr-Zg-8Nv" firstAttribute="top" secondItem="wv1-H3-Qky" secondAttribute="bottom" constant="15" id="hRn-Tu-pWZ"/>
+                            <constraint firstItem="Y8m-KQ-3el" firstAttribute="height" secondItem="sPB-b0-FTN" secondAttribute="height" id="udd-In-1VH"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="playButton" destination="wv1-H3-Qky" id="CWQ-oG-efa"/>
+                        <outlet property="playerView" destination="Y8m-KQ-3el" id="yIt-BU-4Iy"/>
+                        <outlet property="slider" destination="h8z-oH-Aup" id="Kdu-V3-CkZ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="78g-ef-6Z3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="80.799999999999997" y="154.27286356821591"/>
+        </scene>
+    </scenes>
+</document>
