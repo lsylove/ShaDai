@@ -15,6 +15,9 @@
 		671BBF0B1F0E154F0088B84C /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BBF0A1F0E154F0088B84C /* String+.swift */; };
 		671BBF111F0E29720088B84C /* video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 671BBF101F0E29720088B84C /* video.mp4 */; };
 		671BBF131F0E35590088B84C /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 671BBF121F0E35590088B84C /* PlayerView.swift */; };
+		672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 672555FA1F131B99008D88C2 /* nasmo.mp4 */; };
+		672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672555FC1F131BBF008D88C2 /* NasmoController.swift */; };
+		672555FF1F131BF2008D88C2 /* Nasmo.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 672555FE1F131BF2008D88C2 /* Nasmo.storyboard */; };
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
 		675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675775511F0F07AB00270E3F /* HashTag.storyboard */; };
 		675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675775531F0F0A3B00270E3F /* AVViewController.swift */; };
@@ -31,6 +34,9 @@
 		671BBF0A1F0E154F0088B84C /* String+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		671BBF101F0E29720088B84C /* video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = video.mp4; sourceTree = "<group>"; };
 		671BBF121F0E35590088B84C /* PlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		672555FA1F131B99008D88C2 /* nasmo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = nasmo.mp4; sourceTree = SOURCE_ROOT; };
+		672555FC1F131BBF008D88C2 /* NasmoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NasmoController.swift; sourceTree = "<group>"; };
+		672555FE1F131BF2008D88C2 /* Nasmo.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Nasmo.storyboard; sourceTree = "<group>"; };
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
 		675775511F0F07AB00270E3F /* HashTag.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = HashTag.storyboard; sourceTree = "<group>"; };
 		675775531F0F0A3B00270E3F /* AVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVViewController.swift; sourceTree = "<group>"; };
@@ -51,6 +57,7 @@
 			isa = PBXGroup;
 			children = (
 				671BBF101F0E29720088B84C /* video.mp4 */,
+				672555FA1F131B99008D88C2 /* nasmo.mp4 */,
 				3B4B05E91F0E1086006EE5F1 /* ShaDai */,
 				3B4B05E81F0E1086006EE5F1 /* Products */,
 			);
@@ -67,17 +74,19 @@
 		3B4B05E91F0E1086006EE5F1 /* ShaDai */ = {
 			isa = PBXGroup;
 			children = (
+				3B4B05F11F0E1086006EE5F1 /* Assets.xcassets */,
 				3B4B05EA1F0E1086006EE5F1 /* AppDelegate.swift */,
 				3B4B05EC1F0E1086006EE5F1 /* HashTagViewController.swift */,
-				3B4B05F11F0E1086006EE5F1 /* Assets.xcassets */,
-				3B4B05F31F0E1086006EE5F1 /* LaunchScreen.storyboard */,
+				675775531F0F0A3B00270E3F /* AVViewController.swift */,
+				672555FC1F131BBF008D88C2 /* NasmoController.swift */,
 				3B4B05F61F0E1086006EE5F1 /* Info.plist */,
-				671BBF0A1F0E154F0088B84C /* String+.swift */,
-				671BBF121F0E35590088B84C /* PlayerView.swift */,
+				3B4B05F31F0E1086006EE5F1 /* LaunchScreen.storyboard */,
 				3B4B05EE1F0E1086006EE5F1 /* Main.storyboard */,
 				675775511F0F07AB00270E3F /* HashTag.storyboard */,
 				6757754F1F0F069D00270E3F /* ShaDai2.storyboard */,
-				675775531F0F0A3B00270E3F /* AVViewController.swift */,
+				672555FE1F131BF2008D88C2 /* Nasmo.storyboard */,
+				671BBF121F0E35590088B84C /* PlayerView.swift */,
+				671BBF0A1F0E154F0088B84C /* String+.swift */,
 			);
 			path = ShaDai;
 			sourceTree = "<group>";
@@ -146,6 +155,8 @@
 				675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */,
 				3B4B05F21F0E1086006EE5F1 /* Assets.xcassets in Resources */,
 				3B4B05F01F0E1086006EE5F1 /* Main.storyboard in Resources */,
+				672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */,
+				672555FF1F131BF2008D88C2 /* Nasmo.storyboard in Resources */,
 				671BBF111F0E29720088B84C /* video.mp4 in Resources */,
 				675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */,
 			);
@@ -160,6 +171,7 @@
 			files = (
 				3B4B05ED1F0E1086006EE5F1 /* HashTagViewController.swift in Sources */,
 				671BBF0B1F0E154F0088B84C /* String+.swift in Sources */,
+				672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */,
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,
 				671BBF131F0E35590088B84C /* PlayerView.swift in Sources */,
 				3B4B05EB1F0E1086006EE5F1 /* AppDelegate.swift in Sources */,
