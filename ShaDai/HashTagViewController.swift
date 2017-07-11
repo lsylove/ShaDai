@@ -18,6 +18,9 @@ class HashTagViewController: UIViewController {
         
         view.addGestureRecognizer(tap)
         
+//        NotificationCenter.default.addObserver(self, selector: #selector(HashTagViewController.cancelEdit), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+
+        
     }
 
     override func didReceiveMemoryWarning() {

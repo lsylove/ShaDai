@@ -27,17 +27,29 @@
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Yo-6w-c7A">
                                         <rect key="frame" x="172" y="600" width="30" height="30"/>
                                         <state key="normal" title="Play"/>
+                                        <connections>
+                                            <action selector="onPlay:" destination="c5m-8W-u6u" eventType="touchUpInside" id="Sim-FM-qH0"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BKm-GL-SeS">
                                         <rect key="frame" x="95" y="600" width="57" height="30"/>
                                         <state key="normal" title="&lt;&lt;&lt;&lt;&lt;&lt;"/>
+                                        <connections>
+                                            <action selector="onPrev:" destination="c5m-8W-u6u" eventType="touchUpInside" id="Mrj-FV-yMF"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yb0-zX-PC2">
                                         <rect key="frame" x="222" y="600" width="57" height="30"/>
                                         <state key="normal" title="&gt;&gt;&gt;&gt;&gt;&gt;"/>
+                                        <connections>
+                                            <action selector="onNext:" destination="c5m-8W-u6u" eventType="touchUpInside" id="1t8-Pu-Nc6"/>
+                                        </connections>
                                     </button>
                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="SuE-3r-y9x">
                                         <rect key="frame" x="18" y="562" width="339" height="31"/>
+                                        <connections>
+                                            <action selector="onSlide:forEvent:" destination="c5m-8W-u6u" eventType="valueChanged" id="1I3-m8-DaX"/>
+                                        </connections>
                                     </slider>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -63,7 +75,9 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="playButton" destination="1Yo-6w-c7A" id="xmO-gI-Qmc"/>
                         <outlet property="playerView" destination="zSO-4L-V0B" id="uQc-MY-lI6"/>
+                        <outlet property="slider" destination="SuE-3r-y9x" id="zMz-5O-Hdo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mfg-LO-Hmt" userLabel="First Responder" sceneMemberID="firstResponder"/>
