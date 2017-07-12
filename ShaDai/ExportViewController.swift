@@ -41,31 +41,18 @@ class ExportViewController: UIViewController {
     
     func processVideo() {
         DispatchQueue.global().async {
-            let str = self.textField.text ?? "nil"
-            guard let path = Bundle.main.path(forResource: str, ofType: "mp4") else {
-                DispatchQueue.main.async {
-                    self.label.text = "No such resource file!"
-                }
+            guard let path = Bundle.main.path(forResource: self.textField.text ?? "nil", ofType: "mp4") else {
+                self.showMessage("No such resource file!")
                 return
             }
             
             let url = URL(fileURLWithPath: path)
-            let asset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey : true])
-            let sourceTrack = asset.tracks(withMediaType: AVMediaTypeVideo).first!
+            let (asset, sourceTrack) = self.retrieveAsset(url)
             
-            let ratePrev = sourceTrack.estimatedDataRate / 8
-            let secPrev = CMTimeGetSeconds(sourceTrack.timeRange.duration)
+            let sizePrev = self.sizeEstimation(sourceTrack)
+            self.showMessage(String(format: "File Size: %.4lf MB => ", sizePrev / 1024 / 1024))
             
-            let sizePrev = Double(ratePrev) * secPrev
-            DispatchQueue.main.async {
-                self.label.text = String(format: "File Size: %.4lf MB => ", sizePrev / 1024 / 1024)
-            }
-            
-            let composition = AVMutableComposition()
-            let compoTrack = composition.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
-            
-            try! compoTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, asset.duration), of: sourceTrack, at: kCMTimeZero)
-            compoTrack.preferredTransform = sourceTrack.preferredTransform
+            let composition = self.loadAndInsertTrack(sourceTrack)
             
             //        Do your editing
             
@@ -102,128 +89,63 @@ class ExportViewController: UIViewController {
             //        Editing done
             
             let snapshot: AVComposition = composition.copy() as! AVComposition
-            guard let reader = try? AVAssetReader(asset: snapshot) else {
-                DispatchQueue.main.async {
-                    self.label.text = "Resource snapshot failure!"
-                }
-                return
-            }
             
-            let readTrack = snapshot.tracks(withMediaType: AVMediaTypeVideo).first!
-            let readMaterial = AVAssetReaderVideoCompositionOutput(videoTracks: [readTrack], videoSettings: [
-                kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
-                kCVPixelBufferIOSurfacePropertiesKey as String: [:]
-                ])
-            readMaterial.videoComposition = layerComposition
-            guard reader.canAdd(readMaterial) else {
-                DispatchQueue.main.async {
-                    self.label.text = "Resource input material failure!"
-                }
+            guard let (reader, readMaterial) = self.prepareReader(snapshot) else {
+                self.showMessage("Resource input preparation failure!")
                 return
             }
-            reader.add(readMaterial)
+            readMaterial.videoComposition = layerComposition
             reader.startReading()
             
             guard let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
-                DispatchQueue.main.async {
-                    self.label.text = "Temp directory read failure!"
-                }
-                return            }
+                self.showMessage("Temp directory read failure!")
+                return
+            }
             
             let tempURL = dir.appendingPathComponent("temp.mp4")
             try? FileManager.default.removeItem(at: tempURL)
             
-            guard let writer = try? AVAssetWriter(outputURL: tempURL, fileType: AVFileTypeQuickTimeMovie) else {
-                DispatchQueue.main.async {
-                    self.label.text = "Resource output path failure!"
-                }
+            guard let (writer, writeMaterial) = self.prepareWriter(tempURL, size: snapshot.naturalSize) else {
+                self.showMessage("Resource output preparation failure!")
                 return
             }
-            
-            let writeMaterial = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: [
-                AVVideoCodecKey: AVVideoCodecH264,
-                AVVideoWidthKey: Int(videoSize.width),
-                AVVideoHeightKey: Int(videoSize.height),
-                AVVideoCompressionPropertiesKey: [
-                    AVVideoAverageBitRateKey: 8 * 65536,
-                    AVVideoProfileLevelKey: AVVideoProfileLevelH264Main31,
-                    AVVideoMaxKeyFrameIntervalKey: 8
-                ]])
-            guard writer.canAdd(writeMaterial) else {
-                DispatchQueue.main.async {
-                    self.label.text = "Resource output material failure!"
-                }
-                return
-            }
-            writer.add(writeMaterial)
             writer.startWriting()
             writer.startSession(atSourceTime: kCMTimeZero)
             
-            DispatchQueue.main.async {
-                self.label.text = "Compressing..."
-            }
-            
-            let serialQueue = DispatchQueue(label: "serial")
-            let semaphore = DispatchSemaphore(value: 0)
-            
-            writeMaterial.requestMediaDataWhenReady(on: serialQueue) {
-                while (writeMaterial.isReadyForMoreMediaData) {
-                    if let nextBuffer = readMaterial.copyNextSampleBuffer() {
-                        writeMaterial.append(nextBuffer)
-                    } else {
-                        writeMaterial.markAsFinished()
-                        semaphore.signal()
-                        break
-                    }
-                }
-            }
-            
-            semaphore.wait()
-            
-            writer.endSession(atSourceTime: asset.duration)
-            writer.finishWriting {
-                
-                guard writer.status == .completed else {
-                    DispatchQueue.main.async {
-                        self.label.text = "Write to buffer failure!"
-                    }
-                    try? FileManager.default.removeItem(at: tempURL)
-                    return
-                }
-                
-                let tempAsset = AVURLAsset(url: tempURL, options: [AVURLAssetPreferPreciseDurationAndTimingKey : true])
-                DispatchQueue.main.async {
-                    self.label.text = "Writing to file..."
-                }
-                
-                PHPhotoLibrary.shared().performChanges({
-                    PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: tempURL)
-                }) { saved, error in
-                    var strn: String
-                    var label: String
-                    if saved {
-                        strn = "Success"
-                        let tempTrack = tempAsset.tracks(withMediaType: AVMediaTypeVideo).first!
-                        
-                        let rateDone = tempTrack.estimatedDataRate / 8
-                        let secDone = CMTimeGetSeconds(tempTrack.timeRange.duration)
-                        
-                        let sizeDone = Double(rateDone) * secDone
-                        label = String(format: "File Size: %.4lf MB => %.4lf MB", sizePrev / 1024 / 1024, sizeDone / 1024 / 1024)
-                        
-                    } else {
-                        strn = "Failed"
-                        label = "File Save Failure"
-                    }
-                    DispatchQueue.main.async {
-                        self.label.text = label
-                        let alertController = UIAlertController(title: strn, message: nil, preferredStyle: .alert)
-                        let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-                        alertController.addAction(defaultAction)
-                        self.present(alertController, animated: true, completion: nil)
+            self.showMessage("Compressing...")
+            self.syncBufferIO(readMaterial: readMaterial, writeMaterial: writeMaterial) {
+                writer.endSession(atSourceTime: asset.duration)
+                writer.finishWriting {
+                    guard writer.status == .completed else {
+                        self.showMessage("Write to buffer failure!")
+                        try? FileManager.default.removeItem(at: tempURL)
+                        return
                     }
                     
-                    try! FileManager.default.removeItem(at: tempURL)
+                    self.showMessage("Writing to file...")
+                    self.submitToCameraRoll(tempURL) { saved in
+                        var strn: String
+                        var label: String
+                        if saved {
+                            strn = "Success"
+                            let (_, track) = self.retrieveAsset(tempURL)
+                            let sizeDone = self.sizeEstimation(track)
+                            label = String(format: "File Size: %.4lf MB => %.4lf MB", sizePrev / 1048576, sizeDone / 1048576)
+                            
+                        } else {
+                            strn = "Failed"
+                            label = "File Save Failure"
+                        }
+                        DispatchQueue.main.async {
+                            self.label.text = label
+                            let alertController = UIAlertController(title: strn, message: nil, preferredStyle: .alert)
+                            let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                            alertController.addAction(defaultAction)
+                            self.present(alertController, animated: true, completion: nil)
+                        }
+                        
+                        try! FileManager.default.removeItem(at: tempURL)
+                    }
                 }
             }
         }
@@ -239,6 +161,98 @@ class ExportViewController: UIViewController {
     }
     */
     
+    private func showMessage(_ message: String) -> Void {
+        DispatchQueue.main.async {
+            self.label.text = message
+        }
+    }
     
-
+    private func sizeEstimation(_ track: AVAssetTrack) -> Double {
+        let ratePrev = track.estimatedDataRate / 8
+        let secPrev = CMTimeGetSeconds(track.timeRange.duration)
+        
+        return Double(ratePrev) * secPrev
+    }
+    
+    private func retrieveAsset(_ url: URL) -> (AVAsset, AVAssetTrack) {
+        let asset = AVURLAsset(url: url, options: [AVURLAssetPreferPreciseDurationAndTimingKey : true])
+        let sourceTrack = asset.tracks(withMediaType: AVMediaTypeVideo).first!
+        return (asset, sourceTrack)
+    }
+    
+    private func loadAndInsertTrack(_ track: AVAssetTrack) -> AVMutableComposition {
+        let composition = AVMutableComposition()
+        let compoTrack = composition.addMutableTrack(withMediaType: AVMediaTypeVideo, preferredTrackID: kCMPersistentTrackID_Invalid)
+        
+        try! compoTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, track.asset!.duration), of: track, at: kCMTimeZero)
+        compoTrack.preferredTransform = track.preferredTransform
+        
+        return composition
+    }
+    
+    private func prepareReader(_ asset: AVAsset) -> (AVAssetReader, AVAssetReaderVideoCompositionOutput)? {
+        guard let reader = try? AVAssetReader(asset: asset) else {
+            return nil
+        }
+        
+        let readTrack = asset.tracks(withMediaType: AVMediaTypeVideo).first!
+        let readMaterial = AVAssetReaderVideoCompositionOutput(videoTracks: [readTrack], videoSettings: [
+            kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
+            kCVPixelBufferIOSurfacePropertiesKey as String: [:]
+            ])
+        guard reader.canAdd(readMaterial) else {
+            return nil
+        }
+        reader.add(readMaterial)
+        return (reader, readMaterial)
+    }
+    
+    private func prepareWriter(_ url: URL, size: CGSize) -> (AVAssetWriter, AVAssetWriterInput)? {
+        guard let writer = try? AVAssetWriter(outputURL: url, fileType: AVFileTypeQuickTimeMovie) else {
+            return nil
+        }
+        
+        let writeMaterial = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: [
+            AVVideoCodecKey: AVVideoCodecH264,
+            AVVideoWidthKey: Int(size.width),
+            AVVideoHeightKey: Int(size.height),
+            AVVideoCompressionPropertiesKey: [
+                AVVideoAverageBitRateKey: 8 * 65536,
+                AVVideoProfileLevelKey: AVVideoProfileLevelH264Main31,
+                AVVideoMaxKeyFrameIntervalKey: 8
+            ]])
+        guard writer.canAdd(writeMaterial) else {
+            return nil
+        }
+        writer.add(writeMaterial)
+        return (writer, writeMaterial)
+    }
+    
+    private func syncBufferIO(readMaterial: AVAssetReaderOutput, writeMaterial: AVAssetWriterInput, callback: () -> Void) {
+        let serialQueue = DispatchQueue(label: "serial")
+        let semaphore = DispatchSemaphore(value: 0)
+        
+        writeMaterial.requestMediaDataWhenReady(on: serialQueue) {
+            while (writeMaterial.isReadyForMoreMediaData) {
+                if let nextBuffer = readMaterial.copyNextSampleBuffer() {
+                    writeMaterial.append(nextBuffer)
+                } else {
+                    writeMaterial.markAsFinished()
+                    semaphore.signal()
+                    break
+                }
+            }
+        }
+        
+        semaphore.wait()
+        callback()
+    }
+    
+    private func submitToCameraRoll(_ url: URL, callback: @escaping (_ saved: Bool) -> Void) -> Void {
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+        }) { saved, error in
+            callback(saved)
+        }
+    }
 }
