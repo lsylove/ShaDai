@@ -27,6 +27,22 @@ class AVViewController: UIViewController {
         let url = URL(fileURLWithPath: path)
         
         playerView.player = AVPlayer(url: url)
+        playerView.playCallback = {
+            DispatchQueue.main.async {
+                self.playButton.setTitle("Pause", for: .normal)
+            }
+            
+            self.timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(self.updateSlide), userInfo: nil, repeats: true)
+        }
+        
+        playerView.pauseCallback = {
+            DispatchQueue.main.async {
+                self.playButton.setTitle("Play", for: .normal)
+            }
+            
+            self.timer?.invalidate()
+            self.timer = nil
+        }
     }
     
     override func viewDidLoad() {
@@ -40,12 +56,13 @@ class AVViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.pause), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerView.player?.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.selectPause), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerView.player?.currentItem)
         
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         
-        play()
+        playerView.play()
     }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
@@ -53,7 +70,7 @@ class AVViewController: UIViewController {
         
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
         
-        pause()
+        playerView.pause()
     }
     
     /*
@@ -66,35 +83,14 @@ class AVViewController: UIViewController {
     }
     */
     
-    func pause() {
-        playerView.player?.pause()
-        playButton.setTitle("Play", for: .normal)
-        
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    func play() {
-        playerView.player?.play()
-        playButton.setTitle("Pause", for: .normal)
-        
-        timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(self.updateSlide), userInfo: nil, repeats: true)
-    }
-    
     @IBAction func onPlay(_ sender: Any) {
-        if (playerView.player?.timeControlStatus == .playing) {
-            pause()
-        } else {
-            play()
-        }
+        playerView.toggle()
     }
 
     @IBAction func onPrev(_ sender: Any) {
-        if (playerView.player?.timeControlStatus == .playing) {
-            pause()
-        }
+        playerView.pause()
         
-        let time: CMTime = (playerView.player?.currentTime())!
+        let time: CMTime = playerView.player!.currentTime()
         var sec = CMTimeGetSeconds(time)
         var ts = time.timescale
         
@@ -105,18 +101,16 @@ class AVViewController: UIViewController {
             ts = 3
         }
         
-        playerView.player?.seek(to: CMTimeMakeWithSeconds(sec, ts), toleranceBefore: CMTimeMakeWithSeconds(0.002, 3), toleranceAfter: CMTimeMakeWithSeconds(0.002, 3)) {_ in self.updateSlide()}
+        playerView.player!.seek(to: CMTimeMakeWithSeconds(sec, ts), toleranceBefore: CMTimeMakeWithSeconds(0.002, 3), toleranceAfter: CMTimeMakeWithSeconds(0.002, 3)) {_ in self.updateSlide()}
     }
     
     @IBAction func onNext(_ sender: Any) {
-        if (playerView.player?.timeControlStatus == .playing) {
-            pause()
-        }
+        playerView.pause()
         
-        let time = (playerView.player?.currentTime())!
+        let time = playerView.player!.currentTime()
         var sec = CMTimeGetSeconds(time)
         
-        let durationTime = (playerView.player?.currentItem?.asset.duration)!
+        let durationTime = playerView.player!.currentItem!.asset.duration
         let duration = CMTimeGetSeconds(durationTime)
         var ts = time.timescale
         
@@ -127,10 +121,10 @@ class AVViewController: UIViewController {
             ts = durationTime.timescale
         }
         
-        playerView.player?.seek(to: CMTimeMakeWithSeconds(sec, ts), toleranceBefore: CMTimeMakeWithSeconds(0.002, 3), toleranceAfter: CMTimeMakeWithSeconds(0.002, 3)) {_ in self.updateSlide()}
+        playerView.player!.seek(to: CMTimeMakeWithSeconds(sec, ts), toleranceBefore: CMTimeMakeWithSeconds(0.002, 3), toleranceAfter: CMTimeMakeWithSeconds(0.002, 3)) {_ in self.updateSlide()}
     }
     
-    var hasBeenPlaying = false
+    var flag = false
     
     @IBAction func onSlide(_ sender: Any, forEvent event: UIEvent) {
 
@@ -138,14 +132,12 @@ class AVViewController: UIViewController {
             
             let touchEnded = event.allTouches?.first?.phase == nil
             
-            if (self.playerView.player?.timeControlStatus == .playing) {
-                self.playerView.player?.pause()
-                self.timer?.invalidate()
-                self.timer = nil
-                self.hasBeenPlaying = true
+            if (self.playerView.player!.timeControlStatus == .playing) {
+                self.playerView.pause()
+                self.flag = true
             }
             
-            let durationTime = (self.playerView.player?.currentItem?.asset.duration)!
+            let durationTime = self.playerView.player!.currentItem!.asset.duration
             let duration = CMTimeGetSeconds(durationTime)
             
             var sec = Double(self.slider.value) * duration
@@ -159,12 +151,11 @@ class AVViewController: UIViewController {
             }
             
             DispatchQueue.main.async {
-                self.playerView.player?.seek(to: CMTimeMakeWithSeconds(sec, ts), toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) {_ in
+                self.playerView.player!.seek(to: CMTimeMakeWithSeconds(sec, ts), toleranceBefore: kCMTimeZero, toleranceAfter: kCMTimeZero) {_ in
 
-                    if (touchEnded && self.hasBeenPlaying) {
-                        self.hasBeenPlaying = false
-                        self.timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(self.updateSlide), userInfo: nil, repeats: true)
-                        self.playerView.player?.play()
+                    if (touchEnded && self.flag) {
+                        self.flag = false
+                        self.playerView.play()
                     }
                 }
             }
@@ -179,5 +170,9 @@ class AVViewController: UIViewController {
         let duration = CMTimeGetSeconds(durationTime)
         
         slider.value = Float(sec / duration)
+    }
+    
+    func selectPause() {
+        playerView.pause()
     }
 }

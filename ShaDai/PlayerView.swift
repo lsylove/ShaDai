@@ -28,4 +28,33 @@ class PlayerView: UIView {
     override static var layerClass: AnyClass {
         return AVPlayerLayer.self
     }
+    
+    // User Defined
+    var playCallback: (() -> Void)?
+    
+    var pauseCallback: (() -> Void)?
+    
+    func play() {
+        if let pl = playerLayer.player {
+            pl.play()
+            playCallback?()
+        }
+    }
+    
+    func pause() {
+        if let pl = playerLayer.player {
+            pl.pause()
+            pauseCallback?()
+        }
+    }
+    
+    func toggle() {
+        if let pl = playerLayer.player {
+            if pl.timeControlStatus == .playing {
+                pause()
+            } else if pl.timeControlStatus == .paused {
+                play()
+            }
+        }
+    }
 }
