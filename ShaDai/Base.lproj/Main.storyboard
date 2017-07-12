@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Root View Controller-->
+        <!--ShaDai-->
         <scene sceneID="5ni-Jw-2Kd">
             <objects>
                 <tableViewController id="K68-AY-6lB" sceneMemberID="viewController">
@@ -108,7 +108,7 @@
                             <outlet property="delegate" destination="K68-AY-6lB" id="zwN-Ks-Exe"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="RdF-Dv-Xvo"/>
+                    <navigationItem key="navigationItem" title="ShaDai" id="RdF-Dv-Xvo"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aVA-Te-8mu" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

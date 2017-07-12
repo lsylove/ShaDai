@@ -53,10 +53,9 @@ class ExportViewController: UIViewController {
             self.showMessage(String(format: "File Size: %.4lf MB => ", sizePrev / 1024 / 1024))
             
             let composition = self.loadAndInsertTrack(sourceTrack)
+            let videoSize = sourceTrack.naturalSize
             
             //        Do your editing
-            
-            let videoSize = sourceTrack.naturalSize
             
             let parentLayer = CALayer()
             let videoLayer = CALayer()
@@ -70,7 +69,17 @@ class ExportViewController: UIViewController {
             textLayer.font = "Helvetica" as CFTypeRef
             textLayer.fontSize = videoSize.height / 18
             textLayer.alignmentMode = kCAAlignmentCenter
-            textLayer.frame = CGRect(x: videoSize.width / 4, y: videoSize.height / 12 * 11, width: videoSize.width / 2, height: videoSize.height / 12)
+            textLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width / 2, height: videoSize.height / 12)
+            textLayer.position = CGPoint(x: videoSize.width / 4, y: videoSize.height / 12 * 11)
+            
+            let animation = CABasicAnimation(keyPath: "position")
+            animation.beginTime = AVCoreAnimationBeginTimeAtZero
+            animation.isRemovedOnCompletion = false
+            animation.isAdditive = true
+            animation.fromValue = NSValue(cgPoint: CGPoint())
+            animation.toValue = NSValue(cgPoint: CGPoint(x: videoSize.width / 2, y: 0))
+            animation.duration = CMTimeGetSeconds(composition.duration)
+            textLayer.add(animation, forKey: "position")
             parentLayer.addSublayer(textLayer)
             
             let layerComposition = AVMutableVideoComposition()
@@ -82,7 +91,7 @@ class ExportViewController: UIViewController {
             let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: targetTrack)
             
             let instruction = AVMutableVideoCompositionInstruction()
-            instruction.timeRange = CMTimeRangeMake(kCMTimeZero, asset.duration)
+            instruction.timeRange = CMTimeRangeMake(kCMTimeZero, composition.duration)
             instruction.layerInstructions = [layerInstruction]
             layerComposition.instructions = [instruction]
             
