@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Jqb-N1-Cow">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Export View Controller-->
+        <scene sceneID="kx5-g3-e1W">
+            <objects>
+                <viewController id="Jqb-N1-Cow" customClass="ExportViewController" customModule="ShaDai" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="OgQ-xw-Lxo"/>
+                        <viewControllerLayoutGuide type="bottom" id="N0x-Q3-B5t"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Lw7-Zd-s5D">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="video" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="DUz-zU-lj7">
+                                <rect key="frame" x="16" y="75" width="343" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mPe-Ev-gnG">
+                                <rect key="frame" x="16" y="130" width="34" height="30"/>
+                                <state key="normal" title="Load"/>
+                                <connections>
+                                    <action selector="onLoad:" destination="Jqb-N1-Cow" eventType="touchUpInside" id="lG5-MK-gb3"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome!" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PyU-wz-wus">
+                                <rect key="frame" x="16" y="172" width="76" height="21"/>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Mvl-zd-Pnj" customClass="PlayerView" customModule="ShaDai" customModuleProvider="target">
+                                <rect key="frame" x="36" y="263" width="303" height="384"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ReP-at-9rb">
+                                <rect key="frame" x="70" y="130" width="42" height="30"/>
+                                <state key="normal" title="Pause"/>
+                                <connections>
+                                    <action selector="onPlay:" destination="Jqb-N1-Cow" eventType="touchUpInside" id="o7L-I3-VGs"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="mPe-Ev-gnG" firstAttribute="top" secondItem="DUz-zU-lj7" secondAttribute="bottom" constant="20" id="1BZ-IS-VbV"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Mvl-zd-Pnj" secondAttribute="trailing" constant="20" id="2id-HZ-hW9"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="DUz-zU-lj7" secondAttribute="leading" id="4Jv-XY-5SV"/>
+                            <constraint firstItem="ReP-at-9rb" firstAttribute="leading" secondItem="mPe-Ev-gnG" secondAttribute="trailing" constant="20" id="8mK-pg-VGv"/>
+                            <constraint firstItem="PyU-wz-wus" firstAttribute="top" secondItem="mPe-Ev-gnG" secondAttribute="bottom" constant="12" id="BZd-Jq-hmH"/>
+                            <constraint firstItem="DUz-zU-lj7" firstAttribute="top" secondItem="OgQ-xw-Lxo" secondAttribute="bottom" constant="60" id="Boq-Dl-a0X"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="DUz-zU-lj7" secondAttribute="trailing" id="F8S-M5-i40"/>
+                            <constraint firstItem="Mvl-zd-Pnj" firstAttribute="top" secondItem="PyU-wz-wus" secondAttribute="bottom" constant="70" id="G0r-d6-Cgp"/>
+                            <constraint firstItem="Mvl-zd-Pnj" firstAttribute="leading" secondItem="Lw7-Zd-s5D" secondAttribute="leadingMargin" constant="20" id="GoV-7U-bHC"/>
+                            <constraint firstItem="N0x-Q3-B5t" firstAttribute="top" secondItem="Mvl-zd-Pnj" secondAttribute="bottom" constant="20" id="Ntk-Ac-Sso"/>
+                            <constraint firstItem="PyU-wz-wus" firstAttribute="leading" secondItem="mPe-Ev-gnG" secondAttribute="leading" id="YWz-GK-J1Q"/>
+                            <constraint firstItem="mPe-Ev-gnG" firstAttribute="leading" secondItem="DUz-zU-lj7" secondAttribute="leading" id="ccU-N5-HTM"/>
+                            <constraint firstItem="ReP-at-9rb" firstAttribute="centerY" secondItem="mPe-Ev-gnG" secondAttribute="centerY" id="wto-da-E9r"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="label" destination="PyU-wz-wus" id="nOv-Gn-seo"/>
+                        <outlet property="playerView" destination="Mvl-zd-Pnj" id="Wra-Ry-ivd"/>
+                        <outlet property="textField" destination="DUz-zU-lj7" id="hgh-bY-WhI"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cYf-XA-A4Z" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-15.199999999999999" y="-99.400299850074973"/>
+        </scene>
+    </scenes>
+</document>
