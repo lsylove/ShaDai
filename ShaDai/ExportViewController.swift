@@ -69,6 +69,38 @@ class ExportViewController: UIViewController {
             
             //        Do your editing
             
+            let videoSize = sourceTrack.naturalSize
+            
+            let parentLayer = CALayer()
+            let videoLayer = CALayer()
+            parentLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
+            videoLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
+            parentLayer.addSublayer(videoLayer)
+            
+            let textLayer = CATextLayer()
+            textLayer.backgroundColor = UIColor.red.cgColor
+            textLayer.string = "Test String"
+            textLayer.font = "Helvetica" as CFTypeRef
+            textLayer.fontSize = videoSize.height / 18
+            textLayer.alignmentMode = kCAAlignmentCenter
+            textLayer.frame = CGRect(x: videoSize.width / 4, y: videoSize.height / 12 * 11, width: videoSize.width / 2, height: videoSize.height / 12)
+            parentLayer.addSublayer(textLayer)
+            
+            let layerComposition = AVMutableVideoComposition()
+            layerComposition.renderSize = videoSize
+            layerComposition.frameDuration = CMTimeMake(1, 30)
+            layerComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayer, in: parentLayer)
+            
+            let targetTrack = composition.tracks(withMediaType: AVMediaTypeVideo).first!
+            let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: targetTrack)
+            
+            let instruction = AVMutableVideoCompositionInstruction()
+            instruction.timeRange = CMTimeRangeMake(kCMTimeZero, asset.duration)
+            instruction.layerInstructions = [layerInstruction]
+            layerComposition.instructions = [instruction]
+            
+            //        Editing done
+            
             let snapshot: AVComposition = composition.copy() as! AVComposition
             guard let reader = try? AVAssetReader(asset: snapshot) else {
                 DispatchQueue.main.async {
@@ -78,10 +110,11 @@ class ExportViewController: UIViewController {
             }
             
             let readTrack = snapshot.tracks(withMediaType: AVMediaTypeVideo).first!
-            let readMaterial = AVAssetReaderTrackOutput(track: readTrack, outputSettings: [
+            let readMaterial = AVAssetReaderVideoCompositionOutput(videoTracks: [readTrack], videoSettings: [
                 kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
                 kCVPixelBufferIOSurfacePropertiesKey as String: [:]
                 ])
+            readMaterial.videoComposition = layerComposition
             guard reader.canAdd(readMaterial) else {
                 DispatchQueue.main.async {
                     self.label.text = "Resource input material failure!"
@@ -109,8 +142,8 @@ class ExportViewController: UIViewController {
             
             let writeMaterial = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: [
                 AVVideoCodecKey: AVVideoCodecH264,
-                AVVideoWidthKey: Int(sourceTrack.naturalSize.width),
-                AVVideoHeightKey: Int(sourceTrack.naturalSize.height),
+                AVVideoWidthKey: Int(videoSize.width),
+                AVVideoHeightKey: Int(videoSize.height),
                 AVVideoCompressionPropertiesKey: [
                     AVVideoAverageBitRateKey: 8 * 65536,
                     AVVideoProfileLevelKey: AVVideoProfileLevelH264Main31,
@@ -127,7 +160,7 @@ class ExportViewController: UIViewController {
             writer.startSession(atSourceTime: kCMTimeZero)
             
             DispatchQueue.main.async {
-                self.label.text = "Writing to temporary buffer..."
+                self.label.text = "Compressing..."
             }
             
             let serialQueue = DispatchQueue(label: "serial")
@@ -190,7 +223,7 @@ class ExportViewController: UIViewController {
                         self.present(alertController, animated: true, completion: nil)
                     }
                     
-                    try? FileManager.default.removeItem(at: tempURL)
+                    try! FileManager.default.removeItem(at: tempURL)
                 }
             }
         }
@@ -205,5 +238,7 @@ class ExportViewController: UIViewController {
         // Pass the selected object to the new view controller.
     }
     */
+    
+    
 
 }
