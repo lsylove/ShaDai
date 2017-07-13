@@ -53,47 +53,59 @@ class ExportViewController: UIViewController {
             self.showMessage(String(format: "File Size: %.4lf MB => ", sizePrev / 1024 / 1024))
             
             let composition = self.loadAndInsertTrack(sourceTrack)
-            let videoSize = sourceTrack.naturalSize
             
             //        Do your editing
             
-            let parentLayer = CALayer()
-            let videoLayer = CALayer()
-            parentLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-            videoLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-            parentLayer.addSublayer(videoLayer)
+//            let composer = AVAnimationComposer(composition)
+//            let layerComposition = composer.compose(composer.textObject("Hello Golfzon")) { composition in
+//                let videoSize = composition.naturalSize
+//                let animation = CABasicAnimation(keyPath: "position")
+//                animation.beginTime = AVCoreAnimationBeginTimeAtZero
+//                animation.isRemovedOnCompletion = false
+//                animation.isAdditive = false
+//                animation.fromValue = NSValue(cgPoint: CGPoint(x: videoSize.width / 4, y: videoSize.height / 12 * 11))
+//                animation.toValue = NSValue(cgPoint: CGPoint(x: videoSize.width / 4 * 3, y: videoSize.height / 12 * 11))
+//                animation.duration = CMTimeGetSeconds(composition.duration)
+//                return animation
+//            }
             
-            let textLayer = CATextLayer()
-            textLayer.backgroundColor = UIColor.red.cgColor
-            textLayer.string = "Test String"
-            textLayer.font = "Helvetica" as CFTypeRef
-            textLayer.fontSize = videoSize.height / 18
-            textLayer.alignmentMode = kCAAlignmentCenter
-            textLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width / 2, height: videoSize.height / 12)
-            textLayer.position = CGPoint(x: videoSize.width / 4, y: videoSize.height / 12 * 11)
+            let videoSize = composition.naturalSize
+            let composer = AVAnimationComposer(composition)
             
-            let animation = CABasicAnimation(keyPath: "position")
-            animation.beginTime = AVCoreAnimationBeginTimeAtZero
-            animation.isRemovedOnCompletion = false
-            animation.isAdditive = true
-            animation.fromValue = NSValue(cgPoint: CGPoint())
-            animation.toValue = NSValue(cgPoint: CGPoint(x: videoSize.width / 2, y: 0))
-            animation.duration = CMTimeGetSeconds(composition.duration)
-            textLayer.add(animation, forKey: "position")
-            parentLayer.addSublayer(textLayer)
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
             
-            let layerComposition = AVMutableVideoComposition()
-            layerComposition.renderSize = videoSize
-            layerComposition.frameDuration = CMTimeMake(1, 30)
-            layerComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayer, in: parentLayer)
+            let startPoint = CGPoint(x: 25, y: 25)
+            let endPoint = CGPoint(x: 55, y: 35)
+            let control = CGPoint(x: 50, y: 100)
             
-            let targetTrack = composition.tracks(withMediaType: AVMediaTypeVideo).first!
-            let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: targetTrack)
+            let shapePath = UIBezierPath()
+            shapePath.move(to: endPoint)
+            shapePath.addQuadCurve(to: startPoint, controlPoint: control)
             
-            let instruction = AVMutableVideoCompositionInstruction()
-            instruction.timeRange = CMTimeRangeMake(kCMTimeZero, composition.duration)
-            instruction.layerInstructions = [layerInstruction]
-            layerComposition.instructions = [instruction]
+            shapeLayer.path = shapePath.cgPath
+            shapeLayer.fillColor = UIColor(white: 1, alpha: 0).cgColor
+            shapeLayer.strokeColor = UIColor.yellow.cgColor
+            shapeLayer.strokeStart = 1
+            shapeLayer.strokeEnd = 1
+            shapeLayer.lineWidth = 5
+            
+            let layerComposition = composer.compose(shapeLayer) { composition in
+                let strokeStart = CABasicAnimation(keyPath: "strokeStart")
+                strokeStart.fromValue = 1
+                strokeStart.toValue = 0
+                
+                let lineWidth = CABasicAnimation(keyPath: "lineWidth")
+                lineWidth.fromValue = 5
+                lineWidth.toValue = 3
+                
+                let group = CAAnimationGroup()
+                group.beginTime = AVCoreAnimationBeginTimeAtZero + 2
+                group.isRemovedOnCompletion = false
+                group.duration = 1
+                group.animations = [ strokeStart, lineWidth ]
+                return group
+            }
             
             //        Editing done
             
@@ -147,14 +159,44 @@ class ExportViewController: UIViewController {
                         }
                         DispatchQueue.main.async {
                             self.label.text = label
+                            
                             let alertController = UIAlertController(title: strn, message: nil, preferredStyle: .alert)
-                            let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                            let defaultAction = UIAlertAction(title: "OK", style: .default, handler: {
+                                
+                                _ in
+                            
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: { 
+
+                                    let avpc = AVPlayerViewController()
+                                    avpc.player = AVPlayer(url: tempURL)
+                                    self.present(avpc, animated: true)
+                                    
+                                })
+                            })
                             alertController.addAction(defaultAction)
-                            self.present(alertController, animated: true, completion: nil)
+                            self.present(alertController, animated: true)
                         }
                         
-                        try! FileManager.default.removeItem(at: tempURL)
+                        //try! FileManager.default.removeItem(at: tempURL)
                     }
+                }
+            }
+        }
+    }
+    
+    func exportVideo() {
+        DispatchQueue.global().async {
+            guard let path = Bundle.main.path(forResource: self.textField.text ?? "nil", ofType: "mp4") else {
+                self.showMessage("No such resource file!")
+                return
+            }
+        
+            let url = URL(fileURLWithPath: path)
+            self.submitToCameraRoll(url) { saved in
+                if saved {
+                    self.showMessage("saved")
+                } else {
+                    self.showMessage("not saved")
                 }
             }
         }
@@ -239,21 +281,22 @@ class ExportViewController: UIViewController {
     
     private func syncBufferIO(readMaterial: AVAssetReaderOutput, writeMaterial: AVAssetWriterInput, callback: () -> Void) {
         let serialQueue = DispatchQueue(label: "serial")
-        let semaphore = DispatchSemaphore(value: 0)
+        let group = DispatchGroup()
         
+        group.enter()
         writeMaterial.requestMediaDataWhenReady(on: serialQueue) {
             while (writeMaterial.isReadyForMoreMediaData) {
                 if let nextBuffer = readMaterial.copyNextSampleBuffer() {
                     writeMaterial.append(nextBuffer)
                 } else {
                     writeMaterial.markAsFinished()
-                    semaphore.signal()
+                    group.leave()
                     break
                 }
             }
         }
         
-        semaphore.wait()
+        group.wait()
         callback()
     }
     
