@@ -29,6 +29,8 @@
 		672667A11F18613A001541B2 /* Tracer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 672667A01F18613A001541B2 /* Tracer.storyboard */; };
 		672667A31F18614D001541B2 /* TracerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672667A21F18614D001541B2 /* TracerViewController.swift */; };
 		67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */; };
+		674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */; };
+		674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */; };
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
 		675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675775511F0F07AB00270E3F /* HashTag.storyboard */; };
 		675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675775531F0F0A3B00270E3F /* AVViewController.swift */; };
@@ -59,6 +61,8 @@
 		672667A01F18613A001541B2 /* Tracer.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Tracer.storyboard; sourceTree = "<group>"; };
 		672667A21F18614D001541B2 /* TracerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TracerViewController.swift; sourceTree = "<group>"; };
 		67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVAnimationComposer.swift; sourceTree = "<group>"; };
+		674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ProfileOne.storyboard; sourceTree = "<group>"; };
+		674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileOneViewController.swift; sourceTree = "<group>"; };
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
 		675775511F0F07AB00270E3F /* HashTag.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = HashTag.storyboard; sourceTree = "<group>"; };
 		675775531F0F0A3B00270E3F /* AVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVViewController.swift; sourceTree = "<group>"; };
@@ -109,6 +113,7 @@
 				672555FC1F131BBF008D88C2 /* NasmoController.swift */,
 				6725560A1F136E07008D88C2 /* ExportViewController.swift */,
 				672667A21F18614D001541B2 /* TracerViewController.swift */,
+				674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */,
 				3B4B05F61F0E1086006EE5F1 /* Info.plist */,
 				3B4B05F31F0E1086006EE5F1 /* LaunchScreen.storyboard */,
 				3B4B05EE1F0E1086006EE5F1 /* Main.storyboard */,
@@ -117,6 +122,7 @@
 				672555FE1F131BF2008D88C2 /* Nasmo.storyboard */,
 				6725560C1F136E17008D88C2 /* Export.storyboard */,
 				672667A01F18613A001541B2 /* Tracer.storyboard */,
+				674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */,
 				671BBF121F0E35590088B84C /* PlayerView.swift */,
 				671BBF0A1F0E154F0088B84C /* String+.swift */,
 				67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */,
@@ -194,6 +200,7 @@
 				672556011F134535008D88C2 /* pic.jpg in Resources */,
 				3B4B05F01F0E1086006EE5F1 /* Main.storyboard in Resources */,
 				672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */,
+				674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */,
 				672667A11F18613A001541B2 /* Tracer.storyboard in Resources */,
 				672556051F134C59008D88C2 /* pic3.png in Resources */,
 				672556091F134ECA008D88C2 /* pic3-2.png in Resources */,
@@ -214,6 +221,7 @@
 				3B4B05ED1F0E1086006EE5F1 /* HashTagViewController.swift in Sources */,
 				671BBF0B1F0E154F0088B84C /* String+.swift in Sources */,
 				672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */,
+				674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */,
 				67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */,
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,
 				6725560B1F136E07008D88C2 /* ExportViewController.swift in Sources */,
