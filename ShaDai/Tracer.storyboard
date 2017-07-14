@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Xl9-DI-QKX">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Tracer View Controller-->
+        <scene sceneID="ec2-OJ-YxC">
+            <objects>
+                <viewController id="Xl9-DI-QKX" customClass="TracerViewController" customModule="ShaDai" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="0wp-fn-2K1"/>
+                        <viewControllerLayoutGuide type="bottom" id="nY2-6s-sjO"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="6zm-6d-DM7">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ezB-Gr-itF">
+                                <rect key="frame" x="169" y="617" width="36" height="30"/>
+                                <state key="normal" title="Draw"/>
+                                <connections>
+                                    <action selector="onDraw:" destination="Xl9-DI-QKX" eventType="touchUpInside" id="sGg-Ko-oOI"/>
+                                </connections>
+                            </button>
+                            <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="34a-I3-EyP">
+                                <rect key="frame" x="32" y="567" width="310" height="31"/>
+                                <connections>
+                                    <action selector="onSlide:" destination="Xl9-DI-QKX" eventType="valueChanged" id="AE9-vh-HzO"/>
+                                </connections>
+                            </slider>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YUN-1v-ewA">
+                                <rect key="frame" x="241" y="185" width="24" height="24"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="0.80000001190000003" blue="0.40000000600000002" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9kK-Dl-a7Z">
+                                <rect key="frame" x="80" y="275" width="24" height="24"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0" green="1" blue="0.50196081400000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="34a-I3-EyP" secondAttribute="trailing" constant="20" id="LCD-Eu-8I5"/>
+                            <constraint firstItem="ezB-Gr-itF" firstAttribute="top" secondItem="34a-I3-EyP" secondAttribute="bottom" constant="20" id="TZP-oG-8Db"/>
+                            <constraint firstItem="34a-I3-EyP" firstAttribute="leading" secondItem="6zm-6d-DM7" secondAttribute="leadingMargin" constant="20" id="XFQ-eA-2Yk"/>
+                            <constraint firstItem="nY2-6s-sjO" firstAttribute="top" secondItem="ezB-Gr-itF" secondAttribute="bottom" constant="20" id="dT7-pQ-miH"/>
+                            <constraint firstItem="ezB-Gr-itF" firstAttribute="centerX" secondItem="6zm-6d-DM7" secondAttribute="centerX" id="zxL-kB-x0U"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="dstView" destination="YUN-1v-ewA" id="Zg9-BB-e5K"/>
+                        <outlet property="slider" destination="34a-I3-EyP" id="hyq-Me-QS6"/>
+                        <outlet property="srcView" destination="9kK-Dl-a7Z" id="P0z-MB-Lvg"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Sdc-7s-0mH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="66.400000000000006" y="-103.89805097451276"/>
+        </scene>
+    </scenes>
+</document>
