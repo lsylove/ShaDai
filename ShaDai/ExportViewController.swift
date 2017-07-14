@@ -72,40 +72,55 @@ class ExportViewController: UIViewController {
             let videoSize = composition.naturalSize
             let composer = AVAnimationComposer(composition)
             
-            let shapeLayer = CAShapeLayer()
-            shapeLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-            
-            let startPoint = CGPoint(x: 25, y: 25)
-            let endPoint = CGPoint(x: 55, y: 35)
-            let control = CGPoint(x: 50, y: 100)
-            
+            let shapeLayer = [CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer()]
             let shapePath = UIBezierPath()
-            shapePath.move(to: endPoint)
-            shapePath.addQuadCurve(to: startPoint, controlPoint: control)
             
-            shapeLayer.path = shapePath.cgPath
-            shapeLayer.fillColor = UIColor(white: 1, alpha: 0).cgColor
-            shapeLayer.strokeColor = UIColor.yellow.cgColor
-            shapeLayer.strokeStart = 1
-            shapeLayer.strokeEnd = 1
-            shapeLayer.lineWidth = 5
+            var startPoint = CGPoint(x: 25, y: 25)
+            let endPoint = CGPoint(x: 255, y: 65)
+            var control = CGPoint(x: 240, y: 350)
             
-            let layerComposition = composer.compose(shapeLayer) { composition in
-                let strokeStart = CABasicAnimation(keyPath: "strokeStart")
-                strokeStart.fromValue = 1
-                strokeStart.toValue = 0
+            for shape in shapeLayer {
+                shape.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
+                shape.fillColor = UIColor(white: 1, alpha: 0).cgColor
+                shape.strokeColor = UIColor.yellow.cgColor
+                shape.strokeStart = 0
+                shape.strokeEnd = 1
+                shape.opacity = 0
+                shape.lineWidth = 3
                 
-                let lineWidth = CABasicAnimation(keyPath: "lineWidth")
-                lineWidth.fromValue = 5
-                lineWidth.toValue = 3
+                startPoint.x += CGFloat(2.75)
+                control.x += CGFloat(0.5)
+                control.y += CGFloat(0.25)
                 
-                let group = CAAnimationGroup()
-                group.beginTime = AVCoreAnimationBeginTimeAtZero + 2
-                group.isRemovedOnCompletion = false
-                group.duration = 1
-                group.animations = [ strokeStart, lineWidth ]
-                return group
+                shapePath.removeAllPoints()
+                shapePath.move(to: endPoint)
+                shapePath.addQuadCurve(to: startPoint, controlPoint: control)
+                
+                shape.path = shapePath.cgPath.copy()!
             }
+            
+            let strokeStart = CABasicAnimation(keyPath: "strokeStart")
+            strokeStart.fromValue = 1
+            strokeStart.toValue = 0
+            strokeStart.duration = 1
+            
+            let opacity = CABasicAnimation(keyPath: "opacity")
+            opacity.fromValue = 1
+            opacity.toValue = 1
+            opacity.duration = CMTimeGetSeconds(composition.duration) - 2
+            
+            let group = CAAnimationGroup()
+            group.beginTime = AVCoreAnimationBeginTimeAtZero + 2
+            group.isRemovedOnCompletion = false
+            group.duration = CMTimeGetSeconds(composition.duration) - 2
+            group.animations = [strokeStart, opacity]
+            
+            var animations: [CAAnimation] = [group]
+            for _ in 1..<shapeLayer.count {
+                animations.append(group.copy() as! CAAnimation)
+            }
+            
+            let layerComposition = composer.compose(shapeLayer, animation: animations)
             
             //        Editing done
             
@@ -170,14 +185,13 @@ class ExportViewController: UIViewController {
                                     let avpc = AVPlayerViewController()
                                     avpc.player = AVPlayer(url: tempURL)
                                     self.present(avpc, animated: true)
-                                    
+                                    try! FileManager.default.removeItem(at: tempURL)
                                 })
                             })
                             alertController.addAction(defaultAction)
                             self.present(alertController, animated: true)
                         }
                         
-                        //try! FileManager.default.removeItem(at: tempURL)
                     }
                 }
             }

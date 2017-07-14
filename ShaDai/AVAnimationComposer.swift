@@ -26,7 +26,7 @@ class AVAnimationComposer {
         self.composition = composition
     }
     
-    func compose(_ animLayer: CALayer, animation: (_ composition: AVMutableComposition) -> CAAnimation) -> AVMutableVideoComposition {
+    func compose(_ animLayer: [CALayer], animation: [CAAnimation]) -> AVMutableVideoComposition {
         let videoSize = composition.naturalSize
         
         parentLayer = CALayer()
@@ -35,9 +35,11 @@ class AVAnimationComposer {
         videoLayerPlaceholder!.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
         parentLayer!.addSublayer(videoLayerPlaceholder!)
         
-        let animObject = animation(composition)
-        animLayer.add(animObject, forKey: "position")
-        parentLayer!.addSublayer(animLayer)
+        for i in 0..<Swift.min(animLayer.count, animation.count) {
+            let animObject = animation[i]
+            animLayer[i].add(animObject, forKey: nil)
+            parentLayer!.addSublayer(animLayer[i])
+        }
         
         let layerComposition = AVMutableVideoComposition()
         layerComposition.renderSize = videoSize
