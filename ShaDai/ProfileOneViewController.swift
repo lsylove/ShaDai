@@ -236,7 +236,7 @@ class ProfileOneViewController: UIViewController {
             let videoSize = composition.naturalSize
             let composer = AVAnimationComposer(composition)
             
-            let shapeLayer = [CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer()]
+            let shapeLayer = CAShapeLayer()
             let shapePath = UIBezierPath()
             
             let conX = (self.srcView.center.x + self.dstView.center.x * 9) / 10
@@ -244,8 +244,8 @@ class ProfileOneViewController: UIViewController {
             
             let playArea = self.playerView.playerLayer.videoRect
             
-            var start = CGPoint(x: self.srcView.center.x - 9.7 - playArea.minX, y: self.srcView.center.y - playArea.maxY)
-            var end = CGPoint(x: self.dstView.center.x - playArea.minX, y: self.dstView.center.y - playArea.maxY)
+            var start = CGPoint(x: self.srcView.center.x - 11.2 - playArea.minX, y: self.srcView.center.y - playArea.maxY)
+            var end = CGPoint(x: self.dstView.center.x - playArea.minX - 1.5, y: self.dstView.center.y - playArea.maxY)
             var control = CGPoint(x: conX - playArea.minX, y: conY - playArea.maxY)
             
             let ratio = videoSize.width / playArea.width
@@ -257,51 +257,52 @@ class ProfileOneViewController: UIViewController {
             control.x *= ratio
             control.y *= -ratio
             
-            for shape in shapeLayer {
-                shape.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-                shape.fillColor = UIColor.clear.cgColor
-                shape.strokeColor = UIColor.red.cgColor
-                shape.strokeStart = 0
-                shape.strokeEnd = 1
-                shape.opacity = 0
-                shape.lineWidth = 2.75 * ratio
-                
-                start.x += CGFloat(2.75 * ratio)
-                control.x += CGFloat(0.5 * ratio)
-                control.y += CGFloat(0.25 * ratio)
-                
-                shapePath.removeAllPoints()
-                shapePath.move(to: end)
-                shapePath.addQuadCurve(to: start, controlPoint: control)
-                
-                shape.path = shapePath.cgPath.copy()!
-            }
+            shapeLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
+            shapeLayer.fillColor = UIColor.red.cgColor
+            shapeLayer.strokeColor = UIColor.red.cgColor
+            shapeLayer.opacity = 0
+            shapeLayer.lineWidth = 0
+            
+            shapePath.move(to: end)
+            shapePath.addQuadCurve(to: start, controlPoint: control)
+            
+//            (2.75, 0.5, 0.25) * 6 + [3 for start.x]
+            start.x += CGFloat(19.5 * ratio)
+            control.x += CGFloat(3 * ratio)
+            control.y += CGFloat(1.5 * ratio)
+
+            end.x += CGFloat(3 * ratio)
+            
+            shapePath.addLine(to: start)
+            shapePath.addQuadCurve(to: end, controlPoint: control)
+            
+            shapeLayer.path = shapePath.cgPath
             
             let currentTime = CMTimeGetSeconds(self.playerView.player!.currentTime())
             let remainder = CMTimeGetSeconds(composition.duration) - currentTime
             
             let strokeStart = CABasicAnimation(keyPath: "strokeStart")
-            strokeStart.fromValue = 1
+            strokeStart.fromValue = 0.5
             strokeStart.toValue = 0
             strokeStart.duration = Swift.min(5, remainder)
             
+            let strokeEnd = CABasicAnimation(keyPath: "strokeEnd")
+            strokeEnd.fromValue = 0.5
+            strokeEnd.toValue = 1
+            strokeEnd.duration = Swift.min(5, remainder)
+            
             let opacity = CABasicAnimation(keyPath: "opacity")
-            opacity.fromValue = 1
-            opacity.toValue = 1
+            opacity.fromValue = 0.5
+            opacity.toValue = 0.5
             opacity.duration = remainder
             
             let group = CAAnimationGroup()
             group.beginTime = AVCoreAnimationBeginTimeAtZero + currentTime
             group.isRemovedOnCompletion = false
             group.duration = remainder
-            group.animations = [strokeStart, opacity]
+            group.animations = [strokeStart, strokeEnd, opacity]
             
-            var animations: [CAAnimation] = [group]
-            for _ in 1..<shapeLayer.count {
-                animations.append(group.copy() as! CAAnimation)
-            }
-            
-            let layerComposition = composer.compose(shapeLayer, animation: animations)
+            let layerComposition = composer.compose([shapeLayer], animation: [group])
             
             let snapshot: AVComposition = composition.copy() as! AVComposition
             
