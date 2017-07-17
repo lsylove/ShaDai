@@ -22,6 +22,8 @@ class ProfileOneViewController: UIViewController {
     
     @IBOutlet weak var playSlider: UISlider!
     
+    @IBOutlet weak var loadButton: UIButton!
+    
     let deviceSize = UIScreen.main.bounds
     
     let srcView = UIView()
@@ -30,12 +32,22 @@ class ProfileOneViewController: UIViewController {
     
     let shape = CAShapeLayer()
     
-    var convexity: CGFloat = 5.0
+    let gradient = CAGradientLayer()
+    
+    override func loadView() {
+        super.loadView()
+        
+        convexity = CGFloat(convBase - convDelta * 0.5)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
+        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.cancelEdit))
+        
+        view.addGestureRecognizer(tap)
     }
     
     override func didReceiveMemoryWarning() {
@@ -63,9 +75,55 @@ class ProfileOneViewController: UIViewController {
         processVideo()
     }
     
+    let convBase: Float = 7.5
+    let convDelta: Float = 5.0
+    let pushThreshold: Float = 0.02
+    
+    var convexity: CGFloat = CGFloat()
+    
+    @IBAction func onPrevConvex(_ sender: Any) {
+        if (convexSlider.value > pushThreshold) {
+            convexity += CGFloat(pushThreshold * convDelta)
+            DispatchQueue.main.async {
+                self.convexSlider.value -= self.pushThreshold
+                self.reDraw()
+            }
+        }
+    }
+    
+    @IBAction func onNextConvex(_ sender: Any) {
+        if (convexSlider.value < 1 - pushThreshold) {
+            convexity -= CGFloat(pushThreshold * convDelta)
+            DispatchQueue.main.async {
+                self.convexSlider.value += self.pushThreshold
+                self.reDraw()
+            }
+        }
+    }
+    
+    @IBAction func onPrevFrame(_ sender: Any) {
+        let item = playerView.player!.currentItem!
+        
+        if (item.canStepBackward) {
+            item.step(byCount: -1)
+            updatePlaySlide(item: item)
+        }
+    }
+    
+    @IBAction func onNextFrame(_ sender: Any) {
+        let item = playerView.player!.currentItem!
+        
+        if (item.canStepForward) {
+            item.step(byCount: 1)
+            updatePlaySlide(item: item)
+        }
+    }
+    
     @IBAction func onConvexSlide(_ sender: Any) {
-        convexity = CGFloat(7.5 - convexSlider.value * 5.0)
-        reDraw()
+        DispatchQueue.main.async {
+            self.convexity = CGFloat(self.convBase - self.convexSlider.value * self.convDelta)
+            self.reDraw()
+        }
     }
     
     @IBAction func onPlaySlide(_ sender: Any, forEvent event: UIEvent) {
@@ -102,6 +160,10 @@ class ProfileOneViewController: UIViewController {
                 return
             }
             
+            DispatchQueue.main.async {
+                self.loadButton.isEnabled = false
+            }
+            
             let url = URL(fileURLWithPath: path)
             let (asset, sourceTrack) = self.retrieveAsset(url)
             
@@ -127,11 +189,11 @@ class ProfileOneViewController: UIViewController {
             
             self.srcView.layer.cornerRadius = 12
             self.srcView.layer.masksToBounds = true
-            self.srcView.backgroundColor = UIColor.orange
+            self.srcView.backgroundColor = UIColor(red: 1, green: 0.5, blue: 0, alpha: 0.45)
             
             self.dstView.layer.cornerRadius = 12
             self.dstView.layer.masksToBounds = true
-            self.dstView.backgroundColor = UIColor.green
+            self.dstView.backgroundColor = UIColor(red: 0, green: 0.5, blue: 1, alpha: 0.45)
             
             let srcMove = UIPanGestureRecognizer(target: self, action: #selector(self.move))
             self.srcView.addGestureRecognizer(srcMove)
@@ -139,16 +201,19 @@ class ProfileOneViewController: UIViewController {
             let dstMove = UIPanGestureRecognizer(target: self, action: #selector(self.move))
             self.dstView.addGestureRecognizer(dstMove)
             
-            self.shape.frame = CGRect(x: 0, y: 0, width: self.deviceSize.width, height: self.deviceSize.height)
-            self.shape.fillColor = UIColor.clear.cgColor
-            self.shape.strokeColor = UIColor.red.cgColor
-            self.shape.strokeStart = 0
-            self.shape.strokeEnd = 1
-            self.shape.opacity = 0.75
+            self.gradient.frame = playArea
+            self.gradient.colors = [UIColor.red.cgColor, UIColor.red.cgColor]
+            self.gradient.mask = self.shape
+            
+            self.shape.frame = self.gradient.frame
             self.shape.lineWidth = 3
+            self.shape.fillColor = UIColor.clear.cgColor
+            self.shape.strokeColor = UIColor(white: 1, alpha: 0.5).cgColor
+            
+            self.updatePlaySlide(item: playerItem)
             
             DispatchQueue.main.async {
-                self.playerView.layer.addSublayer(self.shape)
+                self.playerView.layer.addSublayer(self.gradient)
                 self.playerView.addSubview(self.srcView)
                 self.playerView.addSubview(self.dstView)
                 
@@ -171,47 +236,64 @@ class ProfileOneViewController: UIViewController {
             let videoSize = composition.naturalSize
             let composer = AVAnimationComposer(composition)
             
-            let shapeLayer = Array(repeating: CAShapeLayer(), count: 7)
+            let shapeLayer = [CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer(), CAShapeLayer()]
             let shapePath = UIBezierPath()
             
-            var startPoint = CGPoint(x: 25, y: 25)
-            let endPoint = CGPoint(x: 255, y: 65)
-            var control = CGPoint(x: 240, y: 350)
+            let conX = (self.srcView.center.x + self.dstView.center.x * 9) / 10
+            let conY = Swift.min(self.srcView.center.y, self.dstView.center.y) + Swift.abs(self.srcView.center.x - self.dstView.center.x) * self.convexity - self.deviceSize.height
+            
+            let playArea = self.playerView.playerLayer.videoRect
+            
+            var start = CGPoint(x: self.srcView.center.x - 9.7 - playArea.minX, y: self.srcView.center.y - playArea.maxY)
+            var end = CGPoint(x: self.dstView.center.x - playArea.minX, y: self.dstView.center.y - playArea.maxY)
+            var control = CGPoint(x: conX - playArea.minX, y: conY - playArea.maxY)
+            
+            let ratio = videoSize.width / playArea.width
+            
+            start.x *= ratio
+            start.y *= -ratio
+            end.x *= ratio
+            end.y *= -ratio
+            control.x *= ratio
+            control.y *= -ratio
             
             for shape in shapeLayer {
                 shape.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-                shape.fillColor = UIColor(white: 1, alpha: 0).cgColor
-                shape.strokeColor = UIColor.yellow.cgColor
+                shape.fillColor = UIColor.clear.cgColor
+                shape.strokeColor = UIColor.red.cgColor
                 shape.strokeStart = 0
                 shape.strokeEnd = 1
                 shape.opacity = 0
-                shape.lineWidth = 3
+                shape.lineWidth = 2.75 * ratio
                 
-                startPoint.x += CGFloat(2.75)
-                control.x += CGFloat(0.5)
-                control.y += CGFloat(0.25)
+                start.x += CGFloat(2.75 * ratio)
+                control.x += CGFloat(0.5 * ratio)
+                control.y += CGFloat(0.25 * ratio)
                 
                 shapePath.removeAllPoints()
-                shapePath.move(to: endPoint)
-                shapePath.addQuadCurve(to: startPoint, controlPoint: control)
+                shapePath.move(to: end)
+                shapePath.addQuadCurve(to: start, controlPoint: control)
                 
                 shape.path = shapePath.cgPath.copy()!
             }
             
+            let currentTime = CMTimeGetSeconds(self.playerView.player!.currentTime())
+            let remainder = CMTimeGetSeconds(composition.duration) - currentTime
+            
             let strokeStart = CABasicAnimation(keyPath: "strokeStart")
             strokeStart.fromValue = 1
             strokeStart.toValue = 0
-            strokeStart.duration = 1
+            strokeStart.duration = Swift.min(5, remainder)
             
             let opacity = CABasicAnimation(keyPath: "opacity")
             opacity.fromValue = 1
             opacity.toValue = 1
-            opacity.duration = CMTimeGetSeconds(composition.duration) - 2
+            opacity.duration = remainder
             
             let group = CAAnimationGroup()
-            group.beginTime = AVCoreAnimationBeginTimeAtZero + 2
+            group.beginTime = AVCoreAnimationBeginTimeAtZero + currentTime
             group.isRemovedOnCompletion = false
-            group.duration = CMTimeGetSeconds(composition.duration) - 2
+            group.duration = remainder
             group.animations = [strokeStart, opacity]
             
             var animations: [CAAnimation] = [group]
@@ -264,7 +346,7 @@ class ProfileOneViewController: UIViewController {
                             let (_, track) = self.retrieveAsset(tempURL)
                             let sizePrev = self.sizeEstimation(sourceTrack)
                             let sizeDone = self.sizeEstimation(track)
-                            label = String(format: "File Size: %.4lf MB => %.4lf MB", sizePrev / 1048576, sizeDone / 1048576)
+                            label = String(format: "File Size: %6.4lf MB => %6.4lf MB", sizePrev / 1048576, sizeDone / 1048576)
                             
                         } else {
                             strn = "Failed"
@@ -285,10 +367,10 @@ class ProfileOneViewController: UIViewController {
         }
     }
     
-//    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
-//    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
-//    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
-//    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
+    //    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
+    //    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
+    //    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
+    //    akakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakakak
     
     private func showMessage(_ message: String) -> Void {
         DispatchQueue.main.async {
@@ -398,9 +480,14 @@ class ProfileOneViewController: UIViewController {
         let conX = (srcView.center.x + dstView.center.x * 9) / 10
         let conY = Swift.min(srcView.center.y, dstView.center.y) + Swift.abs(srcView.center.x - dstView.center.x) * convexity - deviceSize.height
         
-        var start = CGPoint(x: srcView.center.x - 9.7, y: srcView.center.y)
-        let end = CGPoint(x: dstView.center.x, y: dstView.center.y)
-        var control = CGPoint(x: conX, y: conY)
+        let playArea = playerView.playerLayer.videoRect
+        
+        var start = CGPoint(x: srcView.center.x - 9.7 - playArea.minX, y: srcView.center.y - 18 - playArea.maxY)
+        let end = CGPoint(x: dstView.center.x - playArea.minX, y: dstView.center.y - 18 - playArea.maxY)
+        var control = CGPoint(x: conX - playArea.minX, y: conY - 18 - playArea.maxY)
+        
+        //        gradient.startPoint = CGPoint(x: start.x / playArea.width, y: start.y / playArea.height)
+        //        gradient.endPoint = CGPoint(x: start.x / playArea.width + 0.02, y: start.y / playArea.height - 0.02)
         
         for _ in 0..<7 {
             path.move(to: end)
@@ -418,13 +505,24 @@ class ProfileOneViewController: UIViewController {
         let translation = recognizer.translation(in: self.view)
         if let view = recognizer.view {
             let xPos = view.center.x + translation.x, yPos = view.center.y + translation.y
+            let playArea = playerView.playerLayer.videoRect
             
-            if (xPos > 20 && xPos < self.deviceSize.width - 20 && yPos > 100 && yPos < self.deviceSize.height - 150) {
+            if (xPos > playArea.minX + 10 && xPos < playArea.maxX - 10 && yPos > playArea.minY + 10 && yPos < playArea.maxY - 10 ) {
                 view.center = CGPoint(x: xPos, y: yPos)
                 reDraw()
             }
         }
         recognizer.setTranslation(CGPoint(), in: self.view)
     }
-
+    
+    func updatePlaySlide(item: AVPlayerItem) {
+        DispatchQueue.main.async {
+            self.playSlider.value = Float(CMTimeGetSeconds(item.currentTime()) / CMTimeGetSeconds(item.asset.duration))
+        }
+    }
+    
+    func cancelEdit() {
+        view.endEditing(true)
+    }
+    
 }

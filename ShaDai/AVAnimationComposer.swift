@@ -14,11 +14,11 @@ class AVAnimationComposer {
     
     var composition: AVMutableComposition
     
-    var parentLayer: CALayer?
+    var parentLayer = CALayer()
     
-    var videoLayerPlaceholder: CALayer?
+    var videoLayerPlaceholder = CALayer()
     
-    var instruction: AVMutableVideoCompositionInstruction?
+    var instruction = AVMutableVideoCompositionInstruction()
     
     var layerInstruction: AVMutableVideoCompositionLayerInstruction?
     
@@ -26,33 +26,32 @@ class AVAnimationComposer {
         self.composition = composition
     }
     
-    func compose(_ animLayer: [CALayer], animation: [CAAnimation]) -> AVMutableVideoComposition {
+    func compose(_ objLayer: [CALayer], animation: [CAAnimation], superConfig: ((CALayer) -> Void)? = nil) -> AVMutableVideoComposition {
         let videoSize = composition.naturalSize
         
-        parentLayer = CALayer()
-        videoLayerPlaceholder = CALayer()
-        parentLayer!.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-        videoLayerPlaceholder!.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-        parentLayer!.addSublayer(videoLayerPlaceholder!)
+        let frameRect = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
+        parentLayer.frame = frameRect
+        videoLayerPlaceholder.frame = frameRect
         
-        for i in 0..<Swift.min(animLayer.count, animation.count) {
-            let animObject = animation[i]
-            animLayer[i].add(animObject, forKey: nil)
-            parentLayer!.addSublayer(animLayer[i])
+        parentLayer.addSublayer(videoLayerPlaceholder)
+        superConfig?(parentLayer)
+        
+        for i in 0..<Swift.min(objLayer.count, animation.count) {
+            objLayer[i].add(animation[i], forKey: nil)
+            parentLayer.addSublayer(objLayer[i])
         }
         
         let layerComposition = AVMutableVideoComposition()
         layerComposition.renderSize = videoSize
         layerComposition.frameDuration = CMTimeMake(1, 30)
-        layerComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayerPlaceholder!, in: parentLayer!)
+        layerComposition.animationTool = AVVideoCompositionCoreAnimationTool(postProcessingAsVideoLayer: videoLayerPlaceholder, in: parentLayer)
         
         let targetTrack = composition.tracks(withMediaType: AVMediaTypeVideo).first!
         layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: targetTrack)
         
-        instruction = AVMutableVideoCompositionInstruction()
-        instruction!.timeRange = CMTimeRangeMake(kCMTimeZero, composition.duration)
-        instruction!.layerInstructions = [layerInstruction!]
-        layerComposition.instructions = [instruction!]
+        instruction.timeRange = CMTimeRangeMake(kCMTimeZero, composition.duration)
+        instruction.layerInstructions = [layerInstruction!]
+        layerComposition.instructions = [instruction]
         return layerComposition
     }
     
