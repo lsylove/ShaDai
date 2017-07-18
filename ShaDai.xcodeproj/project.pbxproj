@@ -34,6 +34,7 @@
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
 		675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675775511F0F07AB00270E3F /* HashTag.storyboard */; };
 		675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675775531F0F0A3B00270E3F /* AVViewController.swift */; };
+		67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C0F0B61F1DA6E100578029 /* GraphView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +67,7 @@
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
 		675775511F0F07AB00270E3F /* HashTag.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = HashTag.storyboard; sourceTree = "<group>"; };
 		675775531F0F0A3B00270E3F /* AVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVViewController.swift; sourceTree = "<group>"; };
+		67C0F0B61F1DA6E100578029 /* GraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +128,7 @@
 				671BBF121F0E35590088B84C /* PlayerView.swift */,
 				671BBF0A1F0E154F0088B84C /* String+.swift */,
 				67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */,
+				67C0F0B61F1DA6E100578029 /* GraphView.swift */,
 			);
 			path = ShaDai;
 			sourceTree = "<group>";
@@ -221,6 +224,7 @@
 				3B4B05ED1F0E1086006EE5F1 /* HashTagViewController.swift in Sources */,
 				671BBF0B1F0E154F0088B84C /* String+.swift in Sources */,
 				672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */,
+				67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */,
 				674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */,
 				67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */,
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,

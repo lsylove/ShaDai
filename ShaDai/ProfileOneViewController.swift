@@ -9,6 +9,7 @@
 import AVFoundation
 import AVKit
 import Photos
+import GLKit
 
 class ProfileOneViewController: UIViewController {
     
@@ -17,8 +18,6 @@ class ProfileOneViewController: UIViewController {
     @IBOutlet weak var playerView: PlayerView!
     
     @IBOutlet weak var label: UILabel!
-    
-    @IBOutlet weak var convexSlider: UISlider!
     
     @IBOutlet weak var playSlider: UISlider!
     
@@ -30,15 +29,13 @@ class ProfileOneViewController: UIViewController {
     
     let dstView = UIView()
     
+    let vertexView = UIView()
+    
     let shape = CAShapeLayer()
     
-    let gradient = CAGradientLayer()
+    let wrapper = CAShapeLayer()
     
-    override func loadView() {
-        super.loadView()
-        
-        convexity = CGFloat(convBase - convDelta * 0.5)
-    }
+    let gradient = CAShapeLayer()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,32 +72,6 @@ class ProfileOneViewController: UIViewController {
         processVideo()
     }
     
-    let convBase: Float = 7.5
-    let convDelta: Float = 5.0
-    let pushThreshold: Float = 0.02
-    
-    var convexity: CGFloat = CGFloat()
-    
-    @IBAction func onPrevConvex(_ sender: Any) {
-        if (convexSlider.value > pushThreshold) {
-            convexity += CGFloat(pushThreshold * convDelta)
-            DispatchQueue.main.async {
-                self.convexSlider.value -= self.pushThreshold
-                self.reDraw()
-            }
-        }
-    }
-    
-    @IBAction func onNextConvex(_ sender: Any) {
-        if (convexSlider.value < 1 - pushThreshold) {
-            convexity -= CGFloat(pushThreshold * convDelta)
-            DispatchQueue.main.async {
-                self.convexSlider.value += self.pushThreshold
-                self.reDraw()
-            }
-        }
-    }
-    
     @IBAction func onPrevFrame(_ sender: Any) {
         let item = playerView.player!.currentItem!
         
@@ -116,13 +87,6 @@ class ProfileOneViewController: UIViewController {
         if (item.canStepForward) {
             item.step(byCount: 1)
             updatePlaySlide(item: item)
-        }
-    }
-    
-    @IBAction func onConvexSlide(_ sender: Any) {
-        DispatchQueue.main.async {
-            self.convexity = CGFloat(self.convBase - self.convexSlider.value * self.convDelta)
-            self.reDraw()
         }
     }
     
@@ -179,21 +143,28 @@ class ProfileOneViewController: UIViewController {
             
             let playArea = self.playerView.playerLayer.videoRect
             
-            let srcX = self.deviceSize.width / 2.0
+            let srcX = self.deviceSize.width / 2
             let srcY = playArea.maxY - 40
-            let dstX = self.deviceSize.width / 4.0 + playArea.maxX / 2.0
+            let dstX = self.deviceSize.width / 4 + playArea.maxX / 2
             let dstY = playArea.midY + 40
+            let vertexX = (srcX + dstX * 2) / 3
+            let vertexY = playArea.minY + 20
             
             self.srcView.frame = CGRect(x: srcX, y: srcY, width: 24, height: 24)
             self.dstView.frame = CGRect(x: dstX, y: dstY, width: 24, height: 24)
+            self.vertexView.frame = CGRect(x: vertexX, y: vertexY, width: 24, height: 24)
             
             self.srcView.layer.cornerRadius = 12
             self.srcView.layer.masksToBounds = true
-            self.srcView.backgroundColor = UIColor(red: 1, green: 0.5, blue: 0, alpha: 0.45)
+            self.srcView.backgroundColor = UIColor(red: 1, green: 0.5, blue: 0, alpha: 0.35)
             
             self.dstView.layer.cornerRadius = 12
             self.dstView.layer.masksToBounds = true
-            self.dstView.backgroundColor = UIColor(red: 0, green: 0.5, blue: 1, alpha: 0.45)
+            self.dstView.backgroundColor = UIColor(red: 0, green: 0.75, blue: 1, alpha: 0.35)
+            
+            self.vertexView.layer.cornerRadius = 12
+            self.vertexView.layer.masksToBounds = true
+            self.vertexView.backgroundColor = UIColor(red: 1, green: 0, blue: 1, alpha: 0.35)
             
             let srcMove = UIPanGestureRecognizer(target: self, action: #selector(self.move))
             self.srcView.addGestureRecognizer(srcMove)
@@ -201,21 +172,27 @@ class ProfileOneViewController: UIViewController {
             let dstMove = UIPanGestureRecognizer(target: self, action: #selector(self.move))
             self.dstView.addGestureRecognizer(dstMove)
             
-            self.gradient.frame = playArea
-            self.gradient.colors = [UIColor.red.cgColor, UIColor.red.cgColor]
-            self.gradient.mask = self.shape
+            let vertexMove = UIPanGestureRecognizer(target: self, action: #selector(self.move))
+            self.vertexView.addGestureRecognizer(vertexMove)
             
-            self.shape.frame = self.gradient.frame
+            self.wrapper.frame = playArea
+            self.wrapper.backgroundColor = UIColor.red.cgColor
+            self.wrapper.mask = self.shape
+            self.wrapper.addSublayer(self.gradient)
+            
+            self.shape.frame = self.wrapper.frame
             self.shape.lineWidth = 3
-            self.shape.fillColor = UIColor.clear.cgColor
-            self.shape.strokeColor = UIColor(white: 1, alpha: 0.5).cgColor
+            self.shape.fillColor = UIColor(white: 1, alpha: 0.45).cgColor
+            
+            self.gradient.frame = self.wrapper.frame
             
             self.updatePlaySlide(item: playerItem)
             
             DispatchQueue.main.async {
-                self.playerView.layer.addSublayer(self.gradient)
+                self.playerView.layer.addSublayer(self.wrapper)
                 self.playerView.addSubview(self.srcView)
                 self.playerView.addSubview(self.dstView)
+                self.playerView.addSubview(self.vertexView)
                 
                 self.reDraw()
             }
@@ -236,17 +213,19 @@ class ProfileOneViewController: UIViewController {
             let videoSize = composition.naturalSize
             let composer = AVAnimationComposer(composition)
             
+            let shapeWrapper = CAShapeLayer()
+            let wrapperPath = UIBezierPath()
+            
             let shapeLayer = CAShapeLayer()
             let shapePath = UIBezierPath()
-            
-            let conX = (self.srcView.center.x + self.dstView.center.x * 9) / 10
-            let conY = Swift.min(self.srcView.center.y, self.dstView.center.y) + Swift.abs(self.srcView.center.x - self.dstView.center.x) * self.convexity - self.deviceSize.height
             
             let playArea = self.playerView.playerLayer.videoRect
             
             var start = CGPoint(x: self.srcView.center.x - 11.2 - playArea.minX, y: self.srcView.center.y - playArea.maxY)
-            var end = CGPoint(x: self.dstView.center.x - playArea.minX - 1.5, y: self.dstView.center.y - playArea.maxY)
-            var control = CGPoint(x: conX - playArea.minX, y: conY - playArea.maxY)
+            var end = CGPoint(x: self.dstView.center.x - 1.5 - playArea.minX, y: self.dstView.center.y - playArea.maxY)
+            let vertex = CGPoint(x: self.vertexView.center.x - playArea.minX, y: self.vertexView.center.y - playArea.maxY)
+            
+            var control = self.controlPoint(start: start, end: end, vertex: vertex)
             
             let ratio = videoSize.width / playArea.width
             
@@ -258,18 +237,17 @@ class ProfileOneViewController: UIViewController {
             control.y *= -ratio
             
             shapeLayer.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
-            shapeLayer.fillColor = UIColor.red.cgColor
-            shapeLayer.strokeColor = UIColor.red.cgColor
-            shapeLayer.opacity = 0
+            shapeLayer.fillColor = UIColor.white.cgColor
+            shapeLayer.backgroundColor = UIColor.clear.cgColor
             shapeLayer.lineWidth = 0
             
             shapePath.move(to: end)
             shapePath.addQuadCurve(to: start, controlPoint: control)
             
-//            (2.75, 0.5, 0.25) * 6 + [3 for start.x]
-            start.x += CGFloat(19.5 * ratio)
-            control.x += CGFloat(3 * ratio)
-            control.y += CGFloat(1.5 * ratio)
+//            (2.75, 0.5, 0.25) * 6
+            start.x += CGFloat(16.5 * ratio)
+            control.x += CGFloat(5 * ratio)
+            control.y -= CGFloat(2.5 * ratio)
 
             end.x += CGFloat(3 * ratio)
             
@@ -278,31 +256,47 @@ class ProfileOneViewController: UIViewController {
             
             shapeLayer.path = shapePath.cgPath
             
+            shapeWrapper.frame = CGRect(x: 0, y: 0, width: videoSize.width, height: videoSize.height)
+            shapeWrapper.strokeColor = UIColor(red: 1, green: 0, blue: 0, alpha: 0.45).cgColor
+            shapeWrapper.fillColor = UIColor.clear.cgColor
+            shapeWrapper.backgroundColor = UIColor.clear.cgColor
+            shapeWrapper.opacity = 0
+            shapeWrapper.lineWidth = 40
+            
+            shapeWrapper.mask = shapeLayer
+            
+//            (2.75, 0.5, 0.25) * 3
+            start.x -= CGFloat(8.25 * ratio)
+            control.x -= CGFloat(2.5 * ratio)
+            control.y += CGFloat(1.5 * ratio)
+            
+            end.x -= CGFloat(1.5 * ratio)
+            
+            wrapperPath.move(to: end)
+            wrapperPath.addQuadCurve(to: start, controlPoint: control)
+            
+            shapeWrapper.path = wrapperPath.cgPath
+            
             let currentTime = CMTimeGetSeconds(self.playerView.player!.currentTime())
             let remainder = CMTimeGetSeconds(composition.duration) - currentTime
             
             let strokeStart = CABasicAnimation(keyPath: "strokeStart")
-            strokeStart.fromValue = 0.5
+            strokeStart.fromValue = 1
             strokeStart.toValue = 0
             strokeStart.duration = Swift.min(5, remainder)
             
-            let strokeEnd = CABasicAnimation(keyPath: "strokeEnd")
-            strokeEnd.fromValue = 0.5
-            strokeEnd.toValue = 1
-            strokeEnd.duration = Swift.min(5, remainder)
-            
             let opacity = CABasicAnimation(keyPath: "opacity")
-            opacity.fromValue = 0.5
-            opacity.toValue = 0.5
+            opacity.fromValue = 1
+            opacity.toValue = 1
             opacity.duration = remainder
             
             let group = CAAnimationGroup()
             group.beginTime = AVCoreAnimationBeginTimeAtZero + currentTime
             group.isRemovedOnCompletion = false
             group.duration = remainder
-            group.animations = [strokeStart, strokeEnd, opacity]
+            group.animations = [strokeStart, opacity]
             
-            let layerComposition = composer.compose([shapeLayer], animation: [group])
+            let layerComposition = composer.compose([shapeWrapper], animation: [group])
             
             let snapshot: AVComposition = composition.copy() as! AVComposition
             
@@ -477,29 +471,95 @@ class ProfileOneViewController: UIViewController {
     private func reDraw() {
         let path = UIBezierPath()
         
-        //        Swift.max(src.center.y, dst.center.y)
-        let conX = (srcView.center.x + dstView.center.x * 9) / 10
-        let conY = Swift.min(srcView.center.y, dstView.center.y) + Swift.abs(srcView.center.x - dstView.center.x) * convexity - deviceSize.height
+        let playArea = self.playerView.playerLayer.videoRect
         
-        let playArea = playerView.playerLayer.videoRect
+        var start = CGPoint(x: self.srcView.center.x - 11.2 - playArea.minX, y: self.srcView.center.y - 18 - playArea.maxY)
+        var end = CGPoint(x: self.dstView.center.x - 1.5 - playArea.minX, y: self.dstView.center.y - 18 - playArea.maxY)
+        var vertex = CGPoint(x: self.vertexView.center.x - playArea.minX, y: self.vertexView.center.y - 18 - playArea.maxY)
         
-        var start = CGPoint(x: srcView.center.x - 9.7 - playArea.minX, y: srcView.center.y - 18 - playArea.maxY)
-        let end = CGPoint(x: dstView.center.x - playArea.minX, y: dstView.center.y - 18 - playArea.maxY)
-        var control = CGPoint(x: conX - playArea.minX, y: conY - 18 - playArea.maxY)
+        start.y *= -1
+        end.y *= -1
+        vertex.y *= -1
+        
+        var control = controlPoint(start: start, end: end, vertex: vertex)
+        
+        start.y *= -1
+        end.y *= -1
+        vertex.y *= -1
+        control.y *= -1
         
         //        gradient.startPoint = CGPoint(x: start.x / playArea.width, y: start.y / playArea.height)
         //        gradient.endPoint = CGPoint(x: start.x / playArea.width + 0.02, y: start.y / playArea.height - 0.02)
         
-        for _ in 0..<7 {
-            path.move(to: end)
-            path.addQuadCurve(to: start, controlPoint: control)
-            
-            start.x += 2.75
-            control.x += 0.5
-            control.y += 0.25
-        }
+        path.move(to: end)
+        path.addQuadCurve(to: start, controlPoint: control)
+        
+        //            (2.75, 0.5, 0.25) * 6
+        start.x += CGFloat(16.5)
+        control.x += CGFloat(5)
+        control.y += CGFloat(2.5)
+        end.x += CGFloat(3)
+        
+        path.addLine(to: start)
+        path.addQuadCurve(to: end, controlPoint: control)
         
         shape.path = path.cgPath
+        
+//        let ciContext = CIContext()
+//        let filter = CIFilter(name: "CILinearGradient", withInputParameters: [
+//            "inputPoint0": CIVector(cgPoint: start),
+//            "inputPoint1": CIVector(cgPoint: CGPoint(x: (control.x + start.x * 9) / 10, y: (control.y + start.y * 9) / 10)),
+//            "inputColor0": UIColor.clear.ciColor,
+//            "inputColor1": UIColor.red.ciColor
+//            ])
+//        
+//        filter?.setDefaults()
+//        
+//        if let output = filter?.outputImage {
+//            
+//        }
+    }
+    
+    private func controlPoint(start: CGPoint, end: CGPoint, vertex: CGPoint) -> CGPoint {
+        let matrix = matrix_double3x3(columns: (vector3(Double(start.x * start.x), Double(start.x), 1.0), vector3(Double(end.x * end.x), Double(end.x), 1.0), vector3(Double(vertex.x * vertex.x), Double(vertex.x), 1.0)))
+        
+        let inv = matrix_invert(matrix)
+        
+        let a_db = Double(start.y) * inv.columns.0.x + Double(end.y) * inv.columns.0.y + Double(vertex.y) * inv.columns.0.z
+        let b_db = Double(start.y) * inv.columns.1.x + Double(end.y) * inv.columns.1.y + Double(vertex.y) * inv.columns.1.z
+        
+        let a = CGFloat(a_db)
+        let b = CGFloat(b_db)
+        
+        let coef_a = 2 * a * start.x + b
+        let coef_b = 2 * a * end.x + b
+        
+        let conX = (coef_a * start.x - coef_b * end.x - start.y + end.y) / ((start.x - end.x) * 2 * a)
+        let conY = coef_a * (conX - start.x) + start.y
+        
+        return CGPoint(x: conX, y: conY)
+    }
+    
+    private func checkAscend(_ points: [CGPoint]) -> Bool {
+        assert(points.count == 3)
+        
+        var x = CGFloat(0)
+        do {
+            try points.forEach { point in
+                if (point.x <= x + 10) {
+                    throw NSError.init()
+                } else {
+                    x = point.x
+                }
+            }
+        } catch {
+            return false
+        }
+        
+        if (points[1].y >= points[0].y + 10 || points[1].y >= points[2].y + 10) {
+            return false
+        }
+        return true
     }
     
     func move(recognizer: UIPanGestureRecognizer) {
@@ -509,8 +569,23 @@ class ProfileOneViewController: UIViewController {
             let playArea = playerView.playerLayer.videoRect
             
             if (xPos > playArea.minX + 10 && xPos < playArea.maxX - 10 && yPos > playArea.minY + 10 && yPos < playArea.maxY - 10 ) {
-                view.center = CGPoint(x: xPos, y: yPos)
-                reDraw()
+                let target = CGPoint(x: xPos, y: yPos)
+                if (view == self.srcView) {
+                    if (checkAscend([target, self.vertexView.center, self.dstView.center])) {
+                        view.center = CGPoint(x: xPos, y: yPos)
+                        reDraw()
+                    }
+                } else if (view == self.dstView) {
+                    if (checkAscend([self.srcView.center, self.vertexView.center, target])) {
+                        view.center = CGPoint(x: xPos, y: yPos)
+                        reDraw()
+                    }
+                } else if (view == self.vertexView) {
+                    if (checkAscend([self.srcView.center, target, self.dstView.center])) {
+                        view.center = CGPoint(x: xPos, y: yPos)
+                        reDraw()
+                    }
+                }
             }
         }
         recognizer.setTranslation(CGPoint(), in: self.view)

@@ -52,37 +52,17 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="97L-dc-sy7">
-                                <rect key="frame" x="74" y="572" width="227" height="31"/>
-                                <connections>
-                                    <action selector="onConvexSlide:" destination="I9G-bL-bCb" eventType="valueChanged" id="m17-QM-5NY"/>
-                                </connections>
-                            </slider>
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="rT3-Ih-cQp">
                                 <rect key="frame" x="74" y="622" width="227" height="31"/>
                                 <connections>
                                     <action selector="onPlaySlide:forEvent:" destination="I9G-bL-bCb" eventType="valueChanged" id="pUZ-tP-aTP"/>
                                 </connections>
                             </slider>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qBU-Nc-Nou">
-                                <rect key="frame" x="26" y="572" width="30" height="30"/>
-                                <state key="normal" title="&lt;"/>
-                                <connections>
-                                    <action selector="onPrevConvex:" destination="I9G-bL-bCb" eventType="touchUpInside" id="TLh-QT-dx2"/>
-                                </connections>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j6z-Si-LxU">
                                 <rect key="frame" x="319" y="622" width="30" height="30"/>
                                 <state key="normal" title="&gt;"/>
                                 <connections>
                                     <action selector="onNextFrame:" destination="I9G-bL-bCb" eventType="touchUpInside" id="8BB-Tl-Mmb"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XUn-Er-Bpm">
-                                <rect key="frame" x="319" y="572" width="30" height="30"/>
-                                <state key="normal" title="&gt;"/>
-                                <connections>
-                                    <action selector="onNextConvex:" destination="I9G-bL-bCb" eventType="touchUpInside" id="ror-Ie-5UL"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HrQ-hq-MoB">
@@ -102,31 +82,23 @@
                             <constraint firstItem="oMz-Rs-FXY" firstAttribute="top" secondItem="YWg-Nd-VSQ" secondAttribute="bottom" constant="20" id="7Q4-gD-ITf"/>
                             <constraint firstItem="Sxa-Eb-jqt" firstAttribute="centerY" secondItem="oMz-Rs-FXY" secondAttribute="centerY" id="7he-Ov-PeM"/>
                             <constraint firstAttribute="leadingMargin" secondItem="YWg-Nd-VSQ" secondAttribute="leading" id="ABI-Zk-h19"/>
-                            <constraint firstItem="rT3-Ih-cQp" firstAttribute="top" secondItem="97L-dc-sy7" secondAttribute="bottom" constant="20" id="ChA-s9-v8g"/>
                             <constraint firstItem="HrQ-hq-MoB" firstAttribute="leading" secondItem="oYx-I5-0d8" secondAttribute="leadingMargin" constant="10" id="Cva-lX-fcE"/>
                             <constraint firstItem="HrQ-hq-MoB" firstAttribute="centerY" secondItem="rT3-Ih-cQp" secondAttribute="centerY" id="M8g-FO-062"/>
-                            <constraint firstItem="97L-dc-sy7" firstAttribute="leading" secondItem="qBU-Nc-Nou" secondAttribute="trailing" constant="20" id="ROH-T9-hMK"/>
                             <constraint firstItem="jl6-Sf-NSL" firstAttribute="centerX" secondItem="oYx-I5-0d8" secondAttribute="centerX" id="a9G-3v-dJs"/>
                             <constraint firstAttribute="trailingMargin" secondItem="jl6-Sf-NSL" secondAttribute="trailing" id="c2O-OF-MEr"/>
                             <constraint firstAttribute="trailingMargin" secondItem="j6z-Si-LxU" secondAttribute="trailing" constant="10" id="eu0-K8-uek"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="XUn-Er-Bpm" secondAttribute="trailing" constant="10" id="exc-A7-ULA"/>
-                            <constraint firstItem="qBU-Nc-Nou" firstAttribute="leading" secondItem="oYx-I5-0d8" secondAttribute="leadingMargin" constant="10" id="fB3-c9-AjW"/>
                             <constraint firstItem="j6z-Si-LxU" firstAttribute="centerY" secondItem="rT3-Ih-cQp" secondAttribute="centerY" id="ftE-Pn-R4Z"/>
                             <constraint firstItem="Sxa-Eb-jqt" firstAttribute="leading" secondItem="oMz-Rs-FXY" secondAttribute="trailing" constant="20" id="fyF-U5-AEv"/>
                             <constraint firstAttribute="leadingMargin" secondItem="jl6-Sf-NSL" secondAttribute="leading" id="g3h-a6-Fcs"/>
-                            <constraint firstItem="XUn-Er-Bpm" firstAttribute="leading" secondItem="97L-dc-sy7" secondAttribute="trailing" constant="20" id="h8q-IT-Tv8"/>
                             <constraint firstAttribute="trailingMargin" secondItem="YWg-Nd-VSQ" secondAttribute="trailing" id="hXA-5w-vrN"/>
                             <constraint firstItem="oMz-Rs-FXY" firstAttribute="leading" secondItem="YWg-Nd-VSQ" secondAttribute="leading" id="lvB-dx-Ld2"/>
                             <constraint firstItem="hwL-dT-hTi" firstAttribute="top" secondItem="rT3-Ih-cQp" secondAttribute="bottom" constant="15" id="mRg-nv-Sh9"/>
-                            <constraint firstItem="97L-dc-sy7" firstAttribute="centerY" secondItem="XUn-Er-Bpm" secondAttribute="centerY" id="qJv-Up-n7b"/>
-                            <constraint firstItem="97L-dc-sy7" firstAttribute="centerY" secondItem="qBU-Nc-Nou" secondAttribute="centerY" id="rkn-ZI-lHy"/>
                             <constraint firstItem="n0F-mp-cuL" firstAttribute="leading" secondItem="Sxa-Eb-jqt" secondAttribute="trailing" constant="20" id="t1w-CM-Fpn"/>
                             <constraint firstItem="YWg-Nd-VSQ" firstAttribute="top" secondItem="LGy-ov-nIf" secondAttribute="bottom" constant="15" id="tH3-wP-AVV"/>
                             <constraint firstItem="j6z-Si-LxU" firstAttribute="leading" secondItem="rT3-Ih-cQp" secondAttribute="trailing" constant="20" id="y5T-Ab-wM9"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="convexSlider" destination="97L-dc-sy7" id="eNG-qR-Fav"/>
                         <outlet property="label" destination="n0F-mp-cuL" id="uhp-BS-VKu"/>
                         <outlet property="loadButton" destination="oMz-Rs-FXY" id="x78-Fa-iQS"/>
                         <outlet property="playSlider" destination="rT3-Ih-cQp" id="sMu-yn-Qa5"/>
