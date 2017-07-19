@@ -34,6 +34,11 @@
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
 		675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 675775511F0F07AB00270E3F /* HashTag.storyboard */; };
 		675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675775531F0F0A3B00270E3F /* AVViewController.swift */; };
+		6765EAFB1F1EDF860010D115 /* Dual.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6765EAFA1F1EDF860010D115 /* Dual.storyboard */; };
+		6765EAFD1F1EDFA70010D115 /* DualViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6765EAFC1F1EDFA70010D115 /* DualViewController.swift */; };
+		6765EAFF1F1EE2D20010D115 /* SwingConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */; };
+		6765EB021F1EF7EA0010D115 /* oldman.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6765EB001F1EF7EA0010D115 /* oldman.mp4 */; };
+		6765EB031F1EF7EA0010D115 /* two.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6765EB011F1EF7EA0010D115 /* two.mp4 */; };
 		67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C0F0B61F1DA6E100578029 /* GraphView.swift */; };
 /* End PBXBuildFile section */
 
@@ -67,6 +72,11 @@
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
 		675775511F0F07AB00270E3F /* HashTag.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = HashTag.storyboard; sourceTree = "<group>"; };
 		675775531F0F0A3B00270E3F /* AVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVViewController.swift; sourceTree = "<group>"; };
+		6765EAFA1F1EDF860010D115 /* Dual.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Dual.storyboard; sourceTree = "<group>"; };
+		6765EAFC1F1EDFA70010D115 /* DualViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DualViewController.swift; sourceTree = "<group>"; };
+		6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwingConfigViewController.swift; sourceTree = "<group>"; };
+		6765EB001F1EF7EA0010D115 /* oldman.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = oldman.mp4; sourceTree = "<group>"; };
+		6765EB011F1EF7EA0010D115 /* two.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = two.mp4; sourceTree = "<group>"; };
 		67C0F0B61F1DA6E100578029 /* GraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,6 +94,8 @@
 		3B4B05DE1F0E1086006EE5F1 = {
 			isa = PBXGroup;
 			children = (
+				6765EB001F1EF7EA0010D115 /* oldman.mp4 */,
+				6765EB011F1EF7EA0010D115 /* two.mp4 */,
 				671BBF101F0E29720088B84C /* video.mp4 */,
 				672555FA1F131B99008D88C2 /* nasmo.mp4 */,
 				6719F7201F1708D80071A5E8 /* proj.mp4 */,
@@ -116,6 +128,8 @@
 				6725560A1F136E07008D88C2 /* ExportViewController.swift */,
 				672667A21F18614D001541B2 /* TracerViewController.swift */,
 				674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */,
+				6765EAFC1F1EDFA70010D115 /* DualViewController.swift */,
+				6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */,
 				3B4B05F61F0E1086006EE5F1 /* Info.plist */,
 				3B4B05F31F0E1086006EE5F1 /* LaunchScreen.storyboard */,
 				3B4B05EE1F0E1086006EE5F1 /* Main.storyboard */,
@@ -125,6 +139,7 @@
 				6725560C1F136E17008D88C2 /* Export.storyboard */,
 				672667A01F18613A001541B2 /* Tracer.storyboard */,
 				674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */,
+				6765EAFA1F1EDF860010D115 /* Dual.storyboard */,
 				671BBF121F0E35590088B84C /* PlayerView.swift */,
 				671BBF0A1F0E154F0088B84C /* String+.swift */,
 				67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */,
@@ -196,6 +211,7 @@
 			files = (
 				3B4B05F51F0E1086006EE5F1 /* LaunchScreen.storyboard in Resources */,
 				672556031F134BEC008D88C2 /* pic2.png in Resources */,
+				6765EAFB1F1EDF860010D115 /* Dual.storyboard in Resources */,
 				672556081F134ECA008D88C2 /* pic2-2.png in Resources */,
 				675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */,
 				6725560D1F136E17008D88C2 /* Export.storyboard in Resources */,
@@ -205,7 +221,9 @@
 				672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */,
 				674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */,
 				672667A11F18613A001541B2 /* Tracer.storyboard in Resources */,
+				6765EB031F1EF7EA0010D115 /* two.mp4 in Resources */,
 				672556051F134C59008D88C2 /* pic3.png in Resources */,
+				6765EB021F1EF7EA0010D115 /* oldman.mp4 in Resources */,
 				672556091F134ECA008D88C2 /* pic3-2.png in Resources */,
 				672555FF1F131BF2008D88C2 /* Nasmo.storyboard in Resources */,
 				671BBF111F0E29720088B84C /* video.mp4 in Resources */,
@@ -221,6 +239,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6765EAFD1F1EDFA70010D115 /* DualViewController.swift in Sources */,
 				3B4B05ED1F0E1086006EE5F1 /* HashTagViewController.swift in Sources */,
 				671BBF0B1F0E154F0088B84C /* String+.swift in Sources */,
 				672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */,
@@ -230,6 +249,7 @@
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,
 				6725560B1F136E07008D88C2 /* ExportViewController.swift in Sources */,
 				671BBF131F0E35590088B84C /* PlayerView.swift in Sources */,
+				6765EAFF1F1EE2D20010D115 /* SwingConfigViewController.swift in Sources */,
 				672667A31F18614D001541B2 /* TracerViewController.swift in Sources */,
 				3B4B05EB1F0E1086006EE5F1 /* AppDelegate.swift in Sources */,
 			);
