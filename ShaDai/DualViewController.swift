@@ -39,11 +39,15 @@ class DualViewController: UIViewController {
     
     @IBOutlet weak var secondHindrance: UIView!
     
-    var pointsFirst = [Double]()
+    var params: TimemarkParams<PlayerView>!
     
-    var pointsSecond = [Double]()
+    var tempParams: [Double]?
     
     var timer: Timer?
+    
+    let fps = 30.0
+    
+    let ticks = 50.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,33 +61,21 @@ class DualViewController: UIViewController {
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.cancelEdit))
         view.addGestureRecognizer(tap)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        for playerView in [first!, second!] {
-            playerView.playCallback = {
-                guard self.timer == nil else {
-                    return
-                }
-                
-                self.timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(self.slide), userInfo: nil, repeats: true)
-                
-                DispatchQueue.main.async {
-                    self.playButton.setTitle("Pause", for: .normal)
-                }
-            }
-            
-            playerView.pauseCallback = {
-                guard self.timer != nil else {
-                    return
-                }
-                
-                self.timer?.invalidate()
-                self.timer = nil
-                
-                DispatchQueue.main.async {
-                    self.playButton.setTitle("Play", for: .normal)
-                }
-            }
-        }
+        first.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 1))
+        second.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 1))
+        
+        playSlider.value = 0.0
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        pause()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -95,19 +87,24 @@ class DualViewController: UIViewController {
             let target = sender as! UIButton
             
             dst.targetPlayer = target == firstConfig ? first.player! : second.player!
+            dst.targetPlayer.pause()
         }
     }
+    
+    var i = 0
+    var test = [[0.4, 1.6, 2.4, 3.2, 4], [1.2, 1.5, 1.7, 3.9, 4], [0.2, 0.6, 1.5, 2.5, 4]]
     
     @IBAction func unwinded(segue: UIStoryboardSegue, sender: Any?) {
         let src = segue.source as! SwingConfigViewController
         
-        updateFrame([], isFirst: src.targetPlayer == first.player)
+        updateFrame(test[i % 3], isFirst: src.targetPlayer == first.player)
+        i += 1
     }
 
     @IBAction func action(_ sender: UIButton) {
         switch sender {
         case firstLoad, secondLoad: load(sender, isFirst: sender == firstLoad)
-        case playButton: play()
+        case playButton: sender.titleLabel!.text == "Play" ? play() : pause()
         case prevButton, nextButton: moveOneFrame(sender, isPrev: sender == prevButton)
         default: print("[debug] action bind failure")
         }
@@ -147,16 +144,72 @@ class DualViewController: UIViewController {
         }
     }
     
-    func play() {
+    func tick() {
+        var rate = Double(playSlider.value)
+        let duration = params.timemarks.last!
+        let trackTime = rate * duration
         
+        for playerView in [first!, second!] {
+            let player = playerView.player!
+            if (player.timeControlStatus == .playing) {
+                if (params.shouldPause(playerView, trackTime: trackTime)) {
+                    player.pause()
+                }
+                
+            } else if (player.timeControlStatus == .paused) {
+                if (!params.shouldPause(playerView, trackTime: trackTime)) {
+                    player.play()
+                }
+                
+            }
+        }
+        
+        rate += 1 / duration / ticks
+        DispatchQueue.main.async {
+            self.playSlider.value = Float(rate)
+        }
+        
+        if (rate > 0.999) {
+            pause()
+        }
+    }
+    
+    func play() {
+        timer = Timer.scheduledTimer(timeInterval: 1.0 / ticks, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
+        
+        playButton.setTitle("Pause", for: .normal)
+    }
+    
+    func pause() {
+        timer?.invalidate()
+        timer = nil
+        
+        playButton.setTitle("Play", for: .normal)
     }
     
     func moveOneFrame(_ sender: UIButton, isPrev: Bool) {
+        var rate = Double(playSlider.value)
+        let duration = params.timemarks.last!
         
+        rate += 1 / duration / fps * (isPrev ? -1 : 1)
+        moveFrame(rate)
+        DispatchQueue.main.async {
+            self.playSlider.value = Float(rate)
+        }
     }
     
     func moveFrame(_ rate: Double) {
+        let duration = params.timemarks.last!
+        let trackTime = rate * duration
         
+        let firstPlayTime = params.trackTimeToPlayTime(first, trackTime: trackTime)
+        let secondPlayTime = params.trackTimeToPlayTime(second, trackTime: trackTime)
+        
+        let firstItem = first.player!.currentItem!
+        let secondItem = second.player!.currentItem!
+        
+        firstItem.step(byCount: Int(fps * (firstPlayTime - CMTimeGetSeconds(firstItem.currentTime()))))
+        secondItem.step(byCount: Int(fps * (secondPlayTime - CMTimeGetSeconds(secondItem.currentTime()))))
     }
     
     func updatePlaySlide() {
@@ -167,19 +220,26 @@ class DualViewController: UIViewController {
     func updateFrame(_ points: [Double], isFirst: Bool) {
         // (isFirst ? firstSwingTime : secondSwingTime) = obj.currentTime()
         
-        first.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 1))
-        second.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 1))
-        
         (isFirst ? firstHindrance : secondHindrance)?.isHidden = true
         
         if (firstHindrance.isHidden && secondHindrance.isHidden) {
-            playControlState(true)
-            calculateParameters()
+            calculateParameters(points, isFirst: isFirst)
+            if (!playSlider.isEnabled) {
+                playControlState(true)
+                initializeVideo()
+            }
         }
+        
+        tempParams = points
     }
     
     func cancelEdit() {
         view.endEditing(true)
+    }
+    
+    private func initializeVideo() {
+        first.player!.actionAtItemEnd = .pause
+        second.player!.actionAtItemEnd = .pause
     }
     
     private func playControlState(_ state: Bool) {
@@ -190,8 +250,9 @@ class DualViewController: UIViewController {
         nextButton.isEnabled = state
     }
     
-    private func calculateParameters() {
-        
+    private func calculateParameters(_ points: [Double], isFirst: Bool) {
+        let (a, b) = isFirst ? (points, params?.mark[second] ?? tempParams!) : (params?.mark[first] ?? tempParams!, points)
+        params = TimemarkParams(a: first, b: second, markA: a, markB: b)
     }
     
     private func showMessage(_ message: String) {

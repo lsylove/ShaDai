@@ -40,6 +40,7 @@
 		6765EAFF1F1EE2D20010D115 /* SwingConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */; };
 		6765EB021F1EF7EA0010D115 /* oldman.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6765EB001F1EF7EA0010D115 /* oldman.mp4 */; };
 		6765EB031F1EF7EA0010D115 /* two.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6765EB011F1EF7EA0010D115 /* two.mp4 */; };
+		676F16BB1F203F6E00C333CC /* TimemarkParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676F16BA1F203F6E00C333CC /* TimemarkParams.swift */; };
 		67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C0F0B61F1DA6E100578029 /* GraphView.swift */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +81,7 @@
 		6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwingConfigViewController.swift; sourceTree = "<group>"; };
 		6765EB001F1EF7EA0010D115 /* oldman.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = oldman.mp4; sourceTree = "<group>"; };
 		6765EB011F1EF7EA0010D115 /* two.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = two.mp4; sourceTree = "<group>"; };
+		676F16BA1F203F6E00C333CC /* TimemarkParams.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimemarkParams.swift; sourceTree = "<group>"; };
 		67C0F0B61F1DA6E100578029 /* GraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -149,6 +151,7 @@
 				671BBF0A1F0E154F0088B84C /* String+.swift */,
 				67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */,
 				67C0F0B61F1DA6E100578029 /* GraphView.swift */,
+				676F16BA1F203F6E00C333CC /* TimemarkParams.swift */,
 			);
 			path = ShaDai;
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 				67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */,
 				674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */,
 				67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */,
+				676F16BB1F203F6E00C333CC /* TimemarkParams.swift in Sources */,
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,
 				6725560B1F136E07008D88C2 /* ExportViewController.swift in Sources */,
 				671BBF131F0E35590088B84C /* PlayerView.swift in Sources */,
