@@ -42,7 +42,8 @@ class BarIndicatorView: UIView {
     public func addIndicator(identifier: String, color: UIColor, value: Float, priority: Int) -> Bool {
         
         for indicator in indicators {
-            if ((indicator.value > value) != (indicator.orderPrority > priority)) {
+            if ((indicator.value > value) != (indicator.orderPrority > priority)
+                && indicator.identifier != identifier) {
                 return false
             }
         }
