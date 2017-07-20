@@ -39,9 +39,11 @@ class DualViewController: UIViewController {
     
     @IBOutlet weak var secondHindrance: UIView!
     
-    var firstSwingTime = CMTime()
+    var pointsFirst = [Double]()
     
-    var secondSwingTime = CMTime()
+    var pointsSecond = [Double]()
+    
+    var timer: Timer?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +57,33 @@ class DualViewController: UIViewController {
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.cancelEdit))
         view.addGestureRecognizer(tap)
+        
+        for playerView in [first!, second!] {
+            playerView.playCallback = {
+                guard self.timer == nil else {
+                    return
+                }
+                
+                self.timer = Timer.scheduledTimer(timeInterval: 0.02, target: self, selector: #selector(self.slide), userInfo: nil, repeats: true)
+                
+                DispatchQueue.main.async {
+                    self.playButton.setTitle("Pause", for: .normal)
+                }
+            }
+            
+            playerView.pauseCallback = {
+                guard self.timer != nil else {
+                    return
+                }
+                
+                self.timer?.invalidate()
+                self.timer = nil
+                
+                DispatchQueue.main.async {
+                    self.playButton.setTitle("Play", for: .normal)
+                }
+            }
+        }
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -72,7 +101,7 @@ class DualViewController: UIViewController {
     @IBAction func unwinded(segue: UIStoryboardSegue, sender: Any?) {
         let src = segue.source as! SwingConfigViewController
         
-        updateFrame(src.targetPlayer, isFirst: src.targetPlayer == first.player)
+        updateFrame([], isFirst: src.targetPlayer == first.player)
     }
 
     @IBAction func action(_ sender: UIButton) {
@@ -130,21 +159,22 @@ class DualViewController: UIViewController {
         
     }
     
-    func updateFrame(_ obj: AVPlayer, isFirst: Bool) {
-        // (isFirst ? firstSwingTime : secondSwingTime) = obj.currentTime()
-        if (isFirst) {
-            firstSwingTime = obj.currentTime()
-        } else {
-            secondSwingTime = obj.currentTime()
+    func updatePlaySlide() {
+        DispatchQueue.main.async {
         }
+    }
+    
+    func updateFrame(_ points: [Double], isFirst: Bool) {
+        // (isFirst ? firstSwingTime : secondSwingTime) = obj.currentTime()
         
-        first.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 3))
-        second.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 3))
+        first.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 1))
+        second.player?.seek(to: CMTime(seconds: 0.002, preferredTimescale: 1))
         
         (isFirst ? firstHindrance : secondHindrance)?.isHidden = true
         
         if (firstHindrance.isHidden && secondHindrance.isHidden) {
             playControlState(true)
+            calculateParameters()
         }
     }
     
@@ -158,6 +188,10 @@ class DualViewController: UIViewController {
         
         prevButton.isEnabled = state
         nextButton.isEnabled = state
+    }
+    
+    private func calculateParameters() {
+        
     }
     
     private func showMessage(_ message: String) {

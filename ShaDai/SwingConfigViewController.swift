@@ -12,10 +12,28 @@ import AVFoundation
 class SwingConfigViewController: UIViewController {
     
     var targetPlayer = AVPlayer()
+    
+    var state = 0
+    
+    @IBOutlet weak var stateBar: UIView!
+    
+    @IBOutlet weak var state1: UIButton!
 
+    @IBOutlet weak var state2: UIButton!
+    
+    @IBOutlet weak var state3: UIButton!
+    
+    @IBOutlet weak var state4: UIButton!
+    
+    @IBOutlet weak var state5: UIButton!
+    
     @IBOutlet weak var slider: UISlider!
     
     @IBOutlet weak var playerView: PlayerView!
+    
+    var pointLocations = [UIView]()
+    
+    var points = [Double]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +42,35 @@ class SwingConfigViewController: UIViewController {
         
         playerView.player = targetPlayer
         updatePlaySlide(item: targetPlayer.currentItem!)
+        
+        stateBar.layer.borderWidth = 2.0
+        stateBar.layer.borderColor = UIColor.black.cgColor
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        for i in 0..<5 {
+            let loc = UIView()
+            loc.frame = CGRect(x: i * 10, y: 0, width: 2, height: Int(stateBar.frame.height))
+            
+            loc.backgroundColor = .red
+            
+            pointLocations.append(loc)
+            stateBar.addSubview(loc)
+        }
+        
+    }
+    
+    @IBAction func onStateButton(_ sender: UIButton) {
+        switch sender {
+        case state1: state = 0
+        case state2: state = 1
+        case state3: state = 2
+        case state4: state = 3
+        case state5: state = 4
+        default: state = 0
+        }
     }
     
     @IBAction func onSlide(_ sender: Any, forEvent event: UIEvent) {
