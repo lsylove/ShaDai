@@ -135,7 +135,6 @@
 				672667A21F18614D001541B2 /* TracerViewController.swift */,
 				674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */,
 				6765EAFC1F1EDFA70010D115 /* DualViewController.swift */,
-				3B9F7F881F206563002A6B21 /* BarIndicatorView.swift */,
 				6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */,
 				3B4B05F61F0E1086006EE5F1 /* Info.plist */,
 				3B4B05F31F0E1086006EE5F1 /* LaunchScreen.storyboard */,
@@ -152,6 +151,7 @@
 				67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */,
 				67C0F0B61F1DA6E100578029 /* GraphView.swift */,
 				676F16BA1F203F6E00C333CC /* TimemarkParams.swift */,
+				3B9F7F881F206563002A6B21 /* BarIndicatorView.swift */,
 			);
 			path = ShaDai;
 			sourceTree = "<group>";

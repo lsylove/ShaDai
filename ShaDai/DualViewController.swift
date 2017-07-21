@@ -9,7 +9,7 @@
 import AVFoundation
 import AVKit
 
-class DualViewController: UIViewController {
+class DualViewController: UIViewController, UnwindDelegate {
 
     @IBOutlet weak var first: PlayerView!
     
@@ -31,6 +31,8 @@ class DualViewController: UIViewController {
     
     @IBOutlet weak var playButton: UIButton!
     
+    @IBOutlet weak var pauseButton: UIButton!
+    
     @IBOutlet weak var prevButton: UIButton!
     
     @IBOutlet weak var nextButton: UIButton!
@@ -39,9 +41,13 @@ class DualViewController: UIViewController {
     
     @IBOutlet weak var secondHindrance: UIView!
     
+    @IBOutlet weak var firstBar: BarIndicatorView!
+    
+    @IBOutlet weak var secondBar: BarIndicatorView!
+    
     var params: TimemarkParams<PlayerView>!
     
-    var tempParams: [Double]?
+    var tempParams: [AVPlayer:[Double]] = [:]
     
     var timer: Timer?
     
@@ -57,7 +63,11 @@ class DualViewController: UIViewController {
         firstConfig.isEnabled = false
         secondConfig.isEnabled = false
         
+        firstBar.isHidden = true
+        secondBar.isHidden = true
+        
         playControlState(false)
+        pauseButton.isHidden = true
         
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.cancelEdit))
         view.addGestureRecognizer(tap)
@@ -86,25 +96,50 @@ class DualViewController: UIViewController {
             let dst = segue.destination as! SwingConfigViewController
             let target = sender as! UIButton
             
-            dst.targetPlayer = target == firstConfig ? first.player! : second.player!
+            dst.delegate = self
+            
+            let isFirst = target == firstConfig
+            
+            dst.targetPlayer = isFirst ? first.player! : second.player!
             dst.targetPlayer.pause()
+            
+            if let cached = tempParams[dst.targetPlayer] {
+                dst.points = cached
+            }
         }
     }
     
-    var i = 0
-    var test = [[0.4, 1.6, 2.4, 3.2, 4], [1.2, 1.5, 1.7, 3.9, 4], [0.2, 0.6, 1.5, 2.5, 4]]
-    
-    @IBAction func unwinded(segue: UIStoryboardSegue, sender: Any?) {
-        let src = segue.source as! SwingConfigViewController
+    func unwind(controller: UIViewController) {
+        guard let src = controller as? SwingConfigViewController else {
+            return
+        }
         
-        updateFrame(test[i % 3], isFirst: src.targetPlayer == first.player)
-        i += 1
+        let isFirst = src.targetPlayer == first.player
+        var ret = false
+        
+        tempParams[src.targetPlayer] = src.points
+        
+        for (index, value) in src.points.enumerated() {
+            if value < 0.0 {
+                ret = true
+            } else if let swingMotion = SwingMotion(rawValue: index) {
+                (isFirst ? firstBar : secondBar).addIndicator(identifier: swingMotion.identifier,
+                                                              color: swingMotion.barColor,
+                                                              value: Float(value),
+                                                              priority: swingMotion.orderPriority)
+            }
+        }
+        
+        if !ret {
+            updateFrame(src.points, isFirst: isFirst)
+        }
     }
 
     @IBAction func action(_ sender: UIButton) {
         switch sender {
         case firstLoad, secondLoad: load(sender, isFirst: sender == firstLoad)
-        case playButton: sender.titleLabel!.text == "Play" ? play() : pause()
+        case playButton: play()
+        case pauseButton: pause()
         case prevButton, nextButton: moveOneFrame(sender, isPrev: sender == prevButton)
         default: print("[debug] action bind failure")
         }
@@ -115,7 +150,7 @@ class DualViewController: UIViewController {
     }
     
     func load(_ sender: UIButton, isFirst: Bool) {
-        let (field, obj, config, hindrance) = isFirst ? (firstField!, first!, firstConfig!, firstHindrance!) : (secondField!, second!, secondConfig!, secondHindrance!)
+        let (field, obj, config, hindrance, bar) = isFirst ? (firstField!, first!, firstConfig!, firstHindrance!, firstBar!) : (secondField!, second!, secondConfig!, secondHindrance!, secondBar!)
         
         cancelEdit()
         
@@ -138,6 +173,13 @@ class DualViewController: UIViewController {
                 
             }
             DispatchQueue.main.async {
+                let layer = obj.playerLayer
+                let vr = layer.videoRect
+                
+                bar.isHidden = false
+                bar.frame = CGRect(x: layer.frame.minX + vr.minX, y: layer.frame.maxY, width: vr.width, height: 10)
+                bar.setNeedsLayout()
+                
                 hindrance.bounds = obj.playerLayer.videoRect
                 hindrance.backgroundColor = UIColor(red: 0.25, green: 0.25, blue: 0.25, alpha: 0.75)
             }
@@ -148,6 +190,10 @@ class DualViewController: UIViewController {
         var rate = Double(playSlider.value)
         let duration = params.timemarks.last!
         let trackTime = rate * duration
+        
+        if (rate > 0.999) {
+            pause()
+        }
         
         for playerView in [first!, second!] {
             let player = playerView.player!
@@ -168,23 +214,31 @@ class DualViewController: UIViewController {
         DispatchQueue.main.async {
             self.playSlider.value = Float(rate)
         }
-        
-        if (rate > 0.999) {
-            pause()
-        }
     }
     
     func play() {
+        if (playSlider.value > 0.999) {
+            DispatchQueue.main.async {
+                self.playSlider.value = 0.001
+                self.moveFrame(0.001)
+            }
+        }
+        
         timer = Timer.scheduledTimer(timeInterval: 1.0 / ticks, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
         
-        playButton.setTitle("Pause", for: .normal)
+        playButton.isHidden = true
+        pauseButton.isHidden = false
     }
     
     func pause() {
         timer?.invalidate()
         timer = nil
         
-        playButton.setTitle("Play", for: .normal)
+        first.player?.pause()
+        second.player?.pause()
+        
+        playButton.isHidden = false
+        pauseButton.isHidden = true
     }
     
     func moveOneFrame(_ sender: UIButton, isPrev: Bool) {
@@ -212,11 +266,6 @@ class DualViewController: UIViewController {
         secondItem.step(byCount: Int(fps * (secondPlayTime - CMTimeGetSeconds(secondItem.currentTime()))))
     }
     
-    func updatePlaySlide() {
-        DispatchQueue.main.async {
-        }
-    }
-    
     func updateFrame(_ points: [Double], isFirst: Bool) {
         // (isFirst ? firstSwingTime : secondSwingTime) = obj.currentTime()
         
@@ -224,13 +273,12 @@ class DualViewController: UIViewController {
         
         if (firstHindrance.isHidden && secondHindrance.isHidden) {
             calculateParameters(points, isFirst: isFirst)
+            
             if (!playSlider.isEnabled) {
                 playControlState(true)
                 initializeVideo()
             }
         }
-        
-        tempParams = points
     }
     
     func cancelEdit() {
@@ -251,8 +299,15 @@ class DualViewController: UIViewController {
     }
     
     private func calculateParameters(_ points: [Double], isFirst: Bool) {
-        let (a, b) = isFirst ? (points, params?.mark[second] ?? tempParams!) : (params?.mark[first] ?? tempParams!, points)
-        params = TimemarkParams(a: first, b: second, markA: a, markB: b)
+        let (ad, bd) = (CMTimeGetSeconds(first.player!.currentItem!.duration), CMTimeGetSeconds(second.player!.currentItem!.duration))
+        
+        let (a, b) = (tempParams[first.player!]!, tempParams[second.player!]!)
+        var (ar, br) = (a.map { $0 * ad }, b.map { $0 * bd })
+        
+        ar.append(ad)
+        br.append(bd)
+        
+        params = TimemarkParams(a: first, b: second, markA: ar, markB: br)
     }
     
     private func showMessage(_ message: String) {

@@ -27,7 +27,6 @@ class BarIndicatorView: UIView {
         
         for indicator in indicators {
             let x = rect.width * CGFloat(indicator.value)
-            print(x)
             context?.move(to: CGPoint(x: x, y: 0))
             context?.addLine(to: CGPoint(x: x, y: rect.height))
             context?.setLineWidth(2)
