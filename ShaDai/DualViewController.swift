@@ -49,6 +49,8 @@ class DualViewController: UIViewController, UnwindDelegate {
     
     var tempParams: [AVPlayer:[Double]] = [:]
     
+    var masks: [AVPlayer:CAShapeLayer] = [:]
+    
     var timer: Timer?
     
     let fps = 30.0
@@ -180,6 +182,8 @@ class DualViewController: UIViewController, UnwindDelegate {
                 bar.frame = CGRect(x: layer.frame.minX + vr.minX, y: layer.frame.maxY, width: vr.width, height: 10)
                 bar.setNeedsLayout()
                 
+                self.initializeBarMask(bar, obj.player!)
+                
                 hindrance.bounds = obj.playerLayer.videoRect
                 hindrance.backgroundColor = UIColor(red: 0.25, green: 0.25, blue: 0.25, alpha: 0.75)
             }
@@ -213,15 +217,14 @@ class DualViewController: UIViewController, UnwindDelegate {
         rate += 1 / duration / ticks
         DispatchQueue.main.async {
             self.playSlider.value = Float(rate)
+            self.updateBarMask()
         }
     }
     
     func play() {
         if (playSlider.value > 0.999) {
-            DispatchQueue.main.async {
-                self.playSlider.value = 0.001
-                self.moveFrame(0.001)
-            }
+            playSlider.value = 0.001
+            moveFrame(0.001)
         }
         
         timer = Timer.scheduledTimer(timeInterval: 1.0 / ticks, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
@@ -247,9 +250,9 @@ class DualViewController: UIViewController, UnwindDelegate {
         
         rate += 1 / duration / fps * (isPrev ? -1 : 1)
         moveFrame(rate)
-        DispatchQueue.main.async {
-            self.playSlider.value = Float(rate)
-        }
+        playSlider.value = Float(rate)
+        
+        updateBarMask()
     }
     
     func moveFrame(_ rate: Double) {
@@ -264,6 +267,8 @@ class DualViewController: UIViewController, UnwindDelegate {
         
         firstItem.step(byCount: Int(fps * (firstPlayTime - CMTimeGetSeconds(firstItem.currentTime()))))
         secondItem.step(byCount: Int(fps * (secondPlayTime - CMTimeGetSeconds(secondItem.currentTime()))))
+        
+        updateBarMask()
     }
     
     func updateFrame(_ points: [Double], isFirst: Bool) {
@@ -288,6 +293,35 @@ class DualViewController: UIViewController, UnwindDelegate {
     private func initializeVideo() {
         first.player!.actionAtItemEnd = .pause
         second.player!.actionAtItemEnd = .pause
+    }
+    
+    private func initializeBarMask(_ bar: UIView, _ player: AVPlayer) {
+        let mask = CAShapeLayer()
+        mask.backgroundColor = UIColor.clear.cgColor
+        mask.frame = bar.frame
+        
+        mask.strokeColor = UIColor(white: 1, alpha: 0.5).cgColor
+        mask.strokeStart = 0
+        mask.strokeEnd = 0
+        mask.lineWidth = mask.frame.height
+        
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: mask.bounds.minX, y: mask.bounds.midY))
+        path.addLine(to: CGPoint(x: mask.bounds.maxX, y: mask.bounds.midY))
+        mask.path = path.cgPath
+        
+        masks[player] = mask
+        self.view.layer.addSublayer(mask)
+    }
+    
+    private func updateBarMask() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        
+        for (player, mask) in masks {
+            mask.strokeEnd = CGFloat(CMTimeGetSeconds(player.currentTime()) / CMTimeGetSeconds(player.currentItem!.duration))
+        }
+        CATransaction.commit()
     }
     
     private func playControlState(_ state: Bool) {
