@@ -47,6 +47,10 @@ enum SwingMotion: Int {
     }
 }
 
+protocol UnwindDelegate {
+    func unwind(controller: UIViewController)
+}
+
 class SwingConfigViewController: UIViewController {
     
     var targetPlayer = AVPlayer()
@@ -61,7 +65,9 @@ class SwingConfigViewController: UIViewController {
     
     var pointLocations = [UIView]()
     
-    var points = [Double]()
+    var points = [Double](repeating: -1.0, count: 4) // SwingMotion.count
+    
+    var delegate: UnwindDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,32 +81,46 @@ class SwingConfigViewController: UIViewController {
         stateBar.layer.borderColor = UIColor.gray.cgColor
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        for (index, value) in points.enumerated() {
+            if value >= 0.0, let swingMotion = SwingMotion(rawValue: index) {
+                self.stateBar.addIndicator(identifier: swingMotion.identifier,
+                                                         color: swingMotion.barColor,
+                                                         value: Float(value),
+                                                         priority: swingMotion.orderPriority)
+            }
+        }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        delegate?.unwind(controller: self)
+    }
+    
     @IBAction func onAdd() {
         
         if let swingMotion = SwingMotion(rawValue: self.motionSegment.selectedSegmentIndex) {
-
+            
             let success = self.stateBar.addIndicator(identifier: swingMotion.identifier,
                                                      color: swingMotion.barColor,
                                                      value: self.slider.value,
                                                      priority: swingMotion.orderPriority)
-            
             if success {
+                points[swingMotion.orderPriority] = Double(self.slider.value)
                 
                 if self.motionSegment.selectedSegmentIndex < 3 {
-                
                     self.motionSegment.selectedSegmentIndex += 1
                 }
-                
             }
             else {
-            
+                
                 let alert = UIAlertController(title: "순서가 맞지 않습니다.", message: nil, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "확인", style: .destructive, handler: nil))
                 self.present(alert, animated: true)
-                
-                
             }
-            
         }
     }
     
