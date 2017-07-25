@@ -85,7 +85,7 @@
                                     <action selector="action:" destination="Gqq-6y-TMj" eventType="touchUpInside" id="KTS-ar-WS1"/>
                                 </connections>
                             </button>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="AVP-GV-io7">
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" horizontalCompressionResistancePriority="749" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="AVP-GV-io7">
                                 <rect key="frame" x="76" y="569" width="161" height="29"/>
                                 <segments>
                                     <segment title="X1.0"/>
@@ -96,7 +96,7 @@
                                     <action selector="speedSeg:" destination="Gqq-6y-TMj" eventType="valueChanged" id="3QR-7T-HSw"/>
                                 </connections>
                             </segmentedControl>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="559-ee-gp4">
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" horizontalCompressionResistancePriority="749" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="559-ee-gp4">
                                 <rect key="frame" x="66" y="40" width="138" height="29"/>
                                 <segments>
                                     <segment title="↘︎"/>

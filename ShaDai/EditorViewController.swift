@@ -27,6 +27,10 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     
     private var recordSession: RecordSession?
     
+    private var cycle = 2
+    
+    private var ccount = 0
+    
     @IBOutlet weak var playerView: PlayerView!
     
     @IBOutlet weak var shapeSegControl: UISegmentedControl!
@@ -192,9 +196,6 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         updateSliderPosition()
     }
     
-    private var cycle = 2
-    private var ccount = 0
-    
     func tick() {
         ccount += 1
         if (ccount % cycle == 0) {
@@ -232,16 +233,18 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         if let s = recordSession {
             if !s.active {
                 suspend()
-                playbackButton.isEnabled = false
+                let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, undoButton, prevButton, nextButton, slider, shapeSegControl, speedSegControl]
+                
+                controls.forEach { $0.isEnabled = false }
                 
                 timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
                 
                 
                 s.execute(player: player) {
-                    self.playbackButton.isEnabled = true
-                    
                     self.timer?.invalidate()
                     self.timer = nil
+                    
+                    controls.forEach { $0.isEnabled = true }
                 }
             }
         }

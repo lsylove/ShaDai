@@ -37,6 +37,8 @@
 		6765EAFF1F1EE2D20010D115 /* SwingConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */; };
 		6765EB021F1EF7EA0010D115 /* oldman.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6765EB001F1EF7EA0010D115 /* oldman.mp4 */; };
 		6765EB031F1EF7EA0010D115 /* two.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6765EB011F1EF7EA0010D115 /* two.mp4 */; };
+		676C4A3F1F27350D00D7BBF8 /* SquareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676C4A3E1F27350D00D7BBF8 /* SquareViewController.swift */; };
+		676C4A411F27351700D7BBF8 /* Square.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 676C4A401F27351700D7BBF8 /* Square.storyboard */; };
 		676F16BB1F203F6E00C333CC /* TimemarkParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676F16BA1F203F6E00C333CC /* TimemarkParams.swift */; };
 		67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C0F0B61F1DA6E100578029 /* GraphView.swift */; };
 		67E779441F25B06A00C29CE5 /* HSBColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67E779431F25B06A00C29CE5 /* HSBColorPicker.swift */; };
@@ -80,6 +82,8 @@
 		6765EAFE1F1EE2D20010D115 /* SwingConfigViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwingConfigViewController.swift; sourceTree = "<group>"; };
 		6765EB001F1EF7EA0010D115 /* oldman.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = oldman.mp4; path = ../oldman.mp4; sourceTree = "<group>"; };
 		6765EB011F1EF7EA0010D115 /* two.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = two.mp4; path = ../two.mp4; sourceTree = "<group>"; };
+		676C4A3E1F27350D00D7BBF8 /* SquareViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SquareViewController.swift; sourceTree = "<group>"; };
+		676C4A401F27351700D7BBF8 /* Square.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Square.storyboard; sourceTree = "<group>"; };
 		676F16BA1F203F6E00C333CC /* TimemarkParams.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimemarkParams.swift; sourceTree = "<group>"; };
 		67C0F0B61F1DA6E100578029 /* GraphView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GraphView.swift; sourceTree = "<group>"; };
 		67E779431F25B06A00C29CE5 /* HSBColorPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HSBColorPicker.swift; sourceTree = "<group>"; };
@@ -130,6 +134,7 @@
 				67147E311F2586920069F24D /* ProfileOne */,
 				67147E321F2586980069F24D /* Dual */,
 				67147E331F2587DC0069F24D /* Editor */,
+				676C4A3D1F2734EF00D7BBF8 /* Square */,
 			);
 			path = ShaDai;
 			sourceTree = "<group>";
@@ -242,6 +247,15 @@
 			name = Editor;
 			sourceTree = "<group>";
 		};
+		676C4A3D1F2734EF00D7BBF8 /* Square */ = {
+			isa = PBXGroup;
+			children = (
+				676C4A3E1F27350D00D7BBF8 /* SquareViewController.swift */,
+				676C4A401F27351700D7BBF8 /* Square.storyboard */,
+			);
+			name = Square;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -311,6 +325,7 @@
 				3B4B05F01F0E1086006EE5F1 /* Main.storyboard in Resources */,
 				672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */,
 				674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */,
+				676C4A411F27351700D7BBF8 /* Square.storyboard in Resources */,
 				672667A11F18613A001541B2 /* Tracer.storyboard in Resources */,
 				6765EB031F1EF7EA0010D115 /* two.mp4 in Resources */,
 				6765EB021F1EF7EA0010D115 /* oldman.mp4 in Resources */,
@@ -340,6 +355,7 @@
 				67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */,
 				674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */,
 				67E7794A1F25E75900C29CE5 /* RecordSession.swift in Sources */,
+				676C4A3F1F27350D00D7BBF8 /* SquareViewController.swift in Sources */,
 				67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */,
 				676F16BB1F203F6E00C333CC /* TimemarkParams.swift in Sources */,
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,

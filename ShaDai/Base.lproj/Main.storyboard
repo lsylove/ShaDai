@@ -180,6 +180,26 @@
                                             <segue destination="VbF-Pn-aHs" kind="show" id="pHp-NT-8Hx"/>
                                         </connections>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" textLabel="7Ya-BV-UaG" style="IBUITableViewCellStyleDefault" id="clc-bh-q4W">
+                                        <rect key="frame" x="0.0" y="387" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="clc-bh-q4W" id="FjJ-SC-Xby">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Square" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="7Ya-BV-UaG">
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="vrn-T0-2pG" kind="show" id="SLB-uw-2Av"/>
+                                        </connections>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -257,6 +277,14 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bIQ-zM-WuE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="438" y="267"/>
+        </scene>
+        <!--Square-->
+        <scene sceneID="dEC-Du-ZWV">
+            <objects>
+                <viewControllerPlaceholder storyboardName="Square" id="vrn-T0-2pG" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Amn-sE-TGc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="442" y="310"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="nHq-D2-Lik">
