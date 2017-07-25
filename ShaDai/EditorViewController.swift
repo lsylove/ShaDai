@@ -13,19 +13,19 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     
     var url: String?
     
-    var fps = 30.0
+    private var fps = 30.0
     
-    var frequency = 60.0
+    private var frequency = 60.0
     
-    var ticks = 0
+    private var player = AVPlayer()
     
-    var player = AVPlayer()
+    private var duration = 0.0
     
-    var duration = 0.0
+    private var rate: Float = 1.0
     
-    var timer: Timer?
+    private var timer: Timer?
     
-    var uiTimer: Timer?
+    private var recordSession: RecordSession?
     
     @IBOutlet weak var playerView: PlayerView!
     
@@ -54,7 +54,11 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     @IBOutlet weak var slider: UISlider!
     
     @IBAction func speedSeg(_ sender: UISegmentedControl) {
-        player.rate = [1.0, 0.5, 0.25][speedSegControl.selectedSegmentIndex]
+        updateSpeed()
+        
+        if (player.timeControlStatus == .playing) {
+            player.rate = rate
+        }
     }
     
     @IBAction func action(_ sender: UIButton) {
@@ -66,15 +70,19 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         case nextButton: stepUp()
         case startButton: start()
         case finishButton: finish()
+        case playbackButton: playback()
         default: print("[debug] button void bind")
         }
     }
     
     @IBAction func slide(_ sender: UISlider) {
         let targetTime = Double(sender.value) * duration
-        player.currentItem!.step(byCount: Int(fps * (targetTime - CMTimeGetSeconds(player.currentTime()))))
+        let steps = Int(fps * (targetTime - CMTimeGetSeconds(player.currentTime())))
         
-        pause()
+        recordSession?.record(entity: PlaybackEvent(steps))
+        player.currentItem!.step(byCount: steps)
+        
+        suspend()
     }
 
     override func viewDidLoad() {
@@ -132,60 +140,122 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     
     func stepUp() {
         let item = player.currentItem!
+        
         if (item.canStepForward) {
+            recordSession?.record(entity: FrameEvent.forward)
             item.step(byCount: 1)
-            pause()
+            
+            suspend()
         }
     }
     
     func stepDown() {
         let item = player.currentItem!
+        
         if (item.canStepBackward) {
+            recordSession?.record(entity: FrameEvent.backward)
             item.step(byCount: -1)
-            pause()
+            
+            suspend()
         }
     }
     
     func play() {
-        player.play()
+//        recordSession?.record(entity: PlayEvent.play)
+        player.playImmediately(atRate: rate)
         
-        uiTimer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.uiTick), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
         
         toggleButtons(playButton, pauseButton, paused: false)
-        speedSeg(speedSegControl)
     }
     
     func pause() {
+//        recordSession?.record(entity: PlayEvent.pause)
         player.pause()
         
-        uiTimer?.invalidate()
-        uiTimer = nil
+        timer?.invalidate()
+        timer = nil
         
         toggleButtons(playButton, pauseButton)
         updateSliderPosition()
     }
     
-    func uiTick() {
+    private func suspend() {
+        ccount = 0
+        
+        player.pause()
+        
+        timer?.invalidate()
+        timer = nil
+        
+        toggleButtons(playButton, pauseButton)
+        updateSliderPosition()
+    }
+    
+    private var cycle = 2
+    private var ccount = 0
+    
+    func tick() {
+        ccount += 1
+        if (ccount % cycle == 0) {
+            recordSession?.record(entity: FrameEvent.forward)
+        }
+        
         DispatchQueue.main.async {
             self.updateSliderPosition()
         }
     }
     
-    func tick() {
-        ticks += 1
-    }
-    
     func start() {
-        timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
+        suspend()
+        
+        recordSession = RecordSession(frequency: frequency)
+        
+        // Save initial state as events
+        recordSession!.record(entity: SeekEvent(player.currentTime()))
+        updateSpeed()
         
         toggleButtons(startButton, finishButton, paused: false)
+        playbackButton.isEnabled = false
     }
     
     func finish() {
-        timer?.invalidate()
-        timer = nil
+        if !(recordSession?.deactivateSession() ?? false) {
+            print("[debug] record session poor termination")
+        }
         
         toggleButtons(startButton, finishButton)
+        playbackButton.isEnabled = true
+    }
+    
+    func playback() {
+        if let s = recordSession {
+            if !s.active {
+                suspend()
+                playbackButton.isEnabled = false
+                
+                timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
+                
+                
+                s.execute(player: player) {
+                    self.playbackButton.isEnabled = true
+                    
+                    self.timer?.invalidate()
+                    self.timer = nil
+                }
+            }
+        }
+    }
+    
+    private func updateSpeed() {
+        let index = speedSegControl.selectedSegmentIndex
+        rate = Float([1.0, 0.5, 0.25][index])
+        
+        recordSession?.record(entity: RateEvent(rate))
+        recordSession?.record(entity: ArbitraryEvent { _,_,_ in self.speedSegControl.selectedSegmentIndex = index })
+        
+        // Bad coding practice: update cycle
+        cycle = Int(round(2.0 / rate))
     }
     
     private func updateSliderPosition() {
