@@ -1,0 +1,192 @@
+//
+//  ShapeView.swift
+//  ShaDai
+//
+//  Created by lsylove on 2017. 7. 26..
+//  Copyright © 2017년 WebLinkTest. All rights reserved.
+//
+
+import UIKit
+
+protocol ShapeViewGestureRecognitionDelegate {
+    func shapeViewGestureRecognition(view: ShapeView, recognizer: UIPanGestureRecognizer, success: Bool)
+}
+
+class ShapeView: UIView {
+    
+    private var a: CGPoint
+    
+    private var b: CGPoint
+    
+    var c: UIColor {
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    var d: (UIBezierPath, CGPoint, CGPoint) -> Void {
+        didSet {
+            self.setNeedsDisplay()
+        }
+    }
+    
+    let f: CGRect
+    
+    private var absA: CGPoint
+    
+    private var absB: CGPoint
+    
+    private static let r: CGFloat = 6.0
+    
+    private let r: CGFloat = ShapeView.r
+    
+    private let aView = UIView()
+    
+    private let bView = UIView()
+    
+    private let dView = UIView()
+    
+    var isSelected: Bool {
+        set {
+            [aView, bView, dView].forEach { $0.isHidden = !newValue }
+            self.setNeedsDisplay()
+        } get {
+            return !aView.isHidden
+        }
+    }
+    
+    var delegate: ShapeViewGestureRecognitionDelegate?
+    
+    init(a: CGPoint, b: CGPoint, c: UIColor, f: CGRect, d: @escaping (UIBezierPath, CGPoint, CGPoint) -> Void) {
+        let mx = Swift.min(a.x, b.x)
+        let my = Swift.min(a.y, b.y)
+        
+        self.a = CGPoint(x: a.x - mx, y: a.y - my)
+        self.b = CGPoint(x: b.x - mx, y: b.y - my)
+        self.c = c
+        self.d = d
+        self.f = f
+        
+        absA = a
+        absB = b
+        
+        super.init(frame: CGRect())
+        calculateFrames()
+        
+        [aView, bView, dView].forEach {
+            let recognizer = UIPanGestureRecognizer(target: self, action: #selector(self.pan))
+            $0.addGestureRecognizer(recognizer)
+        }
+        
+        self.addSubview(dView)
+        self.addSubview(aView)
+        self.addSubview(bView)
+        
+        self.backgroundColor = UIColor.clear
+        aView.backgroundColor = UIColor.clear
+        bView.backgroundColor = UIColor.clear
+        dView.backgroundColor = UIColor.clear
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        return nil
+    }
+    
+    private func calculatePosition() {
+        let mx = Swift.min(absA.x, absB.x)
+        let my = Swift.min(absA.y, absB.y)
+        
+        a = CGPoint(x: absA.x - mx, y: absA.y - my)
+        b = CGPoint(x: absB.x - mx, y: absB.y - my)
+    }
+    
+    private func calculateFrames() {
+        self.frame = CGRect(x: Swift.min(absA.x, absB.x) - r * 2, y: Swift.min(absA.y, absB.y) - r * 2, width: Swift.abs(absA.x - absB.x) + r * 4, height: Swift.abs(absA.y - absB.y) + r * 4)
+        
+        aView.frame = CGRect(x: a.x, y: a.y, width: r * 4, height: r * 4)
+        bView.frame = CGRect(x: b.x, y: b.y, width: r * 4, height: r * 4)
+        dView.frame = CGRect(x: r * 2, y: r * 2, width: Swift.abs(a.x - b.x), height: Swift.abs(a.y - b.y))
+    }
+    
+    private func check(_ transposed: CGPoint) -> Bool {
+        return f.contains(transposed)
+    }
+    
+    @objc private func pan(recognizer: UIPanGestureRecognizer) {
+        let translation = recognizer.translation(in: self)
+        
+        let res: Bool
+        switch (recognizer.view ?? UIView()) {
+        case aView: res = movePoint(lv: &absA, by: translation)
+        case bView: res = movePoint(lv: &absB, by: translation)
+        case dView: res = transpose(by: translation)
+        default: res = movePoint(lv: &absB, by: translation)
+        }
+        
+        delegate?.shapeViewGestureRecognition(view: self, recognizer: recognizer, success: res)
+        recognizer.setTranslation(CGPoint(), in: self)
+    }
+    
+    func movePoint(lv: inout CGPoint, by: CGPoint) -> Bool {
+        guard check(CGPoint(x: lv.x + by.x, y: lv.y + by.y)) else {
+            return false
+        }
+        
+        lv.x += by.x
+        lv.y += by.y
+        
+        calculatePosition()
+        calculateFrames()
+        
+        self.setNeedsDisplay()
+        return true
+    }
+    
+    func transpose(by: CGPoint) -> Bool {
+        absA.x += by.x
+        absA.y += by.y
+        absB.x += by.x
+        absB.y += by.y
+        
+        if (!check(absA) || !check(absB)) {
+            absA.x -= by.x
+            absA.y -= by.y
+            absB.x -= by.x
+            absB.y -= by.y
+            return false
+        }
+        
+        calculatePosition()
+        calculateFrames()
+        
+        self.setNeedsDisplay()
+        return true
+    }
+    
+    override func draw(_ rect: CGRect) {
+        let pi2 = CGFloat(Double.pi * 2)
+        let A = CGPoint(x: a.x + r * 2, y: a.y + r * 2)
+        let B = CGPoint(x: b.x + r * 2, y: b.y + r * 2)
+        
+        let path = UIBezierPath()
+        d(path, A, B)
+        
+        c.set()
+        path.lineWidth = 1.5
+        path.stroke()
+        
+        UIColor.white.set()
+        
+        if (!aView.isHidden) {
+            let whitePathA = UIBezierPath(arcCenter: A, radius: r, startAngle: 0, endAngle: pi2, clockwise: true)
+            whitePathA.lineWidth = 1.5
+            whitePathA.stroke()
+        }
+        
+        if (!bView.isHidden) {
+            let whitePathB = UIBezierPath(arcCenter: B, radius: r, startAngle: 0, endAngle: pi2, clockwise: true)
+            whitePathB.lineWidth = 1.5
+            whitePathB.stroke()
+        }
+    }
+}

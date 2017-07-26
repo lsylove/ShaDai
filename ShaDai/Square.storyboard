@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -29,9 +30,6 @@
                                     <segment title="☐"/>
                                     <segment title="○"/>
                                 </segments>
-                                <connections>
-                                    <action selector="shapeSegment:" destination="K5m-Z0-qeH" eventType="valueChanged" id="UQW-S8-LP1"/>
-                                </connections>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="whj-O6-34S">
                                 <rect key="frame" x="219" y="39" width="37" height="30"/>
@@ -49,10 +47,23 @@
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OVT-bM-Tx2">
                                 <rect key="frame" x="37" y="183" width="300" height="300"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="300" id="Qur-wT-nho"/>
                                     <constraint firstAttribute="width" constant="300" id="mQ6-nd-1aG"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current Color:  " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FzW-H9-xLC">
+                                <rect key="frame" x="66" y="90" width="117" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6fP-gl-Z5l">
+                                <rect key="frame" x="191" y="89.5" width="21" height="21"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="6fP-gl-Z5l" secondAttribute="height" multiplier="1:1" id="CWc-ci-uhU"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -60,24 +71,31 @@
                         <constraints>
                             <constraint firstItem="whj-O6-34S" firstAttribute="leading" secondItem="vCu-E4-JOg" secondAttribute="trailing" constant="15" id="CI3-pa-EhH"/>
                             <constraint firstItem="OVT-bM-Tx2" firstAttribute="centerX" secondItem="IhL-w1-gt9" secondAttribute="centerX" id="EHY-hZ-22a"/>
+                            <constraint firstItem="6fP-gl-Z5l" firstAttribute="height" secondItem="FzW-H9-xLC" secondAttribute="height" id="NwR-hN-Aty"/>
                             <constraint firstItem="vCu-E4-JOg" firstAttribute="top" secondItem="n98-b9-CBp" secondAttribute="bottom" constant="20" id="O8f-NU-yCC"/>
+                            <constraint firstItem="FzW-H9-xLC" firstAttribute="top" secondItem="vCu-E4-JOg" secondAttribute="bottom" constant="22" id="QFp-xO-vd2"/>
+                            <constraint firstItem="FzW-H9-xLC" firstAttribute="leading" secondItem="vCu-E4-JOg" secondAttribute="leading" id="Xcn-ul-C7d"/>
                             <constraint firstItem="Mfd-iS-dfi" firstAttribute="centerY" secondItem="vCu-E4-JOg" secondAttribute="centerY" id="YPe-j9-CWv"/>
                             <constraint firstItem="vCu-E4-JOg" firstAttribute="leading" secondItem="IhL-w1-gt9" secondAttribute="leadingMargin" constant="50" id="aDU-Ig-MLU"/>
                             <constraint firstItem="whj-O6-34S" firstAttribute="centerY" secondItem="Mfd-iS-dfi" secondAttribute="centerY" id="asL-uD-jSy"/>
                             <constraint firstItem="Mfd-iS-dfi" firstAttribute="leading" secondItem="whj-O6-34S" secondAttribute="trailing" constant="15" id="cRm-fS-PCp"/>
+                            <constraint firstItem="6fP-gl-Z5l" firstAttribute="centerY" secondItem="FzW-H9-xLC" secondAttribute="centerY" id="dY6-ES-5bs"/>
+                            <constraint firstItem="6fP-gl-Z5l" firstAttribute="leading" secondItem="FzW-H9-xLC" secondAttribute="trailing" constant="8" id="fRG-tl-yvp"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Mfd-iS-dfi" secondAttribute="trailing" constant="50" id="ozN-Yl-AKh"/>
                             <constraint firstItem="OVT-bM-Tx2" firstAttribute="centerY" secondItem="IhL-w1-gt9" secondAttribute="centerY" id="weT-5P-1iV"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="colorButton" destination="whj-O6-34S" id="jvh-PS-owr"/>
+                        <outlet property="colorView" destination="6fP-gl-Z5l" id="tbJ-AM-07c"/>
                         <outlet property="shapeSegControl" destination="vCu-E4-JOg" id="dQi-oU-bU9"/>
+                        <outlet property="uiView" destination="OVT-bM-Tx2" id="bZz-ym-JbZ"/>
                         <outlet property="undoButton" destination="Mfd-iS-dfi" id="Z1M-8w-dUq"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sbo-Zd-2fo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-57" y="38"/>
+            <point key="canvasLocation" x="-58.399999999999999" y="37.331334332833585"/>
         </scene>
         <!--Color Picker View Controller-->
         <scene sceneID="Vgm-Lj-2Ql">

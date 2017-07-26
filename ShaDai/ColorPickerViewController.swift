@@ -30,7 +30,9 @@ class ColorPickerViewController: UIViewController, HSBColorPickerDelegate {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
-        delegate?.HSBColorPickerTouched(sender: colorPicker, color: color!, point: point!, state: state!)
+        if let color = self.color {
+            delegate?.HSBColorPickerTouched(sender: colorPicker, color: color, point: point!, state: state!)
+        }
     }
     
     func HSBColorPickerTouched(sender: HSBColorPicker, color: UIColor, point: CGPoint, state: UIGestureRecognizerState) {
