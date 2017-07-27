@@ -6,33 +6,6 @@
 //  Copyright © 2017년 WebLinkTest. All rights reserved.
 //
 
-enum Shape: Int {
-    case line = 0
-    case square
-    case circle
-    
-    func recipe() -> ((UIBezierPath, CGPoint, CGPoint) -> Void) {
-        switch self {
-        case .line: return { path, a, b in
-            path.move(to: a)
-            path.addLine(to: b)
-            }
-        case .square: return { path, a, b in
-            path.move(to: a)
-            path.addLine(to: CGPoint(x: a.x, y: b.y))
-            path.addLine(to: b)
-            path.addLine(to: CGPoint(x: b.x, y: a.y))
-            path.addLine(to: a)
-            }
-        case .circle: return { path, a, b in
-            let center = CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2)
-            let radius = Swift.min(Swift.abs(a.x - b.x), Swift.abs(a.y - b.y)) / 2
-            path.addArc(withCenter: center, radius: radius, startAngle: 0, endAngle: CGFloat(Float.pi * 2), clockwise: true)
-            }
-        }
-    }
-}
-
 import UIKit
 
 class SquareViewController: UIViewController, HSBColorPickerDelegate {
@@ -97,49 +70,50 @@ class SquareViewController: UIViewController, HSBColorPickerDelegate {
     // >_<
     
     func pick(recognizer: UITapGestureRecognizer) {
-        if (recognizer.state == .ended) {
-            let point = recognizer.location(in: self.view)
+        if (recognizer.state != .ended) {
+            return
+        }
+        
+        let point = recognizer.location(in: self.view)
+        current?.isSelected = false
+        
+        if (current?.frame.contains(point) ?? false) {
+            var checkup = current == nil
+            for shape in shapes.reversed() {
+                if (!shape.frame.contains(point)) {
+                    continue
+                }
+                if (shape == current) {
+                    checkup = true
+                    continue
+                }
+                if (!checkup) {
+                    continue
+                }
+                registerShape(shape)
+                return
+            }
+            for shape in shapes.reversed() {
+                if (!shape.frame.contains(point)) {
+                    continue
+                }
+                if (shape == current) {
+                    current = nil
+                    return
+                }
+                registerShape(shape)
+                return
+            }
             
-            current?.isSelected = false
+        } else {
+            current = nil
             
-            if (current?.frame.contains(point) ?? false) {
-                var checkup = current == nil
-                for shape in shapes.reversed() {
-                    if (!shape.frame.contains(point)) {
-                        continue
-                    }
-                    if (shape == current) {
-                        checkup = true
-                        continue
-                    }
-                    if (!checkup) {
-                        continue
-                    }
-                    registerShape(shape)
-                    return
+            for shape in shapes.reversed() {
+                if (!shape.frame.contains(point)) {
+                    continue
                 }
-                for shape in shapes.reversed() {
-                    if (!shape.frame.contains(point)) {
-                        continue
-                    }
-                    if (shape == current) {
-                        current = nil
-                        return
-                    }
-                    registerShape(shape)
-                    return
-                }
-                
-            } else {
-                current = nil
-                
-                for shape in shapes.reversed() {
-                    if (!shape.frame.contains(point)) {
-                        continue
-                    }
-                    registerShape(shape)
-                    return
-                }
+                registerShape(shape)
+                return
             }
         }
     }

@@ -45,8 +45,9 @@ class RecordSession {
         
         timer?.invalidate()
         timer = nil
-        
         ticks = -1
+        
+        print("[debug] the number of records in the session: \(events.count)")
         
         return true
     }
@@ -63,7 +64,7 @@ class RecordSession {
         }
     }
     
-    func execute(player: AVPlayer, animLayer: CAShapeLayer? = nil, completionHandler: (() -> Void)? = nil) {
+    func execute(player: AVPlayer, superView: UIView, completionHandler: (() -> Void)? = nil) {
         
         events.removeValue(forKey: -1)
         let executionBarrier = DispatchSemaphore(value: 1)
@@ -81,7 +82,7 @@ class RecordSession {
                 DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(diff * 1000.0 / self.frequency))) {
                     executionBarrier.signal()
                     for entity in self.events[next]! {
-                        entity.execute(player: player, animLayer: animLayer, metadata: &self.metadata)
+                        entity.execute(player: player, superView: superView, metadata: &self.metadata)
                     }
                 }
             }

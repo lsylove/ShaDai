@@ -9,13 +9,15 @@
 import AVKit
 import AVFoundation
 
-class EditorViewController: UIViewController, HSBColorPickerDelegate {
+class EditorViewController: UIViewController {
     
     var url: String?
     
-    private var fps = 30.0
+    private let fps = 30.0
     
-    private var frequency = 60.0
+    private let frequency = 60.0
+    
+    //
     
     private var player = AVPlayer()
     
@@ -23,23 +25,39 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     
     private var rate: Float = 1.0
     
-    private var timer: Timer?
+    //
     
-    private var recordSession: RecordSession?
+    fileprivate var timer: Timer?
+    
+    fileprivate var recordSession: RecordSession?
+    
+    //
     
     private var cycle = 2
     
     private var ccount = 0
     
+    //
+    
+    fileprivate var shapes = [ShapeView]()
+    
+    fileprivate var current: ShapeView?
+    
+    private var previous = [ShapeView]()
+    
+    //
+    
     @IBOutlet weak var playerView: PlayerView!
     
-    @IBOutlet weak var shapeSegControl: UISegmentedControl!
+    @IBOutlet weak var colorView: UIView!
     
-    @IBOutlet weak var speedSegControl: UISegmentedControl!
+    @IBOutlet weak var shapeSeg: UISegmentedControl!
+    
+    @IBOutlet weak var speedSeg: UISegmentedControl!
     
     @IBOutlet weak var colorButton: UIButton!
     
-    @IBOutlet weak var undoButton: UIButton!
+    @IBOutlet weak var deleteButton: UIButton!
     
     @IBOutlet weak var playButton: UIButton!
     
@@ -57,7 +75,9 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     
     @IBOutlet weak var slider: UISlider!
     
-    @IBAction func speedSeg(_ sender: UISegmentedControl) {
+    // >_<
+    
+    @IBAction func speedChange(_ sender: UISegmentedControl) {
         updateSpeed()
         
         if (player.timeControlStatus == .playing) {
@@ -65,9 +85,20 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         }
     }
     
+    func shapeChange() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(10)) {
+            self.appendShape()
+        }
+        
+//        recordSession?.record(entity: ArbitraryEvent { [weak self] _,_,_ in self?.shapeSeg.selectedSegmentIndex = index })
+        recordSession?.record(entity: SegmentedControlEvent(shapeSeg, shapeSeg.selectedSegmentIndex))
+    }
+    
+    // >_<
+    
     @IBAction func action(_ sender: UIButton) {
         switch sender {
-        case undoButton: undo()
+        case deleteButton: delete()
         case playButton: play()
         case pauseButton: pause()
         case prevButton: stepDown()
@@ -75,7 +106,7 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         case startButton: start()
         case finishButton: finish()
         case playbackButton: playback()
-        default: print("[debug] button void bind")
+        default: assert(false, "[debug] button void bind")
         }
     }
     
@@ -100,6 +131,15 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         player.actionAtItemEnd = .pause
         toggleButtons(playButton, pauseButton)
         toggleButtons(startButton, finishButton)
+        
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.chooseShape)))
+        
+        let segTap = UITapGestureRecognizer(target: self, action: #selector(self.shapeChange))
+        segTap.cancelsTouchesInView = false
+        shapeSeg.addGestureRecognizer(segTap)
+        
+        colorView.layer.borderColor = UIColor.black.cgColor
+        colorView.layer.borderWidth = 1
         
         DispatchQueue.global().async {
             let item = self.player.currentItem!
@@ -131,15 +171,12 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         }
     }
     
-    func HSBColorPickerTouched(sender: HSBColorPicker, color: UIColor, point: CGPoint, state: UIGestureRecognizerState) {
-        for view in [shapeSegControl, colorButton, undoButton] as [UIView] {
-            view.tintColor = color
-        }
-    }
+    // >_<
     
-    func undo() {
-        let frame = CMTimeGetSeconds(player.currentTime()) * fps
-        print(frame, Int(round(frame)))
+    func delete() {
+        if let current = current {
+            removeShape(current)
+        }
     }
     
     func stepUp() {
@@ -165,7 +202,7 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     }
     
     func play() {
-//        recordSession?.record(entity: PlayEvent.play)
+        // recordSession?.record(entity: PlayEvent.play)
         player.playImmediately(atRate: rate)
         
         timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
@@ -174,7 +211,7 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     }
     
     func pause() {
-//        recordSession?.record(entity: PlayEvent.pause)
+        // recordSession?.record(entity: PlayEvent.pause)
         player.pause()
         
         timer?.invalidate()
@@ -209,12 +246,18 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
     
     func start() {
         suspend()
+        previous = shapes.map { $0.copy() as! ShapeView }
         
         recordSession = RecordSession(frequency: frequency)
         
         // Save initial state as events
         recordSession!.record(entity: SeekEvent(player.currentTime()))
-        updateSpeed()
+        recordSession!.record(entity: RateEvent(rate))
+        recordSession!.record(entity: SegmentedControlEvent(speedSeg, speedSeg.selectedSegmentIndex))
+        recordSession!.record(entity: SegmentedControlEvent(shapeSeg, shapeSeg.selectedSegmentIndex))
+        
+        let color = colorView.backgroundColor
+        recordSession!.record(entity: ArbitraryEvent { [weak self] _,_,_ in self?.colorView.backgroundColor = color })
         
         toggleButtons(startButton, finishButton, paused: false)
         playbackButton.isEnabled = false
@@ -233,14 +276,18 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         if let s = recordSession {
             if !s.active {
                 suspend()
-                let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, undoButton, prevButton, nextButton, slider, shapeSegControl, speedSegControl]
+                for shape in shapes {
+                    returnShapeToOriginalPosition(shape)
+                    shape.removeFromSuperview()
+                }
+                
+                let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, deleteButton, prevButton, nextButton, slider, shapeSeg, speedSeg]
                 
                 controls.forEach { $0.isEnabled = false }
                 
                 timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
                 
-                
-                s.execute(player: player) {
+                s.execute(player: player, superView: self.view) {
                     self.timer?.invalidate()
                     self.timer = nil
                     
@@ -250,12 +297,130 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         }
     }
     
+    // >_<
+    
+    @objc private func chooseShape(recognizer: UITapGestureRecognizer) {
+        if (recognizer.state != .ended) {
+            return
+        }
+        
+        let point = recognizer.location(in: self.view)
+        let current = self.current
+        clearCurrentSelection()
+        
+        if (current?.frame.contains(point) ?? false) {
+            var checkup = current == nil
+            for shape in shapes.reversed() {
+                if (!shape.frame.contains(point)) {
+                    continue
+                }
+                if (shape == current) {
+                    checkup = true
+                    continue
+                }
+                if (!checkup) {
+                    continue
+                }
+                selectShape(shape)
+                return
+            }
+            for shape in shapes.reversed() {
+                if (!shape.frame.contains(point)) {
+                    continue
+                }
+                if (shape == current) {
+                    return
+                }
+                selectShape(shape)
+                return
+            }
+            assert(false, "[debug] two iterations should have at least two identical ones!! (even when it's worst)")
+            
+        } else {
+            for shape in shapes.reversed() {
+                if (!shape.frame.contains(point)) {
+                    continue
+                }
+                selectShape(shape)
+                return
+            }
+        }
+    }
+    
+    private func selectShape(_ shape: ShapeView) {
+        shape.isSelected = true
+        current = shape
+        recordSession?.record(entity: ShapeRelatedEvent(shape) { shape, _, _, _ in shape.isSelected = true })
+        
+        shape.removeFromSuperview()
+        self.view.addSubview(shape)
+    }
+    
+    private func clearCurrentSelection() {
+        if let current = current {
+            current.isSelected = false
+            recordSession?.record(entity: ShapeRelatedEvent(current) { shape, _, _, _ in shape.isSelected = false })
+        }
+        
+        current = nil
+    }
+    
+    private func appendShape() {
+        let outer = playerView.frame
+        let inner = playerView.playerLayer.videoRect
+        
+        let a = CGPoint(x: outer.midX, y: outer.midY)
+        let b = CGPoint(x: a.x + 50, y: a.y + 50)
+        let c = colorView.backgroundColor!
+        
+        let translatedOrigin = CGPoint(x: outer.minX + inner.minX, y: outer.minY + inner.minY)
+        let translatedFrame = CGRect(origin: translatedOrigin, size: inner.size)
+        
+        let shape = Shape(rawValue: shapeSeg.selectedSegmentIndex)!
+        let view = ShapeView(a: a, b: b, c: c, f: translatedFrame, d: shape.recipe())
+        
+        view.delegate = self
+        
+        shapes.append(view)
+        recordSession?.record(entity: ShapeRelatedEvent(view) { shape, _, view, _ in view.addSubview(shape); shape.c = c })
+        
+        clearCurrentSelection()
+        selectShape(view)
+    }
+    
+    private func removeShape(_ target: ShapeView) {
+        if (target == current) {
+            current = nil
+        }
+        target.removeFromSuperview()
+        recordSession?.record(entity: ShapeRelatedEvent(target) { shape, _, _, _ in shape.removeFromSuperview() })
+        
+        for (index, shape) in shapes.enumerated() {
+            if (shape == target) {
+                shapes.remove(at: index)
+                
+                return
+            }
+        }
+        assert(false, "[debug] should have target shape!!")
+    }
+    
+    private func returnShapeToOriginalPosition(_ shape: ShapeView) {
+//        let a = CGPoint(x: playerView.frame.midX, y: playerView.frame.midY)
+//        let b = CGPoint(x: a.x + 50, y: a.y + 50)
+//        
+//        shape.a = a
+//        shape.b = b
+    }
+    
+    // >_<
+    
     private func updateSpeed() {
-        let index = speedSegControl.selectedSegmentIndex
+        let index = speedSeg.selectedSegmentIndex
         rate = Float([1.0, 0.5, 0.25][index])
         
         recordSession?.record(entity: RateEvent(rate))
-        recordSession?.record(entity: ArbitraryEvent { _,_,_ in self.speedSegControl.selectedSegmentIndex = index })
+        recordSession?.record(entity: SegmentedControlEvent(speedSeg, index))
         
         // Bad coding practice: update cycle
         cycle = Int(round(2.0 / rate))
@@ -270,4 +435,30 @@ class EditorViewController: UIViewController, HSBColorPickerDelegate {
         button2.isHidden = paused
     }
 
+}
+
+extension EditorViewController: HSBColorPickerDelegate {
+    
+    func HSBColorPickerTouched(sender: HSBColorPicker, color: UIColor, point: CGPoint, state: UIGestureRecognizerState) {
+        colorView.backgroundColor = color
+        recordSession?.record(entity: ArbitraryEvent { [weak self] _,_,_ in self?.colorView.backgroundColor = color })
+        
+        if let current = current {
+            current.c = color
+            recordSession?.record(entity: ShapeRelatedEvent(current) { shape, _, _, _ in shape.c = color })
+        }
+    }
+    
+}
+
+extension EditorViewController: ShapeViewGestureRecognitionDelegate {
+    
+    func shapeViewGestureRecognition(_ view: ShapeView, recognizer: UIGestureRecognizer, operation: Any) {
+        if let recognizer = recognizer as? UIPanGestureRecognizer,
+            let operation = operation as? (ShapeView, CGPoint) -> Void {
+            
+            recordSession?.record(entity: PanningEvent(view, recognizer.translation(in: view), operation: operation))
+        }
+    }
+    
 }

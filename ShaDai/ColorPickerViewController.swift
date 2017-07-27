@@ -8,9 +8,9 @@
 
 import UIKit
 
-class ColorPickerViewController: UIViewController, HSBColorPickerDelegate {
+class ColorPickerViewController: UIViewController {
     
-    weak var delegate: HSBColorPickerDelegate?
+    weak internal var delegate: HSBColorPickerDelegate?
 
     @IBOutlet weak var colorPicker: HSBColorPicker!
     
@@ -34,6 +34,10 @@ class ColorPickerViewController: UIViewController, HSBColorPickerDelegate {
             delegate?.HSBColorPickerTouched(sender: colorPicker, color: color, point: point!, state: state!)
         }
     }
+
+}
+
+extension ColorPickerViewController: HSBColorPickerDelegate {
     
     func HSBColorPickerTouched(sender: HSBColorPicker, color: UIColor, point: CGPoint, state: UIGestureRecognizerState) {
         var red = CGFloat(0)
@@ -48,5 +52,5 @@ class ColorPickerViewController: UIViewController, HSBColorPickerDelegate {
         self.navigationController?.popViewController(animated: true)
         dismiss(animated: true)
     }
-
+    
 }

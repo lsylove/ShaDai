@@ -47,7 +47,7 @@ enum SwingMotion: Int {
     }
 }
 
-protocol UnwindDelegate {
+protocol UnwindDelegate: class {
     func unwind(controller: UIViewController)
 }
 
@@ -67,7 +67,7 @@ class SwingConfigViewController: UIViewController {
     
     var points = [Double](repeating: -1.0, count: 4) // SwingMotion.count
     
-    var delegate: UnwindDelegate?
+    weak var delegate: UnwindDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()

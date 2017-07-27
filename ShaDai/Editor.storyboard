@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -93,11 +94,11 @@
                                     <segment title="X0.25"/>
                                 </segments>
                                 <connections>
-                                    <action selector="speedSeg:" destination="Gqq-6y-TMj" eventType="valueChanged" id="3QR-7T-HSw"/>
+                                    <action selector="speedChange:" destination="Gqq-6y-TMj" eventType="valueChanged" id="N8o-eO-PIC"/>
                                 </connections>
                             </segmentedControl>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" horizontalCompressionResistancePriority="749" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="559-ee-gp4">
-                                <rect key="frame" x="66" y="40" width="138" height="29"/>
+                                <rect key="frame" x="66" y="40" width="131" height="29"/>
                                 <segments>
                                     <segment title="↘︎"/>
                                     <segment title="☐"/>
@@ -105,15 +106,15 @@
                                 </segments>
                             </segmentedControl>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IeX-aj-XG0">
-                                <rect key="frame" x="219" y="39" width="37" height="30"/>
+                                <rect key="frame" x="212" y="39" width="37" height="30"/>
                                 <state key="normal" title="Color"/>
                                 <connections>
                                     <segue destination="Bot-Ys-Ilv" kind="show" identifier="color" id="sPS-A9-xGZ"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IBa-9H-pgQ">
-                                <rect key="frame" x="271" y="39" width="38" height="30"/>
-                                <state key="normal" title="Undo"/>
+                                <rect key="frame" x="264" y="39" width="45" height="30"/>
+                                <state key="normal" title="Delete"/>
                                 <connections>
                                     <action selector="action:" destination="Gqq-6y-TMj" eventType="touchUpInside" id="cpK-f6-4Dw"/>
                                 </connections>
@@ -133,7 +134,7 @@
                                 </connections>
                             </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="IFg-1R-YXn" customClass="PlayerView" customModule="ShaDai" customModuleProvider="target">
-                                <rect key="frame" x="16" y="148" width="343" height="291"/>
+                                <rect key="frame" x="16" y="128" width="343" height="331"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J80-cC-iY8">
@@ -157,6 +158,19 @@
                                     <action selector="action:" destination="Gqq-6y-TMj" eventType="touchUpInside" id="XQw-8B-Uew"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Current Color: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="asg-9u-lKS">
+                                <rect key="frame" x="66" y="88" width="113" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sXd-q4-6d8">
+                                <rect key="frame" x="180" y="88" width="21.5" height="21"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="sXd-q4-6d8" secondAttribute="height" multiplier="30:29" id="rfn-iA-nQS"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -166,7 +180,7 @@
                             <constraint firstItem="559-ee-gp4" firstAttribute="leading" secondItem="qKs-g0-cYF" secondAttribute="leadingMargin" constant="50" id="Az4-2S-Ehj"/>
                             <constraint firstItem="jZS-i4-P6x" firstAttribute="leading" secondItem="rE7-cc-f6S" secondAttribute="trailing" constant="20" id="B7o-8W-o3z"/>
                             <constraint firstItem="AVP-GV-io7" firstAttribute="leading" secondItem="qKs-g0-cYF" secondAttribute="leadingMargin" constant="60" id="B9n-i3-9Og"/>
-                            <constraint firstItem="IFg-1R-YXn" firstAttribute="top" secondItem="559-ee-gp4" secondAttribute="bottom" constant="80" id="Cuw-i3-XFf"/>
+                            <constraint firstItem="IFg-1R-YXn" firstAttribute="top" secondItem="559-ee-gp4" secondAttribute="bottom" constant="60" id="Cuw-i3-XFf"/>
                             <constraint firstItem="cHA-Wm-vII" firstAttribute="top" secondItem="J80-cC-iY8" secondAttribute="bottom" constant="20" id="D5V-jO-ZEr"/>
                             <constraint firstItem="rE7-cc-f6S" firstAttribute="leading" secondItem="ldB-4j-Hre" secondAttribute="trailing" constant="20" id="ETg-kg-hLC"/>
                             <constraint firstItem="1wl-d9-nwr" firstAttribute="top" secondItem="J80-cC-iY8" secondAttribute="bottom" constant="-30" id="FwC-U0-noY"/>
@@ -174,13 +188,16 @@
                             <constraint firstItem="SkC-no-xMF" firstAttribute="centerY" secondItem="AVP-GV-io7" secondAttribute="centerY" id="HLY-LR-bcK"/>
                             <constraint firstItem="IBa-9H-pgQ" firstAttribute="leading" secondItem="IeX-aj-XG0" secondAttribute="trailing" constant="15" id="Krl-lB-Klk"/>
                             <constraint firstItem="1wl-d9-nwr" firstAttribute="leading" secondItem="J80-cC-iY8" secondAttribute="trailing" constant="-37" id="MSV-IC-MO2"/>
-                            <constraint firstItem="rE7-cc-f6S" firstAttribute="top" secondItem="IFg-1R-YXn" secondAttribute="bottom" constant="80" id="NKT-Ql-cco"/>
+                            <constraint firstItem="rE7-cc-f6S" firstAttribute="top" secondItem="IFg-1R-YXn" secondAttribute="bottom" constant="60" id="NKT-Ql-cco"/>
                             <constraint firstItem="AVP-GV-io7" firstAttribute="top" secondItem="rE7-cc-f6S" secondAttribute="bottom" constant="20" id="PFy-nd-XIP"/>
                             <constraint firstItem="IFg-1R-YXn" firstAttribute="leading" secondItem="qKs-g0-cYF" secondAttribute="leadingMargin" id="R3y-eo-Ybb"/>
                             <constraint firstItem="9hk-1n-rlr" firstAttribute="centerY" secondItem="1wl-d9-nwr" secondAttribute="centerY" id="RIu-mQ-oPg"/>
                             <constraint firstAttribute="trailingMargin" secondItem="jZS-i4-P6x" secondAttribute="trailing" id="RvT-Ch-fom"/>
+                            <constraint firstItem="sXd-q4-6d8" firstAttribute="centerY" secondItem="asg-9u-lKS" secondAttribute="centerY" id="TOR-pW-IYu"/>
+                            <constraint firstItem="asg-9u-lKS" firstAttribute="leading" secondItem="559-ee-gp4" secondAttribute="leading" id="WCP-Gk-3Rq"/>
                             <constraint firstItem="IBa-9H-pgQ" firstAttribute="centerY" secondItem="559-ee-gp4" secondAttribute="centerY" id="WE2-y6-Lwq"/>
                             <constraint firstItem="ldB-4j-Hre" firstAttribute="centerY" secondItem="rE7-cc-f6S" secondAttribute="centerY" id="Y6A-hQ-1CH"/>
+                            <constraint firstItem="sXd-q4-6d8" firstAttribute="leading" secondItem="asg-9u-lKS" secondAttribute="trailing" constant="1" id="cT9-dR-hgK"/>
                             <constraint firstItem="bGQ-PQ-kDL" firstAttribute="leading" secondItem="AVP-GV-io7" secondAttribute="trailing" constant="20" id="cve-zB-qSw"/>
                             <constraint firstItem="IeX-aj-XG0" firstAttribute="leading" secondItem="559-ee-gp4" secondAttribute="trailing" constant="15" id="ipd-dh-LP2"/>
                             <constraint firstItem="J80-cC-iY8" firstAttribute="top" secondItem="AVP-GV-io7" secondAttribute="bottom" constant="20" id="k90-Gq-9IL"/>
@@ -189,7 +206,9 @@
                             <constraint firstItem="SkC-no-xMF" firstAttribute="leading" secondItem="AVP-GV-io7" secondAttribute="trailing" constant="20" id="obv-AD-ebK"/>
                             <constraint firstAttribute="trailingMargin" secondItem="bGQ-PQ-kDL" secondAttribute="trailing" constant="60" id="pAc-2u-09a"/>
                             <constraint firstItem="jZS-i4-P6x" firstAttribute="centerY" secondItem="rE7-cc-f6S" secondAttribute="centerY" id="pgo-to-Qbk"/>
+                            <constraint firstItem="asg-9u-lKS" firstAttribute="top" secondItem="559-ee-gp4" secondAttribute="bottom" constant="20" id="qjh-iP-aQb"/>
                             <constraint firstAttribute="trailingMargin" secondItem="IFg-1R-YXn" secondAttribute="trailing" id="qpc-hX-t1A"/>
+                            <constraint firstItem="sXd-q4-6d8" firstAttribute="height" secondItem="asg-9u-lKS" secondAttribute="height" id="sV9-Y0-ecp"/>
                             <constraint firstAttribute="trailingMargin" secondItem="SkC-no-xMF" secondAttribute="trailing" constant="60" id="um3-gt-w9m"/>
                             <constraint firstItem="9hk-1n-rlr" firstAttribute="leading" secondItem="J80-cC-iY8" secondAttribute="trailing" constant="20" id="vLg-um-OtG"/>
                             <constraint firstItem="IeX-aj-XG0" firstAttribute="centerY" secondItem="559-ee-gp4" secondAttribute="centerY" id="wSw-Ei-T9G"/>
@@ -197,6 +216,8 @@
                     </view>
                     <connections>
                         <outlet property="colorButton" destination="IeX-aj-XG0" id="5So-3a-WPf"/>
+                        <outlet property="colorView" destination="sXd-q4-6d8" id="SrM-mX-5fh"/>
+                        <outlet property="deleteButton" destination="IBa-9H-pgQ" id="ihG-Jr-De3"/>
                         <outlet property="finishButton" destination="1wl-d9-nwr" id="VEQ-JP-eTZ"/>
                         <outlet property="nextButton" destination="jZS-i4-P6x" id="OdT-XT-IA4"/>
                         <outlet property="pauseButton" destination="SkC-no-xMF" id="vSd-zW-Frh"/>
@@ -204,11 +225,10 @@
                         <outlet property="playbackButton" destination="9hk-1n-rlr" id="l3d-To-R8l"/>
                         <outlet property="playerView" destination="IFg-1R-YXn" id="J1V-vM-imv"/>
                         <outlet property="prevButton" destination="ldB-4j-Hre" id="rYT-K6-jS5"/>
-                        <outlet property="shapeSegControl" destination="559-ee-gp4" id="JIu-m0-wS4"/>
+                        <outlet property="shapeSeg" destination="559-ee-gp4" id="Q5j-05-Yrz"/>
                         <outlet property="slider" destination="rE7-cc-f6S" id="bFq-cA-dzb"/>
-                        <outlet property="speedSegControl" destination="AVP-GV-io7" id="pWR-wj-7Lg"/>
+                        <outlet property="speedSeg" destination="AVP-GV-io7" id="tQ1-Et-jCg"/>
                         <outlet property="startButton" destination="J80-cC-iY8" id="oQF-aX-sbD"/>
-                        <outlet property="undoButton" destination="IBa-9H-pgQ" id="NgM-IG-CRL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Unk-I8-o5p" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -244,6 +244,7 @@
 				67E779431F25B06A00C29CE5 /* HSBColorPicker.swift */,
 				67E779491F25E75900C29CE5 /* RecordSession.swift */,
 				67E7794B1F25E76300C29CE5 /* EventEntity.swift */,
+				675DFFD21F281EBA004A2602 /* ShapeView.swift */,
 				67147E361F2588280069F24D /* Editor.storyboard */,
 			);
 			name = Editor;
@@ -253,7 +254,6 @@
 			isa = PBXGroup;
 			children = (
 				676C4A3E1F27350D00D7BBF8 /* SquareViewController.swift */,
-				675DFFD21F281EBA004A2602 /* ShapeView.swift */,
 				676C4A401F27351700D7BBF8 /* Square.storyboard */,
 			);
 			name = Square;

@@ -8,15 +8,52 @@
 
 import UIKit
 
-protocol ShapeViewGestureRecognitionDelegate {
-    func shapeViewGestureRecognition(view: ShapeView, recognizer: UIPanGestureRecognizer, success: Bool)
+protocol ShapeViewGestureRecognitionDelegate: class {
+    func shapeViewGestureRecognition(_ view: ShapeView, recognizer: UIGestureRecognizer, operation: Any)
+}
+
+enum Shape: Int {
+    case line = 0
+    case square
+    case circle
+    
+    func recipe() -> ((UIBezierPath, CGPoint, CGPoint) -> Void) {
+        switch self {
+        case .line: return { path, a, b in
+            path.move(to: a)
+            path.addLine(to: b)
+            }
+        case .square: return { path, a, b in
+            path.move(to: a)
+            path.addLine(to: CGPoint(x: a.x, y: b.y))
+            path.addLine(to: b)
+            path.addLine(to: CGPoint(x: b.x, y: a.y))
+            path.addLine(to: a)
+            }
+        case .circle: return { path, a, b in
+            let center = CGPoint(x: (a.x + b.x) / 2, y: (a.y + b.y) / 2)
+            let radius = Swift.min(Swift.abs(a.x - b.x), Swift.abs(a.y - b.y)) / 2
+            path.addArc(withCenter: center, radius: radius, startAngle: 0, endAngle: CGFloat(Float.pi * 2), clockwise: true)
+            }
+        }
+    }
 }
 
 class ShapeView: UIView {
     
-    private var a: CGPoint
+    var a: CGPoint {
+        didSet {
+            absA = a
+            calculatePosition()
+        }
+    }
     
-    private var b: CGPoint
+    var b: CGPoint {
+        didSet {
+            absB = b
+            calculatePosition()
+        }
+    }
     
     var c: UIColor {
         didSet {
@@ -32,9 +69,9 @@ class ShapeView: UIView {
     
     let f: CGRect
     
-    private var absA: CGPoint
+    var absA: CGPoint
     
-    private var absB: CGPoint
+    var absB: CGPoint
     
     private static let r: CGFloat = 6.0
     
@@ -55,7 +92,7 @@ class ShapeView: UIView {
         }
     }
     
-    var delegate: ShapeViewGestureRecognitionDelegate?
+    weak var delegate: ShapeViewGestureRecognitionDelegate?
     
     init(a: CGPoint, b: CGPoint, c: UIColor, f: CGRect, d: @escaping (UIBezierPath, CGPoint, CGPoint) -> Void) {
         let mx = Swift.min(a.x, b.x)
@@ -115,21 +152,34 @@ class ShapeView: UIView {
     @objc private func pan(recognizer: UIPanGestureRecognizer) {
         let translation = recognizer.translation(in: self)
         
-        let res: Bool
+        let operation: (ShapeView, CGPoint) -> Void
         switch (recognizer.view ?? UIView()) {
-        case aView: res = movePoint(lv: &absA, by: translation)
-        case bView: res = movePoint(lv: &absB, by: translation)
-        case dView: res = transpose(by: translation)
-        default: res = movePoint(lv: &absB, by: translation)
+        case aView: operation = moveA
+        case bView: operation = moveB
+        case dView: operation = transpose
+        default: operation = moveB
         }
+        operation(self, translation)
         
-        delegate?.shapeViewGestureRecognition(view: self, recognizer: recognizer, success: res)
+        delegate?.shapeViewGestureRecognition(self, recognizer: recognizer, operation: operation)
         recognizer.setTranslation(CGPoint(), in: self)
     }
     
-    func movePoint(lv: inout CGPoint, by: CGPoint) -> Bool {
+    func moveA(target: ShapeView, by: CGPoint) {
+        target.movePoint(lv: &target.absA, by: by)
+    }
+    
+    func moveB(target: ShapeView, by: CGPoint) {
+        target.movePoint(lv: &target.absB, by: by)
+    }
+    
+    func transpose(target: ShapeView, by: CGPoint) {
+        target.transposeInternal(by: by)
+    }
+    
+    private func movePoint(lv: inout CGPoint, by: CGPoint) {
         guard check(CGPoint(x: lv.x + by.x, y: lv.y + by.y)) else {
-            return false
+            return
         }
         
         lv.x += by.x
@@ -139,10 +189,9 @@ class ShapeView: UIView {
         calculateFrames()
         
         self.setNeedsDisplay()
-        return true
     }
     
-    func transpose(by: CGPoint) -> Bool {
+    private func transposeInternal(by: CGPoint) {
         absA.x += by.x
         absA.y += by.y
         absB.x += by.x
@@ -153,14 +202,13 @@ class ShapeView: UIView {
             absA.y -= by.y
             absB.x -= by.x
             absB.y -= by.y
-            return false
+            return
         }
         
         calculatePosition()
         calculateFrames()
         
         self.setNeedsDisplay()
-        return true
     }
     
     override func draw(_ rect: CGRect) {
