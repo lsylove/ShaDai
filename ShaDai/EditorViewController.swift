@@ -43,7 +43,7 @@ class EditorViewController: UIViewController {
     
     fileprivate var current: ShapeView?
     
-    private var previous = [ShapeView]()
+    private var previous = [ShapeView : ShapeView]()
     
     //
     
@@ -246,7 +246,9 @@ class EditorViewController: UIViewController {
     
     func start() {
         suspend()
-        previous = shapes.map { $0.copy() as! ShapeView }
+        
+        previous.removeAll()
+        zip(shapes, shapes.map{ $0.copy() as! ShapeView }).forEach { previous[$0.0] = $0.1 }
         
         recordSession = RecordSession(frequency: frequency)
         
@@ -279,6 +281,14 @@ class EditorViewController: UIViewController {
                 for shape in shapes {
                     returnShapeToOriginalPosition(shape)
                     shape.removeFromSuperview()
+                }
+                for (curr, prev) in previous {
+                    curr.absA = prev.absA
+                    curr.absB = prev.absB
+                    curr.c = prev.c
+                    
+                    self.view.addSubview(curr)
+                    curr.setNeedsDisplay()
                 }
                 
                 let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, deleteButton, prevButton, nextButton, slider, shapeSeg, speedSeg]
@@ -406,11 +416,11 @@ class EditorViewController: UIViewController {
     }
     
     private func returnShapeToOriginalPosition(_ shape: ShapeView) {
-//        let a = CGPoint(x: playerView.frame.midX, y: playerView.frame.midY)
-//        let b = CGPoint(x: a.x + 50, y: a.y + 50)
-//        
-//        shape.a = a
-//        shape.b = b
+        let a = CGPoint(x: playerView.frame.midX, y: playerView.frame.midY)
+        let b = CGPoint(x: a.x + 50, y: a.y + 50)
+        
+        shape.absA = a
+        shape.absB = b
     }
     
     // >_<

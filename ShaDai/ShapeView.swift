@@ -41,19 +41,9 @@ enum Shape: Int {
 
 class ShapeView: UIView {
     
-    var a: CGPoint {
-        didSet {
-            absA = a
-            calculatePosition()
-        }
-    }
+    var a: CGPoint
     
-    var b: CGPoint {
-        didSet {
-            absB = b
-            calculatePosition()
-        }
-    }
+    var b: CGPoint
     
     var c: UIColor {
         didSet {
@@ -69,9 +59,19 @@ class ShapeView: UIView {
     
     let f: CGRect
     
-    var absA: CGPoint
+    var absA: CGPoint {
+        didSet {
+            calculatePosition()
+            calculateFrames()
+        }
+    }
     
-    var absB: CGPoint
+    var absB: CGPoint {
+        didSet {
+            calculatePosition()
+            calculateFrames()
+        }
+    }
     
     private static let r: CGFloat = 6.0
     
@@ -236,5 +236,13 @@ class ShapeView: UIView {
             whitePathB.lineWidth = 1.5
             whitePathB.stroke()
         }
+    }
+}
+
+extension ShapeView: NSCopying {
+    func copy(with: NSZone? = nil) -> Any {
+        let shape = ShapeView(a: self.absA, b: self.absB, c: self.c, f: self.f, d: self.d)
+        shape.delegate = self.delegate
+        return shape
     }
 }
