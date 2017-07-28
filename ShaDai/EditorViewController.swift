@@ -8,6 +8,7 @@
 
 import AVKit
 import AVFoundation
+import Photos
 
 class EditorViewController: UIViewController {
     
@@ -73,6 +74,8 @@ class EditorViewController: UIViewController {
     
     @IBOutlet weak var playbackButton: UIButton!
     
+    @IBOutlet weak var saveButton: UIButton!
+    
     @IBOutlet weak var slider: UISlider!
     
     // >_<
@@ -106,6 +109,7 @@ class EditorViewController: UIViewController {
         case startButton: start()
         case finishButton: finish()
         case playbackButton: playback()
+        case saveButton: save()
         default: assert(false, "[debug] button void bind")
         }
     }
@@ -131,6 +135,9 @@ class EditorViewController: UIViewController {
         player.actionAtItemEnd = .pause
         toggleButtons(playButton, pauseButton)
         toggleButtons(startButton, finishButton)
+        
+        playbackButton.isEnabled = false
+        saveButton.isEnabled = false
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.chooseShape)))
         
@@ -263,6 +270,7 @@ class EditorViewController: UIViewController {
         
         toggleButtons(startButton, finishButton, paused: false)
         playbackButton.isEnabled = false
+        saveButton.isEnabled = false
     }
     
     func finish() {
@@ -272,6 +280,7 @@ class EditorViewController: UIViewController {
         
         toggleButtons(startButton, finishButton)
         playbackButton.isEnabled = true
+        saveButton.isEnabled = true
     }
     
     func playback() {
@@ -291,7 +300,7 @@ class EditorViewController: UIViewController {
                     curr.setNeedsDisplay()
                 }
                 
-                let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, deleteButton, prevButton, nextButton, slider, shapeSeg, speedSeg]
+                let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, deleteButton, prevButton, nextButton, saveButton, slider, shapeSeg, speedSeg]
                 
                 controls.forEach { $0.isEnabled = false }
                 
@@ -302,6 +311,57 @@ class EditorViewController: UIViewController {
                     self.timer = nil
                     
                     controls.forEach { $0.isEnabled = true }
+                }
+            }
+        }
+    }
+    
+    func save() {
+        if let s = recordSession {
+            if !s.active {
+                suspend()
+                for shape in shapes {
+                    returnShapeToOriginalPosition(shape)
+                    shape.removeFromSuperview()
+                }
+                for (curr, prev) in previous {
+                    curr.absA = prev.absA
+                    curr.absB = prev.absB
+                    curr.c = prev.c
+                    
+                    self.view.addSubview(curr)
+                    curr.setNeedsDisplay()
+                }
+                
+                let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, deleteButton, prevButton, nextButton, saveButton, slider, shapeSeg, speedSeg]
+                
+                controls.forEach { $0.isEnabled = false }
+                
+                timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
+                
+                let docPaths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+                let url = docPaths[0].appendingPathComponent("recording.mp4")
+                
+                try? FileManager.default.removeItem(at: url)
+                
+                print(url)
+                
+                s.exportAsFile(player: player, view: self.view, fileURL: url) {
+                    
+                    PHPhotoLibrary.shared().performChanges({
+                        PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+                        
+                    }) { saved, error in
+                        DispatchQueue.main.async {
+                            
+                            print("camera roll", saved, error.debugDescription)
+                            
+                            self.timer?.invalidate()
+                            self.timer = nil
+                            
+                            controls.forEach { $0.isEnabled = true }
+                        }
+                    }
                 }
             }
         }

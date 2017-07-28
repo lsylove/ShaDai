@@ -29,6 +29,7 @@
 		672667A11F18613A001541B2 /* Tracer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 672667A01F18613A001541B2 /* Tracer.storyboard */; };
 		672667A31F18614D001541B2 /* TracerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672667A21F18614D001541B2 /* TracerViewController.swift */; };
 		67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */; };
+		67367B561F2AFB6000C0A097 /* RecordExportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67367B551F2AFB6000C0A097 /* RecordExportSession.swift */; };
 		674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */; };
 		674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */; };
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
@@ -77,6 +78,7 @@
 		672667A01F18613A001541B2 /* Tracer.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Tracer.storyboard; sourceTree = "<group>"; };
 		672667A21F18614D001541B2 /* TracerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TracerViewController.swift; sourceTree = "<group>"; };
 		67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVAnimationComposer.swift; sourceTree = "<group>"; };
+		67367B551F2AFB6000C0A097 /* RecordExportSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordExportSession.swift; sourceTree = "<group>"; };
 		674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ProfileOne.storyboard; sourceTree = "<group>"; };
 		674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileOneViewController.swift; sourceTree = "<group>"; };
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 				67E779471F25B5E600C29CE5 /* ColorPickerViewController.swift */,
 				67E779431F25B06A00C29CE5 /* HSBColorPicker.swift */,
 				67E779491F25E75900C29CE5 /* RecordSession.swift */,
+				67367B551F2AFB6000C0A097 /* RecordExportSession.swift */,
 				67E7794B1F25E76300C29CE5 /* EventEntity.swift */,
 				675DFFD21F281EBA004A2602 /* ShapeView.swift */,
 				67147E361F2588280069F24D /* Editor.storyboard */,
@@ -380,6 +383,7 @@
 				676F16BB1F203F6E00C333CC /* TimemarkParams.swift in Sources */,
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,
 				6725560B1F136E07008D88C2 /* ExportViewController.swift in Sources */,
+				67367B561F2AFB6000C0A097 /* RecordExportSession.swift in Sources */,
 				67E779481F25B5E600C29CE5 /* ColorPickerViewController.swift in Sources */,
 				67147E351F25881E0069F24D /* EditorViewController.swift in Sources */,
 				671BBF131F0E35590088B84C /* PlayerView.swift in Sources */,

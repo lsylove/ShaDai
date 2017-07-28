@@ -71,9 +71,7 @@ class RecordSession {
         
         sequentialConsumer.async {
             let keysSorted = self.events.keys.sorted()
-            
-            let temp = keysSorted.dropFirst()
-            let seq = zip(keysSorted, temp)
+            let seq = zip(keysSorted, keysSorted.dropFirst())
             
             for (curr, next) in seq {
                 let diff = Double(next - curr)
@@ -92,4 +90,28 @@ class RecordSession {
         }
     }
     
+    func exportAsFile(player: AVPlayer, view: UIView, fileURL: URL, completionHandler: (() -> Void)? = nil) {
+        
+        events.removeValue(forKey: -1)
+        let keysSorted = self.events.keys.sorted()
+        
+        let duration = CMTime(seconds: Double(keysSorted.last!) * 10 / self.frequency + 10.0, preferredTimescale: 1000)
+        print("duration: ", duration)
+        
+        guard let exportSession = RecordExportSession(fileURL: fileURL, size: view.frame.size, duration: duration) else {
+            print("[debug] failed to initialize exportSession")
+            return
+        }
+        
+        DispatchQueue.main.async {
+            
+            for ticks in keysSorted {
+                for entity in self.events[ticks]! {
+                    entity.execute(player: player, superView: view, metadata: &self.metadata)
+                }
+                exportSession.append(view: view, time: CMTime(seconds: Double(ticks) * 10 / self.frequency, preferredTimescale: 1000))
+            }
+            exportSession.markAsFinished(completionHandler: completionHandler)
+        }
+    }
 }
