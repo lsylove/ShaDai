@@ -43,5 +43,7 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app uses your photo library.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app uses your microphone.</string>
 </dict>
 </plist>
