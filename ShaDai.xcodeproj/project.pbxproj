@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3B431A1A1F2AC9B4008E8B05 /* VoiceRecorder.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B431A191F2AC9B4008E8B05 /* VoiceRecorder.storyboard */; };
+		3B431A1C1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B431A1B1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift */; };
 		3B4B05EB1F0E1086006EE5F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B4B05EA1F0E1086006EE5F1 /* AppDelegate.swift */; };
 		3B4B05ED1F0E1086006EE5F1 /* HashTagViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B4B05EC1F0E1086006EE5F1 /* HashTagViewController.swift */; };
 		3B4B05F01F0E1086006EE5F1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B4B05EE1F0E1086006EE5F1 /* Main.storyboard */; };
@@ -50,6 +52,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3B431A191F2AC9B4008E8B05 /* VoiceRecorder.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = VoiceRecorder.storyboard; sourceTree = "<group>"; };
+		3B431A1B1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRecorderViewController.swift; sourceTree = "<group>"; };
 		3B4B05E71F0E1086006EE5F1 /* ShaDai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShaDai.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4B05EA1F0E1086006EE5F1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3B4B05EC1F0E1086006EE5F1 /* HashTagViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashTagViewController.swift; sourceTree = "<group>"; };
@@ -106,6 +110,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3B431A181F2AC99A008E8B05 /* VoiceRecorder */ = {
+			isa = PBXGroup;
+			children = (
+				3B431A191F2AC9B4008E8B05 /* VoiceRecorder.storyboard */,
+				3B431A1B1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift */,
+			);
+			name = VoiceRecorder;
+			sourceTree = "<group>";
+		};
 		3B4B05DE1F0E1086006EE5F1 = {
 			isa = PBXGroup;
 			children = (
@@ -137,6 +150,7 @@
 				67147E321F2586980069F24D /* Dual */,
 				67147E331F2587DC0069F24D /* Editor */,
 				676C4A3D1F2734EF00D7BBF8 /* Square */,
+				3B431A181F2AC99A008E8B05 /* VoiceRecorder */,
 			);
 			path = ShaDai;
 			sourceTree = "<group>";
@@ -291,7 +305,7 @@
 				TargetAttributes = {
 					3B4B05E61F0E1086006EE5F1 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = 9N2GXJ9SUF;
+						DevelopmentTeam = RB73NXNMA7;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
@@ -333,6 +347,7 @@
 				6765EB031F1EF7EA0010D115 /* two.mp4 in Resources */,
 				6765EB021F1EF7EA0010D115 /* oldman.mp4 in Resources */,
 				672555FF1F131BF2008D88C2 /* Nasmo.storyboard in Resources */,
+				3B431A1A1F2AC9B4008E8B05 /* VoiceRecorder.storyboard in Resources */,
 				671BBF111F0E29720088B84C /* video.mp4 in Resources */,
 				6719F7211F1708D80071A5E8 /* proj.mp4 in Resources */,
 				675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */,
@@ -360,6 +375,7 @@
 				674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */,
 				67E7794A1F25E75900C29CE5 /* RecordSession.swift in Sources */,
 				676C4A3F1F27350D00D7BBF8 /* SquareViewController.swift in Sources */,
+				3B431A1C1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift in Sources */,
 				67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */,
 				676F16BB1F203F6E00C333CC /* TimemarkParams.swift in Sources */,
 				675775541F0F0A3B00270E3F /* AVViewController.swift in Sources */,
@@ -494,7 +510,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
+				DEVELOPMENT_TEAM = RB73NXNMA7;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
@@ -507,7 +523,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
+				DEVELOPMENT_TEAM = RB73NXNMA7;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
