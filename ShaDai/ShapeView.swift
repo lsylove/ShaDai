@@ -243,6 +243,7 @@ extension ShapeView: NSCopying {
     func copy(with: NSZone? = nil) -> Any {
         let shape = ShapeView(a: self.absA, b: self.absB, c: self.c, f: self.f, d: self.d)
         shape.delegate = self.delegate
+        shape.isSelected = self.isSelected
         return shape
     }
 }

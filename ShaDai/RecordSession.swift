@@ -22,6 +22,8 @@ class RecordSession {
     
     private let sequentialConsumer = DispatchQueue(label: "sequential")
     
+    fileprivate let rendererBarrier = DispatchSemaphore(value: 1)
+    
     var active: Bool {
         get {
             return _active
@@ -64,7 +66,7 @@ class RecordSession {
         }
     }
     
-    func execute(player: AVPlayer, superView: UIView, completionHandler: (() -> Void)? = nil) {
+    func execute(playerView: PlayerView, superView: UIView, completionHandler: (() -> Void)? = nil) {
         
         events.removeValue(forKey: -1)
         let executionBarrier = DispatchSemaphore(value: 1)
@@ -80,7 +82,7 @@ class RecordSession {
                 DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(diff * 1000.0 / self.frequency))) {
                     executionBarrier.signal()
                     for entity in self.events[next]! {
-                        entity.execute(player: player, superView: superView, metadata: &self.metadata)
+                        entity.execute(player: playerView.player!, superView: superView, metadata: &self.metadata)
                     }
                 }
             }
@@ -90,28 +92,45 @@ class RecordSession {
         }
     }
     
-    func exportAsFile(player: AVPlayer, view: UIView, fileURL: URL, completionHandler: (() -> Void)? = nil) {
+    func exportAsFile(playerView: PlayerView, view: UIView, fileURL: URL, completionHandler: (() -> Void)? = nil) {
         
         events.removeValue(forKey: -1)
         let keysSorted = self.events.keys.sorted()
         
-        let duration = CMTime(seconds: Double(keysSorted.last!) * 10 / self.frequency + 10.0, preferredTimescale: 1000)
-        print("duration: ", duration)
+        let duration = CMTime(seconds: Double(keysSorted.last!) / self.frequency + 1.0, preferredTimescale: 1000)
         
         guard let exportSession = RecordExportSession(fileURL: fileURL, size: view.frame.size, duration: duration) else {
             print("[debug] failed to initialize exportSession")
             return
         }
+        exportSession.delegate = self
         
-        DispatchQueue.main.async {
+        sequentialConsumer.async {
             
             for ticks in keysSorted {
-                for entity in self.events[ticks]! {
-                    entity.execute(player: player, superView: view, metadata: &self.metadata)
+                self.rendererBarrier.wait()
+                
+                DispatchQueue.main.async {
+                    var targetType = self.events[ticks]!.first!.target
+                    
+                    for entity in self.events[ticks]! {
+                        targetType = targetType != entity.target ? .any : targetType
+                        entity.execute(player: playerView.player!, superView: view, metadata: &self.metadata)
+                    }
+                    let time = CMTime(seconds: Double(ticks) / self.frequency, preferredTimescale: 1000)
+//                    exportSession.append(view: view, time: time)
+                    
+                    exportSession.append(view: view, playerView: playerView, targetType: targetType, time: time)
                 }
-                exportSession.append(view: view, time: CMTime(seconds: Double(ticks) * 10 / self.frequency, preferredTimescale: 1000))
             }
+            
             exportSession.markAsFinished(completionHandler: completionHandler)
         }
+    }
+}
+
+extension RecordSession: RecordExportSessionDelegate {
+    func appendingDone(session: RecordExportSession, buffer: CVPixelBuffer, time: CMTime) {
+        rendererBarrier.signal()
     }
 }

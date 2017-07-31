@@ -16,7 +16,7 @@ class EditorViewController: UIViewController {
     
     private let fps = 30.0
     
-    private let frequency = 60.0
+    private let frequency = 30.0
     
     //
     
@@ -25,6 +25,8 @@ class EditorViewController: UIViewController {
     private var duration = 0.0
     
     private var rate: Float = 1.0
+    
+    private var videoFrame = CGRect()
     
     //
     
@@ -45,6 +47,8 @@ class EditorViewController: UIViewController {
     fileprivate var current: ShapeView?
     
     private var previous = [ShapeView : ShapeView]()
+    
+    private var inter = [ShapeView]()
     
     //
     
@@ -91,10 +95,11 @@ class EditorViewController: UIViewController {
     func shapeChange() {
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(10)) {
             self.appendShape()
+            
+            let index = self.shapeSeg.selectedSegmentIndex
+            //        recordSession?.record(entity: ArbitraryEvent { [weak self] _,_,_ in self?.shapeSeg.selectedSegmentIndex = index })
+            self.recordSession?.record(entity: SegmentedControlEvent(self.shapeSeg, index))
         }
-        
-//        recordSession?.record(entity: ArbitraryEvent { [weak self] _,_,_ in self?.shapeSeg.selectedSegmentIndex = index })
-        recordSession?.record(entity: SegmentedControlEvent(shapeSeg, shapeSeg.selectedSegmentIndex))
     }
     
     // >_<
@@ -139,7 +144,7 @@ class EditorViewController: UIViewController {
         playbackButton.isEnabled = false
         saveButton.isEnabled = false
         
-        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.chooseShape)))
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.pickShape)))
         
         let segTap = UITapGestureRecognizer(target: self, action: #selector(self.shapeChange))
         segTap.cancelsTouchesInView = false
@@ -153,7 +158,15 @@ class EditorViewController: UIViewController {
             while (item.status != .readyToPlay) {
                 
             }
+            
             self.duration = CMTimeGetSeconds(self.player.currentItem!.duration)
+            
+//            let outer = self.playerView.frame
+//            let inner = self.playerView.playerLayer.videoRect
+//            
+//            let translatedOrigin = CGPoint(x: outer.minX + inner.minX, y: outer.minY + inner.minY)
+//            self.videoFrame = CGRect(origin: translatedOrigin, size: inner.size)
+            self.videoFrame = self.playerView.playerLayer.videoRect
         }
     }
     
@@ -278,6 +291,8 @@ class EditorViewController: UIViewController {
             print("[debug] record session poor termination")
         }
         
+        inter = shapes
+        
         toggleButtons(startButton, finishButton)
         playbackButton.isEnabled = true
         saveButton.isEnabled = true
@@ -287,7 +302,10 @@ class EditorViewController: UIViewController {
         if let s = recordSession {
             if !s.active {
                 suspend()
-                for shape in shapes {
+                var futureSnapshot: [ShapeView: ShapeView] = [:]
+                zip(shapes, shapes.map{ $0.copy() as! ShapeView }).forEach { futureSnapshot[$0.0] = $0.1 }
+                
+                for shape in shapes + inter {
                     returnShapeToOriginalPosition(shape)
                     shape.removeFromSuperview()
                 }
@@ -296,7 +314,13 @@ class EditorViewController: UIViewController {
                     curr.absB = prev.absB
                     curr.c = prev.c
                     
-                    self.view.addSubview(curr)
+                    if (prev.isSelected) {
+                        curr.isSelected = true
+                    } else {
+                        curr.isSelected = false
+                    }
+                    
+                    playerView.addSubview(curr)
                     curr.setNeedsDisplay()
                 }
                 
@@ -306,11 +330,28 @@ class EditorViewController: UIViewController {
                 
                 timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
                 
-                s.execute(player: player, superView: self.view) {
+                s.execute(playerView: playerView, superView: self.view) {
                     self.timer?.invalidate()
                     self.timer = nil
                     
                     controls.forEach { $0.isEnabled = true }
+                    
+                    for shape in self.inter {
+                        self.returnShapeToOriginalPosition(shape)
+                        shape.removeFromSuperview()
+                    }
+                    for (curr, future) in futureSnapshot {
+                        curr.absA = future.absA
+                        curr.absB = future.absB
+                        curr.c = future.c
+                        
+                        if (future.isSelected) {
+                            self.selectShape(curr)
+                        }
+                        
+                        self.playerView.addSubview(curr)
+                        curr.setNeedsDisplay()
+                    }
                 }
             }
         }
@@ -320,7 +361,10 @@ class EditorViewController: UIViewController {
         if let s = recordSession {
             if !s.active {
                 suspend()
-                for shape in shapes {
+                var futureSnapshot: [ShapeView: ShapeView] = [:]
+                zip(shapes, shapes.map{ $0.copy() as! ShapeView }).forEach { futureSnapshot[$0.0] = $0.1 }
+                
+                for shape in shapes + inter {
                     returnShapeToOriginalPosition(shape)
                     shape.removeFromSuperview()
                 }
@@ -329,7 +373,11 @@ class EditorViewController: UIViewController {
                     curr.absB = prev.absB
                     curr.c = prev.c
                     
-                    self.view.addSubview(curr)
+                    if (prev.isSelected) {
+                        curr.isSelected = true
+                    }
+                    
+                    playerView.addSubview(curr)
                     curr.setNeedsDisplay()
                 }
                 
@@ -346,7 +394,7 @@ class EditorViewController: UIViewController {
                 
                 print(url)
                 
-                s.exportAsFile(player: player, view: self.view, fileURL: url) {
+                s.exportAsFile(playerView: playerView, view: playerView, fileURL: url) {
                     
                     PHPhotoLibrary.shared().performChanges({
                         PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
@@ -354,12 +402,27 @@ class EditorViewController: UIViewController {
                     }) { saved, error in
                         DispatchQueue.main.async {
                             
-                            print("camera roll", saved, error.debugDescription)
-                            
                             self.timer?.invalidate()
                             self.timer = nil
                             
                             controls.forEach { $0.isEnabled = true }
+                            
+                            for shape in self.inter {
+                                self.returnShapeToOriginalPosition(shape)
+                                shape.removeFromSuperview()
+                            }
+                            for (curr, future) in futureSnapshot {
+                                curr.absA = future.absA
+                                curr.absB = future.absB
+                                curr.c = future.c
+                                
+                                if (future.isSelected) {
+                                    self.selectShape(curr)
+                                }
+                                
+                                self.playerView.addSubview(curr)
+                                curr.setNeedsDisplay()
+                            }
                         }
                     }
                 }
@@ -369,12 +432,12 @@ class EditorViewController: UIViewController {
     
     // >_<
     
-    @objc private func chooseShape(recognizer: UITapGestureRecognizer) {
+    @objc private func pickShape(recognizer: UITapGestureRecognizer) {
         if (recognizer.state != .ended) {
             return
         }
         
-        let point = recognizer.location(in: self.view)
+        let point = recognizer.location(in: playerView)
         let current = self.current
         clearCurrentSelection()
         
@@ -423,7 +486,7 @@ class EditorViewController: UIViewController {
         recordSession?.record(entity: ShapeRelatedEvent(shape) { shape, _, _, _ in shape.isSelected = true })
         
         shape.removeFromSuperview()
-        self.view.addSubview(shape)
+        playerView.addSubview(shape)
     }
     
     private func clearCurrentSelection() {
@@ -436,23 +499,18 @@ class EditorViewController: UIViewController {
     }
     
     private func appendShape() {
-        let outer = playerView.frame
-        let inner = playerView.playerLayer.videoRect
-        
-        let a = CGPoint(x: outer.midX, y: outer.midY)
+        let a = CGPoint(x: playerView.bounds.midX, y: playerView.bounds.midY)
         let b = CGPoint(x: a.x + 50, y: a.y + 50)
         let c = colorView.backgroundColor!
         
-        let translatedOrigin = CGPoint(x: outer.minX + inner.minX, y: outer.minY + inner.minY)
-        let translatedFrame = CGRect(origin: translatedOrigin, size: inner.size)
-        
         let shape = Shape(rawValue: shapeSeg.selectedSegmentIndex)!
-        let view = ShapeView(a: a, b: b, c: c, f: translatedFrame, d: shape.recipe())
+        let view = ShapeView(a: a, b: b, c: c, f: videoFrame, d: shape.recipe())
         
         view.delegate = self
         
         shapes.append(view)
-        recordSession?.record(entity: ShapeRelatedEvent(view) { shape, _, view, _ in view.addSubview(shape); shape.c = c })
+        recordSession?.record(entity: ShapeRelatedEvent(view, playerView) { shape, _, view, _ in
+            view.addSubview(shape); shape.c = c })
         
         clearCurrentSelection()
         selectShape(view)
@@ -476,11 +534,13 @@ class EditorViewController: UIViewController {
     }
     
     private func returnShapeToOriginalPosition(_ shape: ShapeView) {
-        let a = CGPoint(x: playerView.frame.midX, y: playerView.frame.midY)
+        let a = CGPoint(x: playerView.bounds.midX, y: playerView.bounds.midY)
         let b = CGPoint(x: a.x + 50, y: a.y + 50)
         
         shape.absA = a
         shape.absB = b
+        
+        shape.isSelected = false
     }
     
     // >_<

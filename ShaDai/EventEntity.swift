@@ -9,12 +9,24 @@
 import AVFoundation
 import AVKit
 
+enum EventSubject {
+    case player
+    case shape
+    case any
+}
+
 protocol EventEntity {
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String])
+    
+    var target: EventSubject { get }
 }
 
 struct VoidEvent: EventEntity {
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String]) {
+    }
+    
+    var target: EventSubject {
+        return .any
     }
 }
 
@@ -36,6 +48,10 @@ enum PlayEvent: EventEntity {
             player.play()
         }
     }
+    
+    var target: EventSubject {
+        return .player
+    }
 }
 
 enum FrameEvent: Int, EventEntity {
@@ -44,6 +60,10 @@ enum FrameEvent: Int, EventEntity {
     
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String]) {
         player.currentItem?.step(byCount: self.rawValue)
+    }
+    
+    var target: EventSubject {
+        return .player
     }
 }
 
@@ -55,6 +75,10 @@ class PlaybackEvent: EventEntity {
     
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String]) {
         player.currentItem?.step(byCount: self.steps)
+    }
+    
+    var target: EventSubject {
+        return .player
     }
 }
 
@@ -70,6 +94,10 @@ class RateEvent: EventEntity {
             player.rate = rate
         }
     }
+    
+    var target: EventSubject {
+        return .player
+    }
 
 }
 
@@ -83,6 +111,10 @@ class SeekEvent: EventEntity {
         let mark = CMTimeMakeWithSeconds(0.0002, 1)
         player.seek(to: position, toleranceBefore: mark, toleranceAfter: mark)
     }
+    
+    var target: EventSubject {
+        return .player
+    }
 }
 
 class ArbitraryEvent: EventEntity {
@@ -93,6 +125,10 @@ class ArbitraryEvent: EventEntity {
     
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String]) {
         callback(player, superView, &metadata)
+    }
+    
+    var target: EventSubject {
+        return .player
     }
 }
 
@@ -107,22 +143,32 @@ class SegmentedControlEvent: EventEntity {
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String]) {
         control.selectedSegmentIndex = index
     }
+    
+    var target: EventSubject {
+        return .shape
+    }
 }
 
 // >_< >_<
 
 class ShapeRelatedEvent: EventEntity {
     let shape: ShapeView
+    let presetSuperView: UIView?
     let optionalCallback: ((ShapeView, AVPlayer, UIView, inout [String : String]) -> Void)?
-    init(_ shape: ShapeView, optionalCallback: ((ShapeView, AVPlayer, UIView, inout [String : String]) -> Void)? = nil) {
+    init(_ shape: ShapeView, _ presetSuperView: UIView? = nil, optionalCallback: ((ShapeView, AVPlayer, UIView, inout [String : String]) -> Void)? = nil) {
         self.shape = shape
+        self.presetSuperView = presetSuperView
         self.optionalCallback = optionalCallback
     }
     
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String]) {
         if let optionalCallback = optionalCallback {
-            optionalCallback(shape, player, superView, &metadata)
+            optionalCallback(shape, player, presetSuperView ?? superView, &metadata)
         }
+    }
+    
+    var target: EventSubject {
+        return .shape
     }
 }
 
@@ -138,5 +184,9 @@ class PanningEvent: EventEntity {
     
     func execute(player: AVPlayer, superView: UIView, metadata: inout [String : String]) {
         operation(shape, point)
+    }
+    
+    var target: EventSubject {
+        return .shape
     }
 }

@@ -9,6 +9,10 @@
 import AVFoundation
 import AVKit
 
+protocol RecordExportSessionDelegate: class {
+    func appendingDone(session: RecordExportSession, buffer: CVPixelBuffer, time: CMTime)
+}
+
 class RecordExportSession {
     
     private let writer: AVAssetWriter
@@ -33,13 +37,17 @@ class RecordExportSession {
     
     private let appenderQueue = DispatchQueue(label: "appender")
     
+    private let renderer = ImageRenderer()
+    
+    var delegate: RecordExportSessionDelegate?
+    
     init?(fileURL: URL, size: CGSize, duration: CMTime, assets: [AVAsset]? = nil) {
         let outputSettings: [String: Any] = [
             AVVideoCodecKey: AVVideoCodecH264,
             AVVideoWidthKey: Int(size.width),
             AVVideoHeightKey: Int(size.height),
             AVVideoCompressionPropertiesKey: [
-                AVVideoAverageBitRateKey: 8 * 65536,
+                AVVideoAverageBitRateKey: 64 * 65536,
                 AVVideoProfileLevelKey: AVVideoProfileLevelH264Main31,
                 AVVideoMaxKeyFrameIntervalKey: 8
             ]]
@@ -129,75 +137,41 @@ class RecordExportSession {
                     
                 }
                 let (buffer, time) = self.pixels.removeFirst()
-                print("appending buffer", time, self.adaptor.append(buffer, withPresentationTime: time))
+                self.adaptor.append(buffer, withPresentationTime: time)
                 
                 workerBarrier.wait()
             }
         }
         
         group.notify(queue: DispatchQueue.global()) {
-           self.assetExportDoneFlag = true
+            self.assetExportDoneFlag = true
         }
     }
     
     private func _append(buffer: CVPixelBuffer, time: CMTime) {
         var buffer: CVPixelBuffer? = buffer
-//        CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
+        //        CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
         
         pixels.append((buffer!, time))
         workerBarrier!.signal()
         
-        appenderQueue.async {
+        delegate?.appendingDone(session: self, buffer: buffer!, time: time)
+        
+        appenderQueue.sync {
             self.appendingCount -= 1
         }
     }
     
+/*
     func append(image: CGImage, time: CMTime) {
         appenderQueue.sync {
             appendingCount += 1
-            
-            self.serial.async {
-                let imageWidth = Int(image.width)
-                let imageHeight = Int(image.height)
-                
-                let attributes : [NSObject:AnyObject] = [
-                    kCVPixelBufferCGImageCompatibilityKey : true as AnyObject,
-                    kCVPixelBufferCGBitmapContextCompatibilityKey : true as AnyObject
-                ]
-                
-                var _pxbuffer: CVPixelBuffer?
-                CVPixelBufferCreate(kCFAllocatorDefault,
-                                    imageWidth,
-                                    imageHeight,
-                                    kCVPixelFormatType_32ARGB,
-                                    attributes as CFDictionary?,
-                                    &_pxbuffer)
-                
-                guard let pxbuffer = _pxbuffer else {
-                    return
-                }
-                let flags = CVPixelBufferLockFlags(rawValue: 0)
-                CVPixelBufferLockBaseAddress(pxbuffer, flags)
-                let pxdata = CVPixelBufferGetBaseAddress(pxbuffer)
-                
-                let rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-                let _context = CGContext(data: pxdata,
-                                         width: imageWidth,
-                                         height: imageHeight,
-                                         bitsPerComponent: 8,
-                                         bytesPerRow: CVPixelBufferGetBytesPerRow(pxbuffer),
-                                         space: rgbColorSpace,
-                                         bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
-                
-                guard let context = _context else {
-                    CVPixelBufferUnlockBaseAddress(pxbuffer, flags)
-                    return
-                }
-                
-                context.draw(image, in: CGRect.init(x: 0, y: 0, width: imageWidth, height: imageHeight))
-                CVPixelBufferUnlockBaseAddress(pxbuffer, flags)
-                self._append(buffer: pxbuffer, time: time)
-            }
+        }
+        
+        if let pxbuffer = renderer.render(cgImage: image) {
+            _append(buffer: pxbuffer, time: time)
+        } else {
+            fatalError("[debug] CG image rendering failure!")
         }
     }
     
@@ -205,15 +179,31 @@ class RecordExportSession {
         appenderQueue.sync {
             appendingCount += 1
         }
-        UIGraphicsBeginImageContext(view.frame.size)
-        view.layer.render(in: UIGraphicsGetCurrentContext()!)
-        
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        
-        self.append(image: image!.cgImage!, time: time)
-        self.appenderQueue.asyncAfter(deadline: .now() + .milliseconds(100)) {
-            self.appendingCount -= 1
+        DispatchQueue.global().async {            
+            self.appenderQueue.asyncAfter(deadline: .now() + .milliseconds(10)) {
+                self.appendingCount -= 1
+            }
+            
+            let image = self.renderer.renderUIView(view: view)
+            self.append(image: image!, time: time)
+        }
+    }
+ */
+    
+    func append(view: UIView, playerView: PlayerView, targetType: EventSubject, time: CMTime) {
+        appenderQueue.sync {
+            appendingCount += 1
+        }
+        DispatchQueue.global().async {
+            let buffer: CVPixelBuffer
+            
+            switch targetType {
+            case .any: buffer = self.renderer.render(shapeView: view, playerView: playerView)
+            case .shape: buffer = self.renderer.render(shapeView: view, playerView: nil)
+            case .player: buffer = self.renderer.render(shapeView: nil, playerView: playerView)
+            }
+            
+            self._append(buffer: buffer, time: time)
         }
     }
     
@@ -228,7 +218,6 @@ class RecordExportSession {
         periodicCheck = {
             print("periodic checking", self.assetExportDoneFlag, self.appendingCount, self.pixels.count)
             if (self.assetExportDoneFlag && self.appendingCount == 0 && self.pixels.count == 0) {
-                print("checking good")
                 let barrier = self.workerBarrier!
                 self.workerBarrier = nil
                 barrier.signal()
