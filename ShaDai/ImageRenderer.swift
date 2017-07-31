@@ -115,19 +115,25 @@ class ImageRenderer {
     
     var cachedShape: CVPixelBuffer?
     var cachedSnapshot: CVPixelBuffer?
+    var cachedSize: CGSize?
     
     func render(shapeView: UIView?, playerView: PlayerView?) -> CVPixelBuffer {
         let processedShape: CVPixelBuffer?
         let processedSnapshot: CVPixelBuffer?
         
+        let size = playerView?.playerLayer.videoRect.size ?? cachedSize!
+        cachedSize = size
+        
         if let shapeView = shapeView {
             let shape = renderUIView(view: shapeView)
-            processedShape = render(cgImage: shape!)
+            let reshape = resize(image: shape!, extent: size)
+            processedShape = render(cgImage: reshape!)
             cachedShape = processedShape
             
             if let playerView = playerView {
                 let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!)
-                processedSnapshot = render(cgImage: snapshot!)
+                let resnap = resize(image: snapshot!, extent: size)
+                processedSnapshot = render(cgImage: resnap!)
                 cachedSnapshot = processedSnapshot
             } else {
                 processedSnapshot = cachedSnapshot
@@ -135,7 +141,8 @@ class ImageRenderer {
             }
         } else if let playerView = playerView {
             let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!)
-            processedSnapshot = render(cgImage: snapshot!)
+            let resnap = resize(image: snapshot!, extent: size)
+            processedSnapshot = render(cgImage: resnap!)
             cachedSnapshot = processedSnapshot
             
             processedShape = cachedShape
@@ -155,8 +162,29 @@ class ImageRenderer {
         composition.setValue(shapeImage, forKey: kCIInputImageKey)
         composition.setValue(snapshotImage, forKey: kCIInputBackgroundImageKey)
         
-        let buffer = render(ciImage: composition.outputImage!, extent: shapeView?.bounds.size ?? playerView!.bounds.size)
+        let buffer = render(ciImage: composition.outputImage!, extent: size)
         return buffer
     }
+    
+    func resize(image: CGImage, extent: CGSize) -> CGImage? {
+        
+        guard let colorSpace = image.colorSpace else {
+            return nil
+        }
+        guard let context = CGContext(data: nil,
+                                      width: Int(extent.width),
+                                      height: Int(extent.height),
+                                      bitsPerComponent: image.bitsPerComponent,
+                                      bytesPerRow: Int(extent.width) * image.bitsPerComponent / 2,
+                                      space: colorSpace,
+                                      bitmapInfo: image.alphaInfo.rawValue) else {
+            return nil
+        }
+        
+        context.interpolationQuality = .high
+        context.draw(image, in: CGRect(x: 0, y: 0, width: Int(extent.width), height: Int(extent.height)))
+        
+        return context.makeImage()
+        
+    }
 }
-

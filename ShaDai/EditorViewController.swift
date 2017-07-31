@@ -16,7 +16,7 @@ class EditorViewController: UIViewController {
     
     private let fps = 30.0
     
-    private let frequency = 30.0
+    private let frequency = 60.0
     
     //
     
@@ -136,6 +136,8 @@ class EditorViewController: UIViewController {
         let url = URL(fileURLWithPath: self.url!)
         player = AVPlayer(url: url)
         playerView.player = player
+        
+        playerView.backgroundColor = .clear
         
         player.actionAtItemEnd = .pause
         toggleButtons(playButton, pauseButton)
