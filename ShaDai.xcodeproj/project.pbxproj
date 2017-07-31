@@ -308,7 +308,7 @@
 				TargetAttributes = {
 					3B4B05E61F0E1086006EE5F1 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = RB73NXNMA7;
+						DevelopmentTeam = 9N2GXJ9SUF;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
@@ -514,7 +514,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = RB73NXNMA7;
+				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
@@ -527,7 +527,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = RB73NXNMA7;
+				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
