@@ -10,10 +10,12 @@ import AVFoundation
 import AVKit
 
 protocol RecordExportSessionDelegate: class {
-    func appendingDone(session: RecordExportSession, buffer: CVPixelBuffer, time: CMTime)
+    func appendingDone(session: RecordExportSession, buffer: CVPixelBuffer, time: CMTime, progress: Double)
 }
 
 class RecordExportSession {
+    
+    private let renderer = ImageRenderer()
     
     private let writer: AVAssetWriter
     
@@ -37,8 +39,6 @@ class RecordExportSession {
     
     private let appenderQueue = DispatchQueue(label: "appender")
     
-    private let renderer = ImageRenderer()
-    
     var delegate: RecordExportSessionDelegate?
     
     init?(fileURL: URL, size: CGSize, duration: CMTime, assets: [AVAsset]? = nil) {
@@ -47,7 +47,7 @@ class RecordExportSession {
             AVVideoWidthKey: Int(size.width),
             AVVideoHeightKey: Int(size.height),
             AVVideoCompressionPropertiesKey: [
-                AVVideoAverageBitRateKey: 64 * 65536,
+                AVVideoAverageBitRateKey: 16 * 65536,
                 AVVideoProfileLevelKey: AVVideoProfileLevelH264Main31,
                 AVVideoMaxKeyFrameIntervalKey: 8
             ]]
@@ -105,6 +105,8 @@ class RecordExportSession {
         
         self.duration = duration
         
+        renderer.size = size
+        
         _init_assetexport(assets: assetStorage)
     }
     
@@ -149,13 +151,11 @@ class RecordExportSession {
     }
     
     private func _append(buffer: CVPixelBuffer, time: CMTime) {
-        var buffer: CVPixelBuffer? = buffer
-        //        CVPixelBufferPoolCreatePixelBuffer(nil, adaptor.pixelBufferPool!, &buffer)
-        
-        pixels.append((buffer!, time))
+        pixels.append((buffer, time))
         workerBarrier!.signal()
         
-        delegate?.appendingDone(session: self, buffer: buffer!, time: time)
+        let progress = CMTimeGetSeconds(time) / CMTimeGetSeconds(duration)
+        delegate?.appendingDone(session: self, buffer: buffer, time: time, progress: progress)
         
         appenderQueue.sync {
             self.appendingCount -= 1

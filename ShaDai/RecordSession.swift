@@ -9,6 +9,14 @@
 import AVFoundation
 import AVKit
 
+protocol ProgressReporter {
+    
+}
+
+protocol ProgressReporterDelegate {
+    func reportProgress(reporter: ProgressReporter, progress: Double, count: Int?)
+}
+
 class RecordSession {
     private var events: [Int : [EventEntity]] = [0 : [VoidEvent()]]
     
@@ -23,6 +31,8 @@ class RecordSession {
     private let sequentialConsumer = DispatchQueue(label: "sequential")
     
     fileprivate let rendererBarrier = DispatchSemaphore(value: 1)
+    
+    var delegate: ProgressReporterDelegate?
     
     var active: Bool {
         get {
@@ -59,7 +69,7 @@ class RecordSession {
     }
     
     func record(entity: EventEntity) {
-        if nil != events[ticks] {
+        if events[ticks] != nil {
             events[ticks]!.append(entity)
         } else {
             events[ticks] = [entity]
@@ -97,9 +107,10 @@ class RecordSession {
         events.removeValue(forKey: -1)
         let keysSorted = self.events.keys.sorted()
         
+        let size = playerView.playerLayer.videoRect.size
         let duration = CMTime(seconds: Double(keysSorted.last!) / self.frequency + 1.0, preferredTimescale: 1000)
         
-        guard let exportSession = RecordExportSession(fileURL: fileURL, size: view.frame.size, duration: duration) else {
+        guard let exportSession = RecordExportSession(fileURL: fileURL, size: size, duration: duration) else {
             print("[debug] failed to initialize exportSession")
             return
         }
@@ -107,8 +118,16 @@ class RecordSession {
         
         sequentialConsumer.async {
             
+            var progressCount = 0
+            
             for ticks in keysSorted {
+                
                 self.rendererBarrier.wait()
+                
+                let progress = Double(progressCount) / Double(self.events.count)
+                self.delegate?.reportProgress(reporter: self, progress: progress, count: self.events.count)
+                
+                progressCount += 1
                 
                 DispatchQueue.main.async {
                     var targetType = self.events[ticks]!.first!.target
@@ -117,8 +136,9 @@ class RecordSession {
                         targetType = targetType != entity.target ? .any : targetType
                         entity.execute(player: playerView.player!, superView: view, metadata: &self.metadata)
                     }
-                    let time = CMTime(seconds: Double(ticks) / self.frequency, preferredTimescale: 1000)
 //                    exportSession.append(view: view, time: time)
+                    
+                    let time = CMTime(seconds: Double(ticks) / self.frequency, preferredTimescale: 1000)
                     
                     exportSession.append(view: view, playerView: playerView, targetType: targetType, time: time)
                 }
@@ -130,7 +150,13 @@ class RecordSession {
 }
 
 extension RecordSession: RecordExportSessionDelegate {
-    func appendingDone(session: RecordExportSession, buffer: CVPixelBuffer, time: CMTime) {
+    
+    func appendingDone(session: RecordExportSession, buffer: CVPixelBuffer, time: CMTime, progress: Double) {
         rendererBarrier.signal()
     }
+    
+}
+
+extension RecordSession: ProgressReporter {
+    
 }

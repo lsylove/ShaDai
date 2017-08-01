@@ -151,7 +151,7 @@
                                     <action selector="action:" destination="Gqq-6y-TMj" eventType="touchUpInside" id="RUT-rH-11P"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9hk-1n-rlr">
+                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9hk-1n-rlr">
                                 <rect key="frame" x="156.5" y="617" width="62" height="30"/>
                                 <state key="normal" title="Playback"/>
                                 <connections>
@@ -171,22 +171,36 @@
                                     <constraint firstAttribute="width" secondItem="sXd-q4-6d8" secondAttribute="height" multiplier="30:29" id="rfn-iA-nQS"/>
                                 </constraints>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ex0-sV-3jK">
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ex0-sV-3jK">
                                 <rect key="frame" x="238" y="617" width="34" height="30"/>
                                 <state key="normal" title="Save"/>
                                 <connections>
                                     <action selector="action:" destination="Gqq-6y-TMj" eventType="touchUpInside" id="7Jv-hD-mtH"/>
                                 </connections>
                             </button>
+                            <view hidden="YES" alpha="0.75" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="T8Z-JP-LoV">
+                                <rect key="frame" x="177" y="323" width="20" height="20"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="h08-jB-Tyk"/>
+                                    <constraint firstAttribute="height" constant="20" id="o9Z-md-Crk"/>
+                                </constraints>
+                            </view>
+                            <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="VKw-M3-O7t">
+                                <rect key="frame" x="36" y="332.5" width="303" height="2"/>
+                            </progressView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="559-ee-gp4" firstAttribute="top" secondItem="fgW-H6-VyE" secondAttribute="bottom" constant="20" id="64U-Or-OZ4"/>
                             <constraint firstItem="bGQ-PQ-kDL" firstAttribute="centerY" secondItem="AVP-GV-io7" secondAttribute="centerY" id="65y-8X-NkQ"/>
                             <constraint firstItem="Ex0-sV-3jK" firstAttribute="leading" secondItem="9hk-1n-rlr" secondAttribute="trailing" constant="20" id="6PL-J4-Zry"/>
+                            <constraint firstItem="T8Z-JP-LoV" firstAttribute="centerY" secondItem="qKs-g0-cYF" secondAttribute="centerY" id="8m0-j4-f6z"/>
+                            <constraint firstItem="VKw-M3-O7t" firstAttribute="centerY" secondItem="qKs-g0-cYF" secondAttribute="centerY" id="ATI-I1-ZJS"/>
                             <constraint firstItem="559-ee-gp4" firstAttribute="leading" secondItem="qKs-g0-cYF" secondAttribute="leadingMargin" constant="50" id="Az4-2S-Ehj"/>
                             <constraint firstItem="jZS-i4-P6x" firstAttribute="leading" secondItem="rE7-cc-f6S" secondAttribute="trailing" constant="20" id="B7o-8W-o3z"/>
                             <constraint firstItem="AVP-GV-io7" firstAttribute="leading" secondItem="qKs-g0-cYF" secondAttribute="leadingMargin" constant="60" id="B9n-i3-9Og"/>
+                            <constraint firstItem="T8Z-JP-LoV" firstAttribute="centerX" secondItem="qKs-g0-cYF" secondAttribute="centerX" id="CFn-qs-vbB"/>
                             <constraint firstItem="IFg-1R-YXn" firstAttribute="top" secondItem="559-ee-gp4" secondAttribute="bottom" constant="60" id="Cuw-i3-XFf"/>
                             <constraint firstItem="cHA-Wm-vII" firstAttribute="top" secondItem="J80-cC-iY8" secondAttribute="bottom" constant="20" id="D5V-jO-ZEr"/>
                             <constraint firstItem="rE7-cc-f6S" firstAttribute="leading" secondItem="ldB-4j-Hre" secondAttribute="trailing" constant="20" id="ETg-kg-hLC"/>
@@ -194,6 +208,7 @@
                             <constraint firstAttribute="trailingMargin" secondItem="IBa-9H-pgQ" secondAttribute="trailing" constant="50" id="G7C-tc-fAH"/>
                             <constraint firstItem="SkC-no-xMF" firstAttribute="centerY" secondItem="AVP-GV-io7" secondAttribute="centerY" id="HLY-LR-bcK"/>
                             <constraint firstItem="9hk-1n-rlr" firstAttribute="centerX" secondItem="qKs-g0-cYF" secondAttribute="centerX" id="JO8-Hd-uJA"/>
+                            <constraint firstItem="VKw-M3-O7t" firstAttribute="leading" secondItem="qKs-g0-cYF" secondAttribute="leadingMargin" constant="20" id="JVF-fG-I1P"/>
                             <constraint firstItem="Ex0-sV-3jK" firstAttribute="centerY" secondItem="9hk-1n-rlr" secondAttribute="centerY" id="Jr6-DK-aFl"/>
                             <constraint firstItem="IBa-9H-pgQ" firstAttribute="leading" secondItem="IeX-aj-XG0" secondAttribute="trailing" constant="15" id="Krl-lB-Klk"/>
                             <constraint firstItem="1wl-d9-nwr" firstAttribute="leading" secondItem="J80-cC-iY8" secondAttribute="trailing" constant="-37" id="MSV-IC-MO2"/>
@@ -216,6 +231,7 @@
                             <constraint firstItem="jZS-i4-P6x" firstAttribute="centerY" secondItem="rE7-cc-f6S" secondAttribute="centerY" id="pgo-to-Qbk"/>
                             <constraint firstItem="asg-9u-lKS" firstAttribute="top" secondItem="559-ee-gp4" secondAttribute="bottom" constant="20" id="qjh-iP-aQb"/>
                             <constraint firstAttribute="trailingMargin" secondItem="IFg-1R-YXn" secondAttribute="trailing" id="qpc-hX-t1A"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="VKw-M3-O7t" secondAttribute="trailing" constant="20" id="qsb-cX-QU4"/>
                             <constraint firstItem="sXd-q4-6d8" firstAttribute="height" secondItem="asg-9u-lKS" secondAttribute="height" id="sV9-Y0-ecp"/>
                             <constraint firstAttribute="trailingMargin" secondItem="SkC-no-xMF" secondAttribute="trailing" constant="60" id="um3-gt-w9m"/>
                             <constraint firstItem="9hk-1n-rlr" firstAttribute="leading" secondItem="J80-cC-iY8" secondAttribute="trailing" constant="20" id="vLg-um-OtG"/>
@@ -227,12 +243,14 @@
                         <outlet property="colorView" destination="sXd-q4-6d8" id="SrM-mX-5fh"/>
                         <outlet property="deleteButton" destination="IBa-9H-pgQ" id="ihG-Jr-De3"/>
                         <outlet property="finishButton" destination="1wl-d9-nwr" id="VEQ-JP-eTZ"/>
+                        <outlet property="maskView" destination="T8Z-JP-LoV" id="u99-oF-gvE"/>
                         <outlet property="nextButton" destination="jZS-i4-P6x" id="OdT-XT-IA4"/>
                         <outlet property="pauseButton" destination="SkC-no-xMF" id="vSd-zW-Frh"/>
                         <outlet property="playButton" destination="bGQ-PQ-kDL" id="9lD-gs-08C"/>
                         <outlet property="playbackButton" destination="9hk-1n-rlr" id="l3d-To-R8l"/>
                         <outlet property="playerView" destination="IFg-1R-YXn" id="J1V-vM-imv"/>
                         <outlet property="prevButton" destination="ldB-4j-Hre" id="rYT-K6-jS5"/>
+                        <outlet property="progressView" destination="VKw-M3-O7t" id="JOV-sZ-Cmp"/>
                         <outlet property="saveButton" destination="Ex0-sV-3jK" id="gkO-jh-zU7"/>
                         <outlet property="shapeSeg" destination="559-ee-gp4" id="Q5j-05-Yrz"/>
                         <outlet property="slider" destination="rE7-cc-f6S" id="bFq-cA-dzb"/>

@@ -82,6 +82,10 @@ class EditorViewController: UIViewController {
     
     @IBOutlet weak var slider: UISlider!
     
+    @IBOutlet weak var progressView: UIProgressView!
+    
+    @IBOutlet weak var maskView: UIView!
+    
     // >_<
     
     @IBAction func speedChange(_ sender: UISegmentedControl) {
@@ -143,9 +147,6 @@ class EditorViewController: UIViewController {
         toggleButtons(playButton, pauseButton)
         toggleButtons(startButton, finishButton)
         
-        playbackButton.isEnabled = false
-        saveButton.isEnabled = false
-        
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.pickShape)))
         
         let segTap = UITapGestureRecognizer(target: self, action: #selector(self.shapeChange))
@@ -169,6 +170,9 @@ class EditorViewController: UIViewController {
 //            let translatedOrigin = CGPoint(x: outer.minX + inner.minX, y: outer.minY + inner.minY)
 //            self.videoFrame = CGRect(origin: translatedOrigin, size: inner.size)
             self.videoFrame = self.playerView.playerLayer.videoRect
+            
+            self.maskView.frame = self.playerView.frame
+            self.maskView.bounds = self.videoFrame
         }
     }
     
@@ -273,6 +277,7 @@ class EditorViewController: UIViewController {
         zip(shapes, shapes.map{ $0.copy() as! ShapeView }).forEach { previous[$0.0] = $0.1 }
         
         recordSession = RecordSession(frequency: frequency)
+        recordSession!.delegate = self
         
         // Save initial state as events
         recordSession!.record(entity: SeekEvent(player.currentTime()))
@@ -363,6 +368,10 @@ class EditorViewController: UIViewController {
         if let s = recordSession {
             if !s.active {
                 suspend()
+                
+                progressView.isHidden = false
+                maskView.isHidden = false
+                
                 var futureSnapshot: [ShapeView: ShapeView] = [:]
                 zip(shapes, shapes.map{ $0.copy() as! ShapeView }).forEach { futureSnapshot[$0.0] = $0.1 }
                 
@@ -425,6 +434,9 @@ class EditorViewController: UIViewController {
                                 self.playerView.addSubview(curr)
                                 curr.setNeedsDisplay()
                             }
+                            
+                            self.maskView.isHidden = true
+                            self.progressView.isHidden = true
                         }
                     }
                 }
@@ -590,6 +602,16 @@ extension EditorViewController: ShapeViewGestureRecognitionDelegate {
             let operation = operation as? (ShapeView, CGPoint) -> Void {
             
             recordSession?.record(entity: PanningEvent(view, recognizer.translation(in: view), operation: operation))
+        }
+    }
+    
+}
+
+extension EditorViewController: ProgressReporterDelegate {
+    
+    func reportProgress(reporter: ProgressReporter, progress: Double, count: Int?) {
+        DispatchQueue.main.async {
+            self.progressView.progress = Float(progress)
         }
     }
     

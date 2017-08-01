@@ -113,27 +113,28 @@ class ImageRenderer {
         return thumb
     }
     
-    var cachedShape: CVPixelBuffer?
-    var cachedSnapshot: CVPixelBuffer?
-    var cachedSize: CGSize?
+    private var cachedShape: CVPixelBuffer?
+    
+    private var cachedSnapshot: CVPixelBuffer?
+    
+    var size = CGSize()
     
     func render(shapeView: UIView?, playerView: PlayerView?) -> CVPixelBuffer {
         let processedShape: CVPixelBuffer?
         let processedSnapshot: CVPixelBuffer?
         
-        let size = playerView?.playerLayer.videoRect.size ?? cachedSize!
-        cachedSize = size
-        
         if let shapeView = shapeView {
             let shape = renderUIView(view: shapeView)
-            let reshape = resize(image: shape!, extent: size)
-            processedShape = render(cgImage: reshape!)
+            let reshape = resize(image: shape!, extent: shapeView.frame.size)
+            let cropped = crop(image: reshape!, prev: shapeView.frame.size, target: size)
+            processedShape = render(cgImage: cropped!)
             cachedShape = processedShape
             
             if let playerView = playerView {
                 let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!)
-                let resnap = resize(image: snapshot!, extent: size)
-                processedSnapshot = render(cgImage: resnap!)
+                let resnap = resize(image: snapshot!, extent: playerView.playerLayer.videoRect.size)
+                let cropped = crop(image: resnap!, prev: playerView.playerLayer.videoRect.size, target: size)
+                processedSnapshot = render(cgImage: cropped!)
                 cachedSnapshot = processedSnapshot
             } else {
                 processedSnapshot = cachedSnapshot
@@ -141,8 +142,9 @@ class ImageRenderer {
             }
         } else if let playerView = playerView {
             let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!)
-            let resnap = resize(image: snapshot!, extent: size)
-            processedSnapshot = render(cgImage: resnap!)
+            let resnap = resize(image: snapshot!, extent: playerView.playerLayer.videoRect.size)
+            let cropped = crop(image: resnap!, prev: playerView.playerLayer.videoRect.size, target: size)
+            processedSnapshot = render(cgImage: cropped!)
             cachedSnapshot = processedSnapshot
             
             processedShape = cachedShape
@@ -158,11 +160,9 @@ class ImageRenderer {
         let shapeImage = CIImage(cvPixelBuffer: readyShape)
         let snapshotImage = CIImage(cvPixelBuffer: readySnapshot)
         
-        let composition = CIFilter(name: "CISourceOverCompositing")!
-        composition.setValue(shapeImage, forKey: kCIInputImageKey)
-        composition.setValue(snapshotImage, forKey: kCIInputBackgroundImageKey)
+        let composition = shapeImage.compositingOverImage(snapshotImage)
         
-        let buffer = render(ciImage: composition.outputImage!, extent: size)
+        let buffer = render(ciImage: composition, extent: size)
         return buffer
     }
     
@@ -186,5 +186,14 @@ class ImageRenderer {
         
         return context.makeImage()
         
+    }
+    
+    func crop(image: CGImage, prev: CGSize, target: CGSize) -> CGImage? {
+        let newX = (prev.width - target.width) / 2.0
+        let newY = (prev.height - target.height) / 2.0
+        
+        let newFrame = CGRect(origin: CGPoint(x: newX, y: newY), size: target)
+        let imageRef = image.cropping(to: newFrame)
+        return imageRef
     }
 }
