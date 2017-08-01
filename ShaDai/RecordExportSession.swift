@@ -51,11 +51,18 @@ class RecordExportSession {
                 AVVideoProfileLevelKey: AVVideoProfileLevelH264Main31,
                 AVVideoMaxKeyFrameIntervalKey: 8
             ]]
+        
         let videoSettings: [String: Any] = [
             kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
             kCVPixelBufferIOSurfacePropertiesKey as String: [:]
         ]
         
+        let audioSettings: [String: Any] = [
+            AVFormatIDKey: Int(kAudioFormatLinearPCM),
+            AVSampleRateKey: 12000,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ]
         guard let writer = try? AVAssetWriter(outputURL: fileURL, fileType: AVFileTypeQuickTimeMovie) else {
             return nil
         }
@@ -66,29 +73,6 @@ class RecordExportSession {
             fatalError("[debug] parent abandons pixel writer child")
         }
         writer.add(pixelInput)
-        
-        var assetStorage = [(AVAssetReader, AVAssetReaderOutput, AVAssetWriterInput)]()
-        
-        assets?.forEach {
-            guard let reader = try? AVAssetReader(asset: $0) else {
-                print("[debug] AVAssetReader configuration fail")
-                return
-            }
-            
-            let output = AVAssetReaderVideoCompositionOutput(videoTracks: $0.tracks, videoSettings: videoSettings)
-            guard reader.canAdd(output) else {
-                fatalError("[debug] parent abandons reader child")
-            }
-            reader.add(output)
-            
-            let input = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
-            guard writer.canAdd(input) else {
-                fatalError("[debug] parent abandons writer child")
-            }
-            writer.add(input)
-            
-            assetStorage.append((reader, output, input))
-        }
         
         self.adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: pixelInput, sourcePixelBufferAttributes: [
             kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
@@ -107,26 +91,55 @@ class RecordExportSession {
         
         renderer.size = size
         
-        _init_assetexport(assets: assetStorage)
-    }
-    
-    private func _init_assetexport(assets: [(AVAssetReader, AVAssetReaderOutput, AVAssetWriterInput)]) {
         let group = DispatchGroup()
         
-        for (reader, output, input) in assets {
-            reader.startReading()
-            let queue = DispatchQueue(label: reader.description)
+        assets?.forEach {
+            guard let reader = try? AVAssetReader(asset: $0) else {
+                print("[debug] AVAssetReader configuration fail for", $0)
+                return
+            }
             
-            group.enter()
-            input.requestMediaDataWhenReady(on: queue) {
-                while (input.isReadyForMoreMediaData) {
-                    if let nextBuffer = output.copyNextSampleBuffer() {
-                        input.append(nextBuffer)
-                        
-                    } else {
-                        input.markAsFinished()
-                        group.leave()
-                        break
+            reader.startReading()
+            
+            for track in $0.tracks {
+                let queue = DispatchQueue(label: track.description)
+                
+                let output: AVAssetReaderTrackOutput
+                let input: AVAssetWriterInput
+                
+                if (track.mediaType == AVMediaTypeVideo) {
+                    output = AVAssetReaderTrackOutput(track: track, outputSettings: videoSettings)
+                    input = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
+                    
+                } else if (track.mediaType == AVMediaTypeAudio) {
+                    output = AVAssetReaderTrackOutput(track: track, outputSettings: audioSettings)
+                    input = AVAssetWriterInput(mediaType: AVMediaTypeAudio, outputSettings: audioSettings)
+                    
+                } else {
+                    continue
+                }
+                
+                guard reader.canAdd(output) else {
+                    fatalError("[debug] parent abandons reader child")
+                }
+                reader.add(output)
+                
+                guard writer.canAdd(input) else {
+                    fatalError("[debug] parent abandons writer child")
+                }
+                writer.add(input)
+                
+                group.enter()
+                input.requestMediaDataWhenReady(on: queue) {
+                    while (input.isReadyForMoreMediaData) {
+                        if let nextBuffer = output.copyNextSampleBuffer() {
+                            input.append(nextBuffer)
+                            
+                        } else {
+                            input.markAsFinished()
+                            group.leave()
+                            break
+                        }
                     }
                 }
             }

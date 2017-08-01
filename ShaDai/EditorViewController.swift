@@ -52,6 +52,22 @@ class EditorViewController: UIViewController {
     
     //
     
+    private var audioRecorder: AVAudioRecorder?
+    
+    private let audioSettings = [
+        AVFormatIDKey: Int(kAudioFormatLinearPCM),
+        AVSampleRateKey: 12000,
+        AVNumberOfChannelsKey: 1,
+        AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+    ]
+    
+    private lazy var audioURL: URL = {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0].appendingPathComponent("temp.wav")
+    }()
+    
+    //
+    
     @IBOutlet weak var playerView: PlayerView!
     
     @IBOutlet weak var colorView: UIView!
@@ -174,6 +190,10 @@ class EditorViewController: UIViewController {
             self.maskView.frame = self.playerView.frame
             self.maskView.bounds = self.videoFrame
         }
+        
+        let session = AVAudioSession.sharedInstance()
+        try! session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        try! session.setActive(true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -291,6 +311,19 @@ class EditorViewController: UIViewController {
         toggleButtons(startButton, finishButton, paused: false)
         playbackButton.isEnabled = false
         saveButton.isEnabled = false
+        
+        if audioRecorder?.isRecording ?? false {
+            audioRecorder?.stop()
+            audioRecorder = nil
+            print("[debug] audio recorder state corruption")
+            
+        } else if let audioRecorder = try? AVAudioRecorder(url: audioURL, settings: audioSettings) {
+            audioRecorder.record()
+            self.audioRecorder = audioRecorder
+            
+        } else {
+            print("[debug] OMG not recording")
+        }
     }
     
     func finish() {
@@ -305,6 +338,17 @@ class EditorViewController: UIViewController {
         toggleButtons(startButton, finishButton)
         playbackButton.isEnabled = true
         saveButton.isEnabled = true
+        
+        if audioRecorder?.isRecording ?? false {
+            audioRecorder?.stop()
+            audioRecorder = nil
+            
+            let asset = AVURLAsset(url: audioURL)
+            recordSession?.assets = [asset]
+            
+        } else {
+            print("[debug] audio recorder state corruption while finishing")
+        }
     }
     
     func playback() {

@@ -121,15 +121,24 @@ class ImageRenderer {
     var size = CGSize()
     
     func render(shapeView: UIView?, playerView: PlayerView?) -> CVPixelBuffer {
-        let processedShape: CVPixelBuffer?
-        let processedSnapshot: CVPixelBuffer?
+        var processedShape: CVPixelBuffer?
+        var processedSnapshot: CVPixelBuffer?
+        
+        let group = DispatchGroup()
         
         if let shapeView = shapeView {
-            let shape = renderUIView(view: shapeView)
-            let reshape = resize(image: shape!, extent: shapeView.frame.size)
-            let cropped = crop(image: reshape!, prev: shapeView.frame.size, target: size)
-            processedShape = render(cgImage: cropped!)
-            cachedShape = processedShape
+            
+            group.enter()
+            DispatchQueue.global().async {
+                
+                let shape = self.renderUIView(view: shapeView)
+                let reshape = self.resize(image: shape!, extent: shapeView.frame.size)
+                let cropped = self.crop(image: reshape!, prev: shapeView.frame.size, target: self.size)
+                processedShape = self.render(cgImage: cropped!)
+                self.cachedShape = processedShape
+                
+                group.leave()
+            }
             
             if let playerView = playerView {
                 let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!)
@@ -137,6 +146,7 @@ class ImageRenderer {
                 let cropped = crop(image: resnap!, prev: playerView.playerLayer.videoRect.size, target: size)
                 processedSnapshot = render(cgImage: cropped!)
                 cachedSnapshot = processedSnapshot
+                
             } else {
                 processedSnapshot = cachedSnapshot
                 
@@ -153,6 +163,8 @@ class ImageRenderer {
         } else {
             fatalError("[debug] renderer has to render at least one of views!")
         }
+        
+        group.wait()
         
         guard let readyShape = processedShape, let readySnapshot = processedSnapshot else {
             fatalError("[debug] cannot render null value")

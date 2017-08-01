@@ -119,8 +119,8 @@
 		3B431A181F2AC99A008E8B05 /* VoiceRecorder */ = {
 			isa = PBXGroup;
 			children = (
-				3B431A191F2AC9B4008E8B05 /* VoiceRecorder.storyboard */,
 				3B431A1B1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift */,
+				3B431A191F2AC9B4008E8B05 /* VoiceRecorder.storyboard */,
 			);
 			name = VoiceRecorder;
 			sourceTree = "<group>";

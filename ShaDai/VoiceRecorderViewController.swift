@@ -18,7 +18,7 @@ class VoiceRecorderViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var statusLabel: UILabel!
     
     let recorderSettings = [
-        AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+        AVFormatIDKey: Int(kAudioFormatLinearPCM),
         AVSampleRateKey: 12000,
         AVNumberOfChannelsKey: 1,
         AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
@@ -26,7 +26,7 @@ class VoiceRecorderViewController: UIViewController, AVAudioRecorderDelegate {
     
     lazy var outputURL: URL = {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return paths[0].appendingPathComponent("recording.m4a")
+        return paths[0].appendingPathComponent("temp.wav")
     }()
 
     var audioRecorder: AVAudioRecorder?
@@ -36,8 +36,8 @@ class VoiceRecorderViewController: UIViewController, AVAudioRecorderDelegate {
         super.viewDidLoad()
 
         let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(AVAudioSessionCategoryPlayAndRecord)
-        try? session.setActive(true)
+        try! session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        try! session.setActive(true)
 
     }
     
@@ -58,7 +58,6 @@ class VoiceRecorderViewController: UIViewController, AVAudioRecorderDelegate {
         
         })
         self.player?.play()
-
         
     }
     
@@ -73,6 +72,7 @@ class VoiceRecorderViewController: UIViewController, AVAudioRecorderDelegate {
             
             self.recordButton.setTitle("Stop Recording", for: .normal)
             do {
+                
                 self.audioRecorder = try AVAudioRecorder(url: outputURL,
                                                     settings: recorderSettings)
                 self.audioRecorder?.delegate = self
