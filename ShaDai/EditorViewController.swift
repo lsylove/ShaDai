@@ -294,6 +294,8 @@ class EditorViewController: UIViewController {
     }
     
     func finish() {
+        recordSession?.record(entity: VoidEvent())
+        
         if !(recordSession?.deactivateSession() ?? false) {
             print("[debug] record session poor termination")
         }
@@ -495,21 +497,25 @@ class EditorViewController: UIViewController {
     }
     
     private func selectShape(_ shape: ShapeView) {
-        shape.isSelected = true
-        current = shape
-        recordSession?.record(entity: ShapeRelatedEvent(shape) { shape, _, _, _ in shape.isSelected = true })
-        
-        shape.removeFromSuperview()
-        playerView.addSubview(shape)
+        DispatchQueue.main.async {
+            shape.isSelected = true
+            self.current = shape
+            self.recordSession?.record(entity: ShapeRelatedEvent(shape) { shape, _, _, _ in shape.isSelected = true })
+            
+            shape.removeFromSuperview()
+            self.playerView.addSubview(shape)
+        }
     }
     
     private func clearCurrentSelection() {
-        if let current = current {
-            current.isSelected = false
-            recordSession?.record(entity: ShapeRelatedEvent(current) { shape, _, _, _ in shape.isSelected = false })
+        DispatchQueue.main.async {
+            if let current = self.current {
+                current.isSelected = false
+                self.recordSession?.record(entity: ShapeRelatedEvent(current) { shape, _, _, _ in shape.isSelected = false })
+            }
+            
+            self.current = nil
         }
-        
-        current = nil
     }
     
     private func appendShape() {

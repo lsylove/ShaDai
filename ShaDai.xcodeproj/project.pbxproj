@@ -30,6 +30,7 @@
 		672667A31F18614D001541B2 /* TracerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672667A21F18614D001541B2 /* TracerViewController.swift */; };
 		67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */; };
 		67367B561F2AFB6000C0A097 /* RecordExportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67367B551F2AFB6000C0A097 /* RecordExportSession.swift */; };
+		6743D6471F303C8E00EE574B /* three.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6743D6461F303C8E00EE574B /* three.mp4 */; };
 		674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */; };
 		674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */; };
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
@@ -80,6 +81,7 @@
 		672667A21F18614D001541B2 /* TracerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TracerViewController.swift; sourceTree = "<group>"; };
 		67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVAnimationComposer.swift; sourceTree = "<group>"; };
 		67367B551F2AFB6000C0A097 /* RecordExportSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordExportSession.swift; sourceTree = "<group>"; };
+		6743D6461F303C8E00EE574B /* three.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = three.mp4; sourceTree = SOURCE_ROOT; };
 		674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ProfileOne.storyboard; sourceTree = "<group>"; };
 		674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileOneViewController.swift; sourceTree = "<group>"; };
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 		67147E2B1F2585BE0069F24D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6743D6461F303C8E00EE574B /* three.mp4 */,
 				6765EB001F1EF7EA0010D115 /* oldman.mp4 */,
 				6765EB011F1EF7EA0010D115 /* two.mp4 */,
 				671BBF101F0E29720088B84C /* video.mp4 */,
@@ -343,6 +346,7 @@
 				3B4B05F51F0E1086006EE5F1 /* LaunchScreen.storyboard in Resources */,
 				6765EAFB1F1EDF860010D115 /* Dual.storyboard in Resources */,
 				675775521F0F07AB00270E3F /* HashTag.storyboard in Resources */,
+				6743D6471F303C8E00EE574B /* three.mp4 in Resources */,
 				6725560D1F136E17008D88C2 /* Export.storyboard in Resources */,
 				3B4B05F21F0E1086006EE5F1 /* Assets.xcassets in Resources */,
 				3B4B05F01F0E1086006EE5F1 /* Main.storyboard in Resources */,

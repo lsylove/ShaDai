@@ -216,7 +216,6 @@ class RecordExportSession {
         var periodicCheck: (() -> Void)!
         
         periodicCheck = {
-            print("periodic checking", self.assetExportDoneFlag, self.appendingCount, self.pixels.count)
             if (self.assetExportDoneFlag && self.appendingCount == 0 && self.pixels.count == 0) {
                 let barrier = self.workerBarrier!
                 self.workerBarrier = nil

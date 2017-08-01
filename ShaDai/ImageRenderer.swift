@@ -58,9 +58,10 @@ class ImageRenderer {
         return pxbuffer
     }
     
-    func render(ciImage: CIImage, extent: CGSize) -> CVPixelBuffer {
+    func render(ciImage: CIImage) -> CVPixelBuffer {
         
         let image = ciImage
+        let extent = image.extent
         if let pxbuffer = image.pixelBuffer {
             return pxbuffer
         }
@@ -162,7 +163,7 @@ class ImageRenderer {
         
         let composition = shapeImage.compositingOverImage(snapshotImage)
         
-        let buffer = render(ciImage: composition, extent: size)
+        let buffer = render(ciImage: composition)
         return buffer
     }
     

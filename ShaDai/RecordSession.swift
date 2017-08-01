@@ -104,11 +104,13 @@ class RecordSession {
     
     func exportAsFile(playerView: PlayerView, view: UIView, fileURL: URL, completionHandler: (() -> Void)? = nil) {
         
+        let timeout = 1
+        
         events.removeValue(forKey: -1)
         let keysSorted = self.events.keys.sorted()
         
         let size = playerView.playerLayer.videoRect.size
-        let duration = CMTime(seconds: Double(keysSorted.last!) / self.frequency + 1.0, preferredTimescale: 1000)
+        let duration = CMTime(seconds: Double(keysSorted.last!) / self.frequency + Double(timeout), preferredTimescale: 1000)
         
         guard let exportSession = RecordExportSession(fileURL: fileURL, size: size, duration: duration) else {
             print("[debug] failed to initialize exportSession")
@@ -144,6 +146,7 @@ class RecordSession {
                 }
             }
             
+            self.rendererBarrier.wait()
             exportSession.markAsFinished(completionHandler: completionHandler)
         }
     }
