@@ -41,7 +41,7 @@ class RecordExportSession {
     
     var delegate: RecordExportSessionDelegate?
     
-    init?(fileURL: URL, size: CGSize, duration: CMTime, assets: [AVAsset]? = nil) {
+    init?(fileURL: URL, size: CGSize, duration: CMTime, asset: AVAsset? = nil) {
         let outputSettings: [String: Any] = [
             AVVideoCodecKey: AVVideoCodecH264,
             AVVideoWidthKey: Int(size.width),
@@ -56,13 +56,10 @@ class RecordExportSession {
             kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
             kCVPixelBufferIOSurfacePropertiesKey as String: [:]
         ]
-        
         let audioSettings: [String: Any] = [
-            AVFormatIDKey: Int(kAudioFormatLinearPCM),
-            AVSampleRateKey: 12000,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+            AVFormatIDKey: Int(kAudioFormatLinearPCM)
         ]
+        
         guard let writer = try? AVAssetWriter(outputURL: fileURL, fileType: AVFileTypeQuickTimeMovie) else {
             return nil
         }
@@ -84,25 +81,37 @@ class RecordExportSession {
             ])
         
         self.writer = writer
-        writer.startWriting()
-        writer.startSession(atSourceTime: kCMTimeZero)
         
         self.duration = duration
         
         renderer.size = size
         
+        // >_<
+        
         let group = DispatchGroup()
         
-        assets?.forEach {
-            guard let reader = try? AVAssetReader(asset: $0) else {
-                print("[debug] AVAssetReader configuration fail for", $0)
+        var tempRW = [(AVAssetReaderOutput, AVAssetWriterInput)]()
+        
+        if let asset = asset {
+            let composition = AVMutableComposition()
+            
+            for track in asset.tracks {
+                let compoTrack = composition.addMutableTrack(withMediaType: track.mediaType, preferredTrackID: kCMPersistentTrackID_Invalid)
+                
+                try! compoTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, track.asset!.duration), of: track, at: kCMTimeZero)
+                compoTrack.preferredTransform = track.preferredTransform
+            }
+            
+            let immutableSnapshot = composition.copy() as! AVComposition
+            
+            guard let reader = try? AVAssetReader(asset: immutableSnapshot) else {
+                print("[debug] AVAssetReader configuration fail for", asset)
                 return
             }
             
-            reader.startReading()
-            
-            for track in $0.tracks {
-                let queue = DispatchQueue(label: track.description)
+            for track in immutableSnapshot.tracks {
+                
+                print("track", track)
                 
                 let output: AVAssetReaderTrackOutput
                 let input: AVAssetWriterInput
@@ -112,12 +121,17 @@ class RecordExportSession {
                     input = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
                     
                 } else if (track.mediaType == AVMediaTypeAudio) {
+                    var audioFormat: CMFormatDescription? = nil
+                    _init_audioformatdesc(format: &audioFormat)
+                    
                     output = AVAssetReaderTrackOutput(track: track, outputSettings: audioSettings)
-                    input = AVAssetWriterInput(mediaType: AVMediaTypeAudio, outputSettings: audioSettings)
+                    input = AVAssetWriterInput(mediaType: AVMediaTypeAudio, outputSettings: nil, sourceFormatHint: audioFormat)
                     
                 } else {
                     continue
                 }
+                
+                output.alwaysCopiesSampleData = false
                 
                 guard reader.canAdd(output) else {
                     fatalError("[debug] parent abandons reader child")
@@ -129,17 +143,30 @@ class RecordExportSession {
                 }
                 writer.add(input)
                 
-                group.enter()
-                input.requestMediaDataWhenReady(on: queue) {
-                    while (input.isReadyForMoreMediaData) {
-                        if let nextBuffer = output.copyNextSampleBuffer() {
-                            input.append(nextBuffer)
-                            
-                        } else {
-                            input.markAsFinished()
-                            group.leave()
-                            break
-                        }
+                tempRW.append((output, input))
+            }
+            
+            reader.startReading()
+        }
+        
+        writer.startWriting()
+        writer.startSession(atSourceTime: kCMTimeZero)
+        
+        for (index, (output, input)) in tempRW.enumerated() {
+            let queue = DispatchQueue(label: "track #\(index)")
+            print("track #", index)
+            
+            group.enter()
+            input.requestMediaDataWhenReady(on: queue) {
+                while (input.isReadyForMoreMediaData) {
+                    if let nextBuffer = output.copyNextSampleBuffer() {
+                        print(nextBuffer)
+                        input.append(nextBuffer)
+                        
+                    } else {
+                        input.markAsFinished()
+                        group.leave()
+                        break
                     }
                 }
             }
@@ -163,6 +190,30 @@ class RecordExportSession {
         }
     }
     
+    private func _init_audioformatdesc(format: inout CMFormatDescription?) {
+        var audioFormat = AudioStreamBasicDescription()
+        bzero(&audioFormat, MemoryLayout<AudioStreamBasicDescription>.size)
+        audioFormat.mSampleRate = 44100
+        audioFormat.mFormatID   = kAudioFormatMPEG4AAC
+        audioFormat.mFramesPerPacket = 1024
+        audioFormat.mChannelsPerFrame = 2
+        let bytes_per_sample = MemoryLayout<Float>.size
+        audioFormat.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked;
+        
+        audioFormat.mBitsPerChannel = UInt32(bytes_per_sample * 8)
+        audioFormat.mBytesPerPacket = UInt32(bytes_per_sample * 2)
+        audioFormat.mBytesPerFrame = UInt32(bytes_per_sample * 2)
+        
+        CMAudioFormatDescriptionCreate(kCFAllocatorDefault,
+                                       &audioFormat,
+                                       0,
+                                       nil,
+                                       0,
+                                       nil,
+                                       nil,
+                                       &format);
+    }
+    
     private func _append(buffer: CVPixelBuffer, time: CMTime) {
         pixels.append((buffer, time))
         workerBarrier!.signal()
@@ -175,33 +226,33 @@ class RecordExportSession {
         }
     }
     
-/*
-    func append(image: CGImage, time: CMTime) {
-        appenderQueue.sync {
-            appendingCount += 1
-        }
-        
-        if let pxbuffer = renderer.render(cgImage: image) {
-            _append(buffer: pxbuffer, time: time)
-        } else {
-            fatalError("[debug] CG image rendering failure!")
-        }
-    }
-    
-    func append(view: UIView, time: CMTime) {
-        appenderQueue.sync {
-            appendingCount += 1
-        }
-        DispatchQueue.global().async {            
-            self.appenderQueue.asyncAfter(deadline: .now() + .milliseconds(10)) {
-                self.appendingCount -= 1
-            }
-            
-            let image = self.renderer.renderUIView(view: view)
-            self.append(image: image!, time: time)
-        }
-    }
- */
+    /*
+     func append(image: CGImage, time: CMTime) {
+     appenderQueue.sync {
+     appendingCount += 1
+     }
+     
+     if let pxbuffer = renderer.render(cgImage: image) {
+     _append(buffer: pxbuffer, time: time)
+     } else {
+     fatalError("[debug] CG image rendering failure!")
+     }
+     }
+     
+     func append(view: UIView, time: CMTime) {
+     appenderQueue.sync {
+     appendingCount += 1
+     }
+     DispatchQueue.global().async {
+     self.appenderQueue.asyncAfter(deadline: .now() + .milliseconds(10)) {
+     self.appendingCount -= 1
+     }
+     
+     let image = self.renderer.renderUIView(view: view)
+     self.append(image: image!, time: time)
+     }
+     }
+     */
     
     func append(view: UIView, playerView: PlayerView, targetType: EventSubject, time: CMTime) {
         appenderQueue.sync {
@@ -229,6 +280,7 @@ class RecordExportSession {
         var periodicCheck: (() -> Void)!
         
         periodicCheck = {
+            print("periodic check", self.assetExportDoneFlag, self.appendingCount, self.pixels.count)
             if (self.assetExportDoneFlag && self.appendingCount == 0 && self.pixels.count == 0) {
                 let barrier = self.workerBarrier!
                 self.workerBarrier = nil

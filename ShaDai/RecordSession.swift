@@ -42,7 +42,7 @@ class RecordSession {
     
     var metadata: [String : String] = [:]
     
-    var assets: [AVAsset]?
+    var asset: AVAsset?
     
     init(frequency: Double) {
         self.frequency = frequency
@@ -114,7 +114,7 @@ class RecordSession {
         let size = playerView.playerLayer.videoRect.size
         let duration = CMTime(seconds: Double(keysSorted.last!) / self.frequency + Double(timeout), preferredTimescale: 1000)
         
-        guard let exportSession = RecordExportSession(fileURL: fileURL, size: size, duration: duration, assets: assets) else {
+        guard let exportSession = RecordExportSession(fileURL: fileURL, size: size, duration: duration) else {
             print("[debug] failed to initialize exportSession")
             return
         }

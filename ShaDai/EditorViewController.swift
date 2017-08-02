@@ -344,7 +344,7 @@ class EditorViewController: UIViewController {
             audioRecorder = nil
             
             let asset = AVURLAsset(url: audioURL)
-            recordSession?.assets = [asset]
+            recordSession?.asset = asset
             
         } else {
             print("[debug] audio recorder state corruption while finishing")
