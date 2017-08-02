@@ -131,20 +131,26 @@ class ImageRenderer {
             group.enter()
             DispatchQueue.global().async {
                 
-                let shape = self.renderUIView(view: shapeView)
-                let reshape = self.resize(image: shape!, extent: shapeView.frame.size)
-                let cropped = self.crop(image: reshape!, prev: shapeView.frame.size, target: self.size)
-                processedShape = self.render(cgImage: cropped!)
+                guard let shape = self.renderUIView(view: shapeView),
+                    let reshape = self.resize(image: shape, extent: shapeView.frame.size),
+                    let cropped = self.crop(image: reshape, prev: shapeView.frame.size, target: self.size) else {
+                        fatalError("[debug] nil image processing! (for shape)")
+                }
+                
+                processedShape = self.render(cgImage: cropped)
                 self.cachedShape = processedShape
                 
                 group.leave()
             }
             
             if let playerView = playerView {
-                let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!)
-                let resnap = resize(image: snapshot!, extent: playerView.playerLayer.videoRect.size)
-                let cropped = crop(image: resnap!, prev: playerView.playerLayer.videoRect.size, target: size)
-                processedSnapshot = render(cgImage: cropped!)
+                guard let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!),
+                    let resnap = resize(image: snapshot, extent: playerView.playerLayer.videoRect.size),
+                    let cropped = crop(image: resnap, prev: playerView.playerLayer.videoRect.size, target: size) else {
+                        fatalError("[debug] nil image processing! (for snapshot)")
+                }
+                
+                processedSnapshot = render(cgImage: cropped)
                 cachedSnapshot = processedSnapshot
                 
             } else {
@@ -152,10 +158,13 @@ class ImageRenderer {
                 
             }
         } else if let playerView = playerView {
-            let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!)
-            let resnap = resize(image: snapshot!, extent: playerView.playerLayer.videoRect.size)
-            let cropped = crop(image: resnap!, prev: playerView.playerLayer.videoRect.size, target: size)
-            processedSnapshot = render(cgImage: cropped!)
+            guard let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!),
+                let resnap = resize(image: snapshot, extent: playerView.playerLayer.videoRect.size),
+                let cropped = crop(image: resnap, prev: playerView.playerLayer.videoRect.size, target: size) else {
+                    fatalError("[debug] nil image processing! (for snapshot)")
+            }
+            
+            processedSnapshot = render(cgImage: cropped)
             cachedSnapshot = processedSnapshot
             
             processedShape = cachedShape

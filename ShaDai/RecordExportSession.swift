@@ -160,28 +160,20 @@ class RecordExportSession {
             group.enter()
             input.requestMediaDataWhenReady(on: queue) {
                 while (input.isReadyForMoreMediaData) {
-                    do {
-                        try ObjC.catchException {
-                            if let nextBuffer = output.copyNextSampleBuffer() {
-                                print(nextBuffer)
-                                input.append(nextBuffer)
-                                
-                            } else {
-                                input.markAsFinished()
-                                group.leave()
-                                return
-                            }
-                        }
-                    } catch {
-                        print(error)
-                        print(reader.status)
-                        print(reader.error ?? "no error")
+                    if let nextBuffer = output.copyNextSampleBuffer() {
+                        input.append(nextBuffer)
+                        
+                    } else {
+                        input.markAsFinished()
+                        group.leave()
+                        
+                        reader.cancelReading()
+                        return
                     }
-                    
                 }
             }
         }
-        
+    
         _init_worker()
         
         group.notify(queue: DispatchQueue.global()) {
@@ -210,9 +202,10 @@ class RecordExportSession {
         var audioFormat = AudioStreamBasicDescription()
         bzero(&audioFormat, MemoryLayout<AudioStreamBasicDescription>.size)
         audioFormat.mSampleRate = 44100
-        audioFormat.mFormatID   = kAudioFormatMPEG4AAC
+        audioFormat.mFormatID = kAudioFormatMPEG4AAC
         audioFormat.mFramesPerPacket = 1024
         audioFormat.mChannelsPerFrame = 2
+        
         let bytes_per_sample = MemoryLayout<Float>.size
         audioFormat.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked;
         
@@ -296,7 +289,6 @@ class RecordExportSession {
         var periodicCheck: (() -> Void)!
         
         periodicCheck = {
-            print("periodic check", self.assetExportDoneFlag, self.appendingCount, self.pixels.count)
             if (self.assetExportDoneFlag && self.appendingCount == 0 && self.pixels.count == 0) {
                 let barrier = self.workerBarrier!
                 self.workerBarrier = nil

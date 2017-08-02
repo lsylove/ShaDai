@@ -56,8 +56,8 @@ class EditorViewController: UIViewController {
     
     private let audioSettings = [
         AVFormatIDKey: Int(kAudioFormatLinearPCM),
-        AVSampleRateKey: 12000,
-        AVNumberOfChannelsKey: 1,
+        AVSampleRateKey: 44100,
+        AVNumberOfChannelsKey: 2,
         AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
         AVLinearPCMIsBigEndianKey: 0,
         AVLinearPCMIsFloatKey: 0,
@@ -381,13 +381,19 @@ class EditorViewController: UIViewController {
                     curr.setNeedsDisplay()
                 }
                 
+                let recordPlayer = AVPlayer(url: audioURL)
+                
                 let controls: [UIControl] = [playbackButton, startButton, playButton, colorButton, deleteButton, prevButton, nextButton, saveButton, slider, shapeSeg, speedSeg]
                 
                 controls.forEach { $0.isEnabled = false }
                 
                 timer = Timer.scheduledTimer(timeInterval: 1.0 / frequency, target: self, selector: #selector(self.tick), userInfo: nil, repeats: true)
                 
+                recordPlayer.play()
+                
                 s.execute(playerView: playerView, superView: self.view) {
+                    recordPlayer.pause()
+                    
                     self.timer?.invalidate()
                     self.timer = nil
                     
