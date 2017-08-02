@@ -31,6 +31,7 @@
 		67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */; };
 		67367B561F2AFB6000C0A097 /* RecordExportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67367B551F2AFB6000C0A097 /* RecordExportSession.swift */; };
 		6743D6471F303C8E00EE574B /* three.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6743D6461F303C8E00EE574B /* three.mp4 */; };
+		6749B1651F31A8B7007ABE5E /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 6749B1641F31A8B7007ABE5E /* ObjC.m */; };
 		674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */; };
 		674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */; };
 		675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6757754F1F0F069D00270E3F /* ShaDai2.storyboard */; };
@@ -82,6 +83,9 @@
 		67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVAnimationComposer.swift; sourceTree = "<group>"; };
 		67367B551F2AFB6000C0A097 /* RecordExportSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordExportSession.swift; sourceTree = "<group>"; };
 		6743D6461F303C8E00EE574B /* three.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = three.mp4; sourceTree = SOURCE_ROOT; };
+		6749B1621F31A891007ABE5E /* ObjC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjC.h; sourceTree = "<group>"; };
+		6749B1631F31A8B6007ABE5E /* ShaDai-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ShaDai-Bridging-Header.h"; sourceTree = "<group>"; };
+		6749B1641F31A8B7007ABE5E /* ObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC.m; sourceTree = "<group>"; };
 		674B776F1F189CA400DF9D3E /* ProfileOne.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ProfileOne.storyboard; sourceTree = "<group>"; };
 		674B77711F189CB600DF9D3E /* ProfileOneViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileOneViewController.swift; sourceTree = "<group>"; };
 		6757754F1F0F069D00270E3F /* ShaDai2.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = ShaDai2.storyboard; sourceTree = "<group>"; };
@@ -145,6 +149,7 @@
 		3B4B05E91F0E1086006EE5F1 /* ShaDai */ = {
 			isa = PBXGroup;
 			children = (
+				6749B1611F31A87D007ABE5E /* ObjC */,
 				67147E2B1F2585BE0069F24D /* Resources */,
 				67147E2A1F2584F90069F24D /* Common */,
 				67147E2C1F2586330069F24D /* HashTag */,
@@ -273,6 +278,16 @@
 			name = Editor;
 			sourceTree = "<group>";
 		};
+		6749B1611F31A87D007ABE5E /* ObjC */ = {
+			isa = PBXGroup;
+			children = (
+				6749B1621F31A891007ABE5E /* ObjC.h */,
+				6749B1641F31A8B7007ABE5E /* ObjC.m */,
+				6749B1631F31A8B6007ABE5E /* ShaDai-Bridging-Header.h */,
+			);
+			name = ObjC;
+			sourceTree = "<group>";
+		};
 		676C4A3D1F2734EF00D7BBF8 /* Square */ = {
 			isa = PBXGroup;
 			children = (
@@ -383,6 +398,7 @@
 				671BBF0B1F0E154F0088B84C /* String+.swift in Sources */,
 				672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */,
 				67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */,
+				6749B1651F31A8B7007ABE5E /* ObjC.m in Sources */,
 				674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */,
 				67E7794A1F25E75900C29CE5 /* RecordSession.swift in Sources */,
 				676C4A3F1F27350D00D7BBF8 /* SquareViewController.swift in Sources */,
@@ -522,11 +538,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ShaDai/ShaDai-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -535,11 +554,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ShaDai/ShaDai-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

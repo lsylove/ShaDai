@@ -56,9 +56,6 @@ class RecordExportSession {
             kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value: kCVPixelFormatType_32BGRA),
             kCVPixelBufferIOSurfacePropertiesKey as String: [:]
         ]
-        let audioSettings: [String: Any] = [
-            AVFormatIDKey: Int(kAudioFormatLinearPCM)
-        ]
         
         guard let writer = try? AVAssetWriter(outputURL: fileURL, fileType: AVFileTypeQuickTimeMovie) else {
             return nil
@@ -92,85 +89,107 @@ class RecordExportSession {
         
         var tempRW = [(AVAssetReaderOutput, AVAssetWriterInput)]()
         
-        if let asset = asset {
-            let composition = AVMutableComposition()
+        guard let asset = asset else {
+            writer.startWriting()
+            writer.startSession(atSourceTime: kCMTimeZero)
             
-            for track in asset.tracks {
-                let compoTrack = composition.addMutableTrack(withMediaType: track.mediaType, preferredTrackID: kCMPersistentTrackID_Invalid)
-                
-                try! compoTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, track.asset!.duration), of: track, at: kCMTimeZero)
-                compoTrack.preferredTransform = track.preferredTransform
-            }
+            _init_worker()
             
-            let immutableSnapshot = composition.copy() as! AVComposition
-            
-            guard let reader = try? AVAssetReader(asset: immutableSnapshot) else {
-                print("[debug] AVAssetReader configuration fail for", asset)
-                return
-            }
-            
-            for track in immutableSnapshot.tracks {
-                
-                print("track", track)
-                
-                let output: AVAssetReaderTrackOutput
-                let input: AVAssetWriterInput
-                
-                if (track.mediaType == AVMediaTypeVideo) {
-                    output = AVAssetReaderTrackOutput(track: track, outputSettings: videoSettings)
-                    input = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
-                    
-                } else if (track.mediaType == AVMediaTypeAudio) {
-                    var audioFormat: CMFormatDescription? = nil
-                    _init_audioformatdesc(format: &audioFormat)
-                    
-                    output = AVAssetReaderTrackOutput(track: track, outputSettings: audioSettings)
-                    input = AVAssetWriterInput(mediaType: AVMediaTypeAudio, outputSettings: nil, sourceFormatHint: audioFormat)
-                    
-                } else {
-                    continue
-                }
-                
-                output.alwaysCopiesSampleData = false
-                
-                guard reader.canAdd(output) else {
-                    fatalError("[debug] parent abandons reader child")
-                }
-                reader.add(output)
-                
-                guard writer.canAdd(input) else {
-                    fatalError("[debug] parent abandons writer child")
-                }
-                writer.add(input)
-                
-                tempRW.append((output, input))
-            }
-            
-            reader.startReading()
+            assetExportDoneFlag = true
+            return
         }
+//            let composition = AVMutableComposition()
+//            
+//            for track in asset.tracks {
+//                let compoTrack = composition.addMutableTrack(withMediaType: track.mediaType, preferredTrackID: kCMPersistentTrackID_Invalid)
+//                
+//                try! compoTrack.insertTimeRange(CMTimeRangeMake(kCMTimeZero, track.asset!.duration), of: track, at: kCMTimeZero)
+//                compoTrack.preferredTransform = track.preferredTransform
+//            }
+//            
+//            let immutableSnapshot = composition.copy() as! AVComposition
+            
+        guard let reader = try? AVAssetReader(asset: asset) else {
+            print("[debug] AVAssetReader configuration fail for", asset)
+            return
+        }
+        
+        for track in asset.tracks {
+            
+            let output: AVAssetReaderTrackOutput
+            let input: AVAssetWriterInput
+            
+            if (track.mediaType == AVMediaTypeVideo) {
+                output = AVAssetReaderTrackOutput(track: track, outputSettings: videoSettings)
+                input = AVAssetWriterInput(mediaType: AVMediaTypeVideo, outputSettings: outputSettings)
+                
+            } else if (track.mediaType == AVMediaTypeAudio) {
+                var audioFormat: CMFormatDescription? = nil
+                _init_audioformatdesc(format: &audioFormat)
+                
+                output = AVAssetReaderTrackOutput(track: track, outputSettings: nil)
+                input = AVAssetWriterInput(mediaType: AVMediaTypeAudio, outputSettings: nil, sourceFormatHint: audioFormat)
+                
+            } else {
+                continue
+            }
+            
+            output.alwaysCopiesSampleData = false
+            
+            guard reader.canAdd(output) else {
+                fatalError("[debug] parent abandons reader child")
+            }
+            reader.add(output)
+            
+            guard writer.canAdd(input) else {
+                fatalError("[debug] parent abandons writer child")
+            }
+            writer.add(input)
+            
+            tempRW.append((output, input))
+        }
+        
+        reader.startReading()
         
         writer.startWriting()
         writer.startSession(atSourceTime: kCMTimeZero)
         
         for (index, (output, input)) in tempRW.enumerated() {
             let queue = DispatchQueue(label: "track #\(index)")
-            print("track #", index)
             
             group.enter()
             input.requestMediaDataWhenReady(on: queue) {
                 while (input.isReadyForMoreMediaData) {
-                    if let nextBuffer = output.copyNextSampleBuffer() {
-                        print(nextBuffer)
-                        input.append(nextBuffer)
-                        
-                    } else {
-                        input.markAsFinished()
-                        group.leave()
-                        break
+                    do {
+                        try ObjC.catchException {
+                            if let nextBuffer = output.copyNextSampleBuffer() {
+                                print(nextBuffer)
+                                input.append(nextBuffer)
+                                
+                            } else {
+                                input.markAsFinished()
+                                group.leave()
+                                return
+                            }
+                        }
+                    } catch {
+                        print(error)
+                        print(reader.status)
+                        print(reader.error ?? "no error")
                     }
+                    
                 }
             }
         }
+        
+        _init_worker()
+        
+        group.notify(queue: DispatchQueue.global()) {
+            self.assetExportDoneFlag = true
+        }
+    }
+    
+    private func _init_worker() {
         
         worker.async {
             self.workerBarrier!.wait()
@@ -185,9 +204,6 @@ class RecordExportSession {
             }
         }
         
-        group.notify(queue: DispatchQueue.global()) {
-            self.assetExportDoneFlag = true
-        }
     }
     
     private func _init_audioformatdesc(format: inout CMFormatDescription?) {

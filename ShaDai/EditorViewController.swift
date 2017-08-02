@@ -58,7 +58,11 @@ class EditorViewController: UIViewController {
         AVFormatIDKey: Int(kAudioFormatLinearPCM),
         AVSampleRateKey: 12000,
         AVNumberOfChannelsKey: 1,
-        AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+        AVLinearPCMIsBigEndianKey: 0,
+        AVLinearPCMIsFloatKey: 0,
+        AVLinearPCMBitDepthKey: 16,
+        AVLinearPCMIsNonInterleaved: 0
     ]
     
     private lazy var audioURL: URL = {

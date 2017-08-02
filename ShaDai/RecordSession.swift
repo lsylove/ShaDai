@@ -114,7 +114,7 @@ class RecordSession {
         let size = playerView.playerLayer.videoRect.size
         let duration = CMTime(seconds: Double(keysSorted.last!) / self.frequency + Double(timeout), preferredTimescale: 1000)
         
-        guard let exportSession = RecordExportSession(fileURL: fileURL, size: size, duration: duration) else {
+        guard let exportSession = RecordExportSession(fileURL: fileURL, size: size, duration: duration, asset: asset) else {
             print("[debug] failed to initialize exportSession")
             return
         }
