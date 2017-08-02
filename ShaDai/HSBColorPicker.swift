@@ -96,6 +96,10 @@ class HSBColorPicker : UIView {
     }
     
     func touchedColor(gestureRecognizer: UILongPressGestureRecognizer){
+        if (gestureRecognizer.state != .began) {
+            return
+        }
+        
         let point = gestureRecognizer.location(in: self)
         let color = getColorAtPoint(point: point)
         
