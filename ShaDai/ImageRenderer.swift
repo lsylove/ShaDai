@@ -131,46 +131,30 @@ class ImageRenderer {
             group.enter()
             DispatchQueue.global().async {
                 
-                guard let shape = self.renderUIView(view: shapeView),
-                    let reshape = self.resize(image: shape, extent: shapeView.frame.size),
-                    let cropped = self.crop(image: reshape, prev: shapeView.frame.size, target: self.size) else {
-                        fatalError("[debug] nil image processing! (for shape)")
+                guard let shape = self.renderUIView(view: shapeView) else {
+                    fatalError("[debug] nil image processing! (for shape)")
                 }
                 
-                processedShape = self.render(cgImage: cropped)
+                processedShape = self.render(cgImage: shape)
                 self.cachedShape = processedShape
                 
                 group.leave()
             }
-            
-            if let playerView = playerView {
-                guard let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!),
-                    let resnap = resize(image: snapshot, extent: playerView.playerLayer.videoRect.size),
-                    let cropped = crop(image: resnap, prev: playerView.playerLayer.videoRect.size, target: size) else {
-                        fatalError("[debug] nil image processing! (for snapshot)")
-                }
-                
-                processedSnapshot = render(cgImage: cropped)
-                cachedSnapshot = processedSnapshot
-                
-            } else {
-                processedSnapshot = cachedSnapshot
-                
-            }
-        } else if let playerView = playerView {
+        }
+
+        if let playerView = playerView {
             guard let snapshot = renderSnapshot(playerItem: playerView.player!.currentItem!),
-                let resnap = resize(image: snapshot, extent: playerView.playerLayer.videoRect.size),
-                let cropped = crop(image: resnap, prev: playerView.playerLayer.videoRect.size, target: size) else {
+                let resnap = resize(image: snapshot, extent: self.size) else {
                     fatalError("[debug] nil image processing! (for snapshot)")
             }
             
-            processedSnapshot = render(cgImage: cropped)
+            processedSnapshot = render(cgImage: resnap)
             cachedSnapshot = processedSnapshot
             
             processedShape = cachedShape
             
         } else {
-            fatalError("[debug] renderer has to render at least one of views!")
+            processedSnapshot = cachedSnapshot
         }
         
         group.wait()
@@ -190,32 +174,23 @@ class ImageRenderer {
     
     func resize(image: CGImage, extent: CGSize) -> CGImage? {
         
-        guard let colorSpace = image.colorSpace else {
-            return nil
-        }
-        guard let context = CGContext(data: nil,
-                                      width: Int(extent.width),
-                                      height: Int(extent.height),
-                                      bitsPerComponent: image.bitsPerComponent,
-                                      bytesPerRow: Int(extent.width) * image.bitsPerComponent / 2,
-                                      space: colorSpace,
-                                      bitmapInfo: image.alphaInfo.rawValue) else {
-            return nil
-        }
+        UIGraphicsBeginImageContext(extent)
+        UIImage(cgImage: image).draw(in: CGRect(origin: .zero, size: extent))
         
-        context.interpolationQuality = .high
-        context.draw(image, in: CGRect(x: 0, y: 0, width: Int(extent.width), height: Int(extent.height)))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
         
-        return context.makeImage()
-        
+        return newImage?.cgImage
     }
     
-    func crop(image: CGImage, prev: CGSize, target: CGSize) -> CGImage? {
-        let newX = (prev.width - target.width) / 2.0
-        let newY = (prev.height - target.height) / 2.0
-        
-        let newFrame = CGRect(origin: CGPoint(x: newX, y: newY), size: target)
-        let imageRef = image.cropping(to: newFrame)
-        return imageRef
-    }
+//    func crop(image: CGImage, prev: CGSize, target: CGSize) -> CGImage? {
+//        
+//        return image
+//        let newX = (prev.width - target.width) / 2.0
+//        let newY = (prev.height - target.height) / 2.0
+//        
+//        let newFrame = CGRect(origin: CGPoint(x: newX, y: newY), size: target)
+//        let imageRef = image.cropping(to: newFrame)
+//        return imageRef
+//    }
 }
