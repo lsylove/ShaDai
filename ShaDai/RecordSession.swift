@@ -111,7 +111,10 @@ class RecordSession {
         events.removeValue(forKey: -1)
         let keysSorted = self.events.keys.sorted()
         
-        let size = playerView.playerLayer.videoRect.size
+        var size = playerView.playerLayer.videoRect.size
+        size.width *= UIScreen.main.scale
+        size.height *= UIScreen.main.scale
+        
         let duration = CMTime(seconds: Double(keysSorted.last!) / self.frequency + Double(timeout), preferredTimescale: 1000)
         
         guard let exportSession = RecordExportSession(fileURL: fileURL, size: size, duration: duration, asset: asset) else {
