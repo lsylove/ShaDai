@@ -116,11 +116,11 @@ Once you record a session using the “start/finish” button for the first time
 
 Profile One’s main features are: loading and seeking video, drawing and positioning a trajectory parabola, and exporting with animation.
 
-# Loading and Seeking
+### Loading and Seeking
 
 Most of these features are simple thanks to powerful [AVPlayer](https://developer.apple.com/documentation/avfoundation/avplayer) and [AVPlayerItem](https://developer.apple.com/documentation/avfoundation/avplayeritem) APIs. These are easy tasks, so I won’t cover their details.
 
-# Drawing and Positioning a Trajectory Parabola
+### Drawing and Positioning a Trajectory Parabola
 
 Three points on the video are represented as srcView, dstView, and vertexView objects (Yes. The third point was supposed to be a “vertex” of a trajectory. However, it was not possible.) and procuring their coordinates is rather a straightforward task. 
 
@@ -147,7 +147,7 @@ In the meantime, the calculated curve is not drawn as-is, or as a sublayer to th
 
 The reason behind such indirect expression is explained later.
 
-# Exporting with Animation
+### Exporting with Animation
 
 This part was the trickiest and frustrated me very much. The process is (primarily) written in [processVideo() method of ProfileOneViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ProfileOneViewController.swift#L202). For the most part, the method deals with “shapeLayer” and “shapeWrapper” CALayer objects. The two layers have similar relationship to previous “Shape” and “Wrapper”; i.e. shapeWrapper has the red fill and shapeLayer has a perspective stroke which masks the wrapper.
 
