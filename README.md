@@ -2,13 +2,13 @@
 
 iOS/AVFoundation project compilation
 
-————————————————————————
+----------------------------------------------
 
 ## How to Build
 
 Load the project (“ShaDai.xcodeproj” file) using Xcode IDE
 
-————————————————————————
+----------------------------------------------
 
 ## Notable Projects
 
@@ -25,7 +25,7 @@ The list of notable projects are as follows.
 
 (By the way, sorry for poor naming)
 
-————————————————————————
+----------------------------------------------
 
 ## Profile One
 
@@ -60,7 +60,7 @@ Finally, you can press “save” button to export the video with animation. The
 
 ![Profile One](/doc/images/p1vid2.png)
 
-————————————————————————
+----------------------------------------------
 
 ## Dual
 
@@ -89,7 +89,7 @@ You can move slider along and press “Add” button to mark position as respect
 There are four(4) disjoint steps in a swing motion, which are address, backswing, impact, and finish.
 From upper segment controls, you can choose which motion point you are marking.
 
-————————————————————————
+----------------------------------------------
 
 ## Editor
 
@@ -122,4 +122,4 @@ Once you record a session using the “start/finish” button for the first time
 
 ![Editor](/doc/images/editorPlayable.png)
 
-————————————————————————
+----------------------------------------------
