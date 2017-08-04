@@ -127,14 +127,18 @@ Three points on the video are represented as srcView, dstView, and vertexView ob
 To draw a parabola (i.e. a quadratic curve), I used [UIBezierPath](https://developer.apple.com/documentation/uikit/uibezierpath), especially [addQuadCurve(to:controlPoint:)](https://developer.apple.com/documentation/uikit/uibezierpath/1624351-addquadcurve) method. For this, a simple simultaneous equation is solved to get a control path.
 
 ![Equation](/doc/images/equation/01.gif)
+
 ![Equation](/doc/images/equation/02.gif)
+
 ![Equation](/doc/images/equation/03.gif)
+
 ![Equation](/doc/images/equation/04.gif)
 
 Solving equation involves matrix multiplication and, therefore, GLKit is used.
 Getting the [control point for a quadratic bezier curve](https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Constructing_B.C3.A9zier_curves) is trivial, as follows.
 
 ![Equation](/doc/images/equation/05.gif)
+
 ![Equation](/doc/images/equation/06.gif)
 
 In the meantime, the calculated curve is not drawn as-is, or as a sublayer to the view. Rather, it is drawn as a “mask” of a sublayer which is filled with red color everywhere so that only the masked area (which is a drawn path curve) is visible to the user. These two layers are “Shape” and “Wrapper” instance variables of [ProfileOneViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ProfileOneViewController.swift) in the project.
