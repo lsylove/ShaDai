@@ -311,3 +311,66 @@ When the offset is directly applied for each `timemark` segment positions, it lo
 ![Dual](/doc/images/dexp7.png)
 
 Therefore, the only exception is “when the video is paused”, and such case can be handled easily using `sub` and other arrays.
+
+## Implementation: Editor
+
+Compared to all the other projects in the compilation, Editor project is very large. It uses complicated class relationship hierarchy shown below.
+
+![Editor](/doc/images/exp1.png)
+
+* [EditorViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EditorViewController.swift): View controller responsible for main scene, whose responsibilities include handling various control responses, forwarding data to and receiving data as delegate from ColorPickerViewController, managing record sessions, etc.
+
+* PlayerView: Implemented using AVPlayer and AVPlayerLayer, the class has been used throughout the project, making nothing so special about it.
+
+* [ShapeView](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ShapeView.swift): View object representing each shape. It has basic shape information like appearance, size, and color. Also, it handles panning (dragging) events and resulting resize/translate by itself. Because of such responsibility, it also stores data for its own boundary and its position within it.
+
+* [RecordSession](https://github.com/lsylove/ShaDai/blob/master/ShaDai/RecordSession.swift): RecordSession is deployed to record each event during the recording period and to replay recorded data during playback/export.
+
+* [EventEntity](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EventEntity.swift) and its implementations: Each EventEntity object abstracts the “event” that occurred during the recording session and the session is made up of a pair of (the time event occurred, the event) values.
+
+* [RecordExportSession](https://github.com/lsylove/ShaDai/blob/master/ShaDai/RecordExportSession.swift): RecordExportSession is used by RecordSession when exporting. It mainly configures exporting related assets (aforementioned AVAssetReader, AVAssetWriter, ...) and format descriptors.
+
+* [ImageRenderer](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ImageRenderer.swift): Located within RecordExportSession, ImageRenderer captures each scene after the event and renders them into pixel buffers that are appended by RecordExportSession.
+
+* [ColorPickerViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ColorPickerViewController.swift): The view controller manages “color change” screen. It has nothing but transferring picked color information back to the delegate.
+
+* [HSBColorPicker](https://github.com/lsylove/ShaDai/blob/master/ShaDai/HSBColorPicker.swift): Courtesy to [StackOverflow](https://stackoverflow.com/a/34142316), this functioning view element could be obtained very easily. Fixed minor gesture glitches.
+
+### AVPlayer
+
+Nearly all projects cover usage with AVPlayer so, again, it is redundant to describe how PlayerView and associated controls are implemented.
+
+### Drawing and Editing Shapes
+
+Shapes are implemented as ShapeView in this project. 
+
+Shapes deal with dragging events for resizing and translation on its own. These events are received via three sublayers: aView, bView, and dView. The former two marks the two edge points (“circles”) of the shape and, when dragged, resizes the shape. The latter is invisible and moves the shape when dragged.
+
+![Editor](/doc/images/exp2.png)
+
+ShapeView has `isSelected` calculated property. When this property goes off, all of sublayers become hidden so that they don’t receive any panning events. In addition, circles which displays resizing point also disappear (due to being hidden), making visual difference to the user.
+
+From the user’s perspective, only one shape can be selected at the time. The user can select the shape by clicking (tapping) on it. When no shape is on the space where the user tapped, no shape becomes selected (all shapes are deselected). If there is one, that shape is the one selected. If there are more than one, the most recently drawn shape gets priority.
+
+However, if such point is clicked more than once or, more generally, one of stacked shapes is previously selected by the user, the next shape will be the one created before the previous selection. This policy is set to prevent some older shapes from not being able to be selected.
+
+![Editor](/doc/images/exp3.png)
+
+Such functionality is implemented in [EditorViewController.pickShape(recognizer:)](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EditorViewController.swift#L505). It uses `checkup` local variable to make sure newly selected shape is older than previously selected shape.
+
+More specifically, no shape can be chosen while `checkup` is false (see 524th line). When the selected shape is found, `checkup` is turned to true, enabling the following shapes to be chosen. Since the elements are iterated in reverse order (to give chance to newer ones in general situations), after “checked up”, only older ones are eligible for checking.
+
+Check this example regarding the point with <2> and <3> only. In this case, <3> is the previously selected shape before tapping.
+
+![Editor](/doc/images/exp4.png)
+
+However, if the checked up element is the last eligible element, or the oldest, in the iteration, there is chance some other elements are eligible to be chosen yet neglected
+because of not being checked up yet. To overcome such issue, in the absence of chosen shape, the array is iterated once more to choose the proper one.
+
+Check this example with the same point tapped, but different shape (<2>) is chosen at the time of tapping.
+
+![Editor](/doc/images/exp5.png)
+
+The function also handles other situations like when no shape is eligible, no shape is currently picked, tapped area does not contain currently picked shape, etc. You can check the code.
+
+In the meantime, when the user changes color using HSBColorPicker, currently picked shape also changes color. This is trivial. One shortcoming is that the user cannot change multiple shapes’ color at the same time this way (or, in fact, in any other way).
