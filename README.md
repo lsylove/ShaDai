@@ -89,7 +89,7 @@ The application capable of recording narration, supplementary drawings, playback
 
 Upper part is related to drawing shapes.
 You can use controls to choose the shape. The shape is added as you press the control button.
-You can ‘pick’ the shape on the screen by clicking on it. Picked shape has resizing controls (white circles) on it.
+You can pick the shape on the screen by clicking on it. Picked shape has resizing controls (white circles) on it.
 You can press “color” button to change the color of currently picked shape and all shapes you draw after.
 You can press “delete” button to remove currently picked shape.
 You can drag the picked shape to move it around and to resize it.
@@ -141,7 +141,7 @@ Getting the [control point for a quadratic bezier curve](https://en.wikipedia.or
 
 ![Equation](/doc/images/equation/06.gif)
 
-In the meantime, the calculated curve is not drawn as-is, or as a sublayer to the view. Rather, it is drawn as a “mask” of a sublayer which is filled with red color everywhere so that only the masked area (which is a drawn path curve) is visible to the user. These two layers are “Shape” and “Wrapper” instance variables of [ProfileOneViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ProfileOneViewController.swift) in the project.
+In the meantime, the calculated curve is not drawn as-is, or as a sublayer to the view. Rather, it is drawn as a “mask” of a sublayer which is filled with red color everywhere so that only the masked area (which is a drawn path curve) is visible to the user. These two layers are `Shape` and `Wrapper` instance variables of [ProfileOneViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ProfileOneViewController.swift) in the project.
 
 ![Profile One](/doc/images/p1exp1.png)
 
@@ -149,11 +149,11 @@ The reason behind such indirect expression is explained later.
 
 ### Exporting with Animation
 
-This part was the trickiest and frustrated me very much. The process is (primarily) written in [processVideo() method of ProfileOneViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ProfileOneViewController.swift#L202). For the most part, the method deals with “shapeLayer” and “shapeWrapper” CALayer objects. The two layers have similar relationship to previous “Shape” and “Wrapper”; i.e. shapeWrapper has the red fill and shapeLayer has a perspective stroke which masks the wrapper.
+This part was the trickiest and frustrated me very much. The process is (primarily) written in [processVideo() method of ProfileOneViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ProfileOneViewController.swift#L202). For the most part, the method deals with `shapeLayer` and `shapeWrapper` CALayer objects. The two layers have similar relationship to previous `Shape` and `Wrapper`; i.e. shapeWrapper has the red fill and shapeLayer has a perspective stroke which masks the wrapper.
 
 ![Profile One](/doc/images/p1exp2.png)
 
-The reason for dividing the red fill and the perspective stroke is to apply the animation for a path as simple as possible. Under such structure, to apply animation, the implementation only has to manipulate the stroke of “shapeWrapper”. It doesn’t have to deal with the shape with much more complex stroke “shapeLayer” has.
+The reason for dividing the red fill and the perspective stroke is to apply the animation for a path as simple as possible. Under such structure, to apply animation, the implementation only has to manipulate the stroke of `shapeWrapper`. It doesn’t have to deal with the shape with much more complex stroke `shapeLayer` has.
 
 ![Profile One](/doc/images/p1exp3.png)
 
@@ -175,3 +175,139 @@ layerComposition.instructions = [instruction]
 ```
 
 Afterwards, as with regular exports, [AVAssetReader](https://developer.apple.com/documentation/avfoundation/avassetreader), [AVAssetReaderVideoCompositionOutput](https://developer.apple.com/documentation/avfoundation/avassetreadervideocompositionoutput), [AVAssetWriter](https://developer.apple.com/documentation/avfoundation/avassetwriter), and [AVAssetWriterInput](https://developer.apple.com/documentation/avfoundation/avassetwriterinput) are used to export the video and finally, [PHPhotoLibrary.performChanges(_:completionHandler:)](https://developer.apple.com/documentation/photos/phphotolibrary/1620743-performchanges) for exporting to camera roll.
+
+## Implementation: Dual
+
+Dual has two view screen and two view controllers: [DualViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/DualViewController.swift) and [SwingConfigViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/SwingConfigViewController.swift), the former for synchronous play and the latter for position configuration.
+
+Both view controllers, especially the latter, uses [BarIndicatorView](https://github.com/lsylove/ShaDai/blob/master/ShaDai/BarIndicatorView.swift) to display the time position of each motion. The view component checks before each segment, or bar indicator, that shows the position is inserted so that all bars are in proper order.
+
+```swift
+for indicator in indicators {
+        if ((indicator.value > value) != (indicator.orderPrority > priority)
+                && indicator.identifier != identifier) {
+                return false
+        }
+}
+```
+
+SwingConfigViewController is not that complex other than that: it preserves/forwards state via delegates, it triggers event on user’s trying to add a new position mark (i.e. bar indicator), it has simple controls for seeking the video, and so on.
+
+In the meantime, DualViewController would have been something similar in complexity; however, it is not. It is mostly covering data transfer (again, using delegates) and play/pause/tick/seek controls but it also has to deal with manipulating AVPlayers regarding when to play/stop each video. 
+
+To synchronize playing of each motion, [TimemarkParams](https://github.com/lsylove/ShaDai/blob/master/ShaDai/TimemarkParams.swift) object performs a series of calculation to translate the “master time” into actual play time for each video and vice versa.
+
+TimemarkParams have four instance variables `mark`, `sub`, `offset`, and `timemarks` and they are initialized upon object construction.
+
+\* Note that `markA` and `markB` are arguments storing each motion’s timing information.
+
+```swift
+self.mark = [ a: markA, b: markB ]
+        
+var dif = 0.0
+let diffA = markA.map { a -> Double in defer { dif = a }; return a - dif }
+        
+dif = 0.0
+let diffB = markB.map { a -> Double in defer { dif = a }; return a - dif }
+        
+let zipped = zip(diffA, diffB)
+        
+self.sub = zipped.map { $0 > $1 ? b : a }
+let mins = zipped.map { min($0, $1) }
+let diff = zipped.map { abs($0 - $1) }
+        
+var _offset = [T:[Double]]()
+        
+var sum = 0.0
+_offset[a] = zip(sub, diff).flatMap { [0.0, $0 == a ? -$1 : 0.0] }.map { (sum += $0, sum).1 }
+        
+sum = 0.0
+_offset[b] = zip(sub, diff).flatMap { [0.0, $0 == b ? -$1 : 0.0] }.map { (sum += $0, sum).1 }
+        
+self.offset = _offset
+        
+sum = 0.0
+self.timemarks = zip(mins, diff).flatMap { [$0, $1] }.map { (sum += $0, sum).1 }
+```
+
+These operations perform something similar to following explanation.
+
+Suppose each motion for A video starts at 5, 10, 18, 20, 25 seconds position and that 6, 9, 15, 18, 25 seconds for B. Also, both video has a 25 seconds play duration.
+
+Then, `markA = [5, 10, 18, 20, 25]` and `markB = [6, 9, 15, 18, 25]`.
+
+It would look something similar to this.
+
+![Dual](/doc/images/dexp1.png)
+
+When you play the videos at the same time from the start, it would be like this.
+
+![Dual](/doc/images/dexp2.png)
+
+However, as per spec, each motion should start at the same time: to implement the feature, I set one of them (which has a shorter previous motion) waits until the same motion of the other video ends so that both videos start the next video simultaneously.
+
+![Dual](/doc/images/dexp3.png)
+
+`diff` local variable stores each motion’s length, or difference between each motion’s starting position. In this case:
+
+```
+diffA = [5, 5, 8, 2, 5]
+diffB = [6, 3, 6, 3, 7]
+```
+
+`sub` instance variable stores which one between A and B has a shorter play length for each motion; i.e. the one with lower `diff` value. For this, each member in `diffA` and `diffB` are compared in parallel.
+
+```
+sub = [A, B, B, A, A]
+```
+
+`timemark` instance variable provides key information regarding the “master” play controls. It is created by weaving two arrays in a manner that all “stopping time” information is kept.
+
+![Dual](/doc/images/dexp4.png)
+
+The final array is constructed by cumulating each segment’s value.
+
+```
+timemark = [5, 6, 9, 11, 17, 19, 21, 22, 27, 29]
+```
+
+First, the play length for master control becomes 29 seconds, which is the last element of the array.
+
+In addition, combined with `sub`, it has information for A and B videos about when they play and stop during the master playing session. Like this:
+
+![Dual](/doc/images/dexp5.png)
+
+`timemark` instance variable has all information needed to play the videos synchronously. In the meantime, `offset` instance variable is used to figure out each video’s modified position when the master control’s slider is dragged.
+
+In our case, “master” has 29 seconds of playing time. Video A stops from 5 seconds to 6 seconds of “master”, from 21 seconds to 22 seconds, and so on. The same for video B. Then, the correlation from master’s play time position to each video’s actual play time position should have a relationship like this.
+
+![Dual](/doc/images/dexp6.png)
+
+The implementation in TimemarkParams class gets `offset` value in a step similar to this.
+
+1. Prepend zero to each element, using input array values.
+
+```
+preA = [0, 5, 0, 10, 0, 18, 0, 20, 0, 25]
+preB = [0, 6, 0, 9, 0, 15, 0, 18, 0, 25]
+```
+
+2. If the video is `sub` between the two (similar to `timemark` array usage, 1/2 index is used to check which video is `sub`), subtract the value on the `timemark` array with the same position. If not, just replace the value with zero.
+
+```
+_preA = [0, -1, 0, 0, 0, 0, 0, -2, 0, -4]
+_preB = [0, 0, 0, -2, 0, -4, 0, 0, 0, 0]
+```
+
+3. Replace all zeros to “previous element’s value”; except for the first element which keeps the value of zero.
+
+```
+offsetA = [0, -1, -1, -1, -1, -1, -1, -2, -2, -4]
+offsetB = [0, 0, 0, -2, -2, -4, -4, -4, -4, -4]
+```
+
+When the offset is directly applied for each `timemark` segment positions, it looks like this.
+
+![Dual](/doc/images/dexp7.png)
+
+Therefore, the only exception is “when the video is paused”, and such case can be handled easily using `sub` and other arrays.
