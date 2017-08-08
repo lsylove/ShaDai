@@ -135,6 +135,7 @@ To draw a parabola (i.e. a quadratic curve), I used [UIBezierPath](https://devel
 ![Equation](/doc/images/equation/04.gif)
 
 Solving equation involves matrix multiplication and, therefore, GLKit is used.
+
 Getting the [control point for a quadratic bezier curve](https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Constructing_B.C3.A9zier_curves) is trivial, as follows.
 
 ![Equation](/doc/images/equation/05.gif)
@@ -383,7 +384,7 @@ To record events real-time, EditorViewController calls [RecordSession.record(ent
 
 All these events are recorded and kept with time information: when each event occurred. Time information has a unit of “ticks” (rather than real time) to ease the calculation. To save events, [EventEntity](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EventEntity.swift) and its subclass implementations are used depending on nature of the event; for instance, [FrameEvent](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EventEntity.swift#L57) for frame change, [ShapeRelatedEvent](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EventEntity.swift#L154) for shape change, and so on. RecordSession’s `events` dictionary achieves “heterogeneous container polymorphism”.
 
-For playback on UI scene, RecordSession calculates back play time period between each events (it converts tick time back into real time differences) and executes each event back in sequence. Managing execution with time period is implemented using [DispatchQueue.asyncAfter(deadline:execute:)](https://developer.apple.com/documentation/dispatch/dispatchqueue/2300020-asyncafter).
+For playback on UI scene, RecordSession calculates back play time period between each events (it converts tick time back into real time differences) and executes each event back in sequence. Managing execution with time period is implemented using [DispatchQueue.asyncAfter(deadline:execute:)](https://developer.apple.com/documentation/dispatch/dispatchqueue/2300020-asyncafter) and a [DispatchSemaphore](https://developer.apple.com/documentation/dispatch/dispatchsemaphore) object (named `executionBarrier` since it does something similar to a barrier).
 
 ```swift
 let keysSorted = self.events.keys.sorted()
@@ -397,12 +398,11 @@ for (curr, next) in seq {
                 executionBarrier.signal()
                 for entity in self.events[next]! {
                         entity.execute(player: playerView.player!, superView: superView, metadata: &self.metadata)
-                        }
                 }
         }
-        DispatchQueue.main.async {
-                completionHandler?()
-        }
+}
+DispatchQueue.main.async {
+        completionHandler?()
 }
 ```
 
@@ -514,3 +514,93 @@ for (curr, future) in futureSnapshot {
         curr.setNeedsDisplay()
 }
 ```
+
+### Exporting
+
+This part is full of complicated API usage and weird async/DispatchSemaphore usages. 
+
+For exporting, every logic deployed in [Recording and Playback](https://github.com/lsylove/ShaDai#recording-and-playback) are applied the same way except that exporting-related operations are added. It is the only entry point to RecordExportSession and ImageRender objects.
+
+This code snippet explains [RecordSession.exportAsFile(playerView:view:fileURL:completionHandler:)](https://github.com/lsylove/ShaDai/blob/master/ShaDai/RecordSession.swift#L107) method’s functionality.
+
+```swift
+
+                ...
+
+                // sequentialConsumer acts as a single worker thread. (a DispatchQueue object)
+                sequentialConsumer.async {
+
+                        // progressCount for reporting progress to delegate (EditorViewController which displays progress in a bar)
+                        var progressCount = 0
+            
+                        for ticks in keysSorted {
+                
+                                // WAITS until rendering of previous frame is complete!
+                                self.rendererBarrier.wait()
+                
+                                // report progress
+                                let progress = Double(progressCount) / Double(self.events.count)
+                                self.delegate?.reportProgress(reporter: self, progress: progress, count: self.events.count)
+                
+                                // increment progress (we are one step done! aren’t we?)
+                                progressCount += 1
+                
+                                // execute events for the next frame in main thread
+                                DispatchQueue.main.async {
+                                        var targetType = self.events[ticks]!.first!.target
+                    
+                                        // execute all events for the next frame
+                                        for entity in self.events[ticks]! {
+                                                targetType = targetType != entity.target ? .any : targetType
+                                                entity.execute(player: playerView.player!, superView: view, metadata: &self.metadata)
+                                        }
+                    
+                                        let time = CMTime(seconds: Double(ticks) / self.frequency, preferredTimescale: 1000)
+                    
+                                        // render this updated frame to video being exported
+                                        exportSession.append(view: view, playerView: playerView, targetType: targetType, time: time)
+                                }
+                        }
+            
+                        // WAITS once more (for the last frame’s VoidEvent entity)
+                        self.rendererBarrier.wait()
+
+                        // and then done. work on post-process
+                        exportSession.markAsFinished(completionHandler: completionHandler)
+                }
+        }
+}
+
+extension RecordSession: RecordExportSessionDelegate {
+    
+        // PROGRESS onc rendering the frame is done (“appending” means it was appended to export queue)
+        func appendingDone(session: RecordExportSession, buffer: CVPixelBuffer, time: CMTime, progress: Double) {
+                rendererBarrier.signal()
+        }
+    
+}
+```
+
+RecordExportSession uses standard AVAssetReader, AVAssetWriter and corresponding input/output objects to handle the task. There are several differences, though. First, it also deals with audio track. During recording, audio data is not compressed and follows linear PCM format. For export the format is compressed into MPEG-4 AAC.
+
+Second, images that contained captured frames also make up part of the video. In fact, the resulting video does not have any “source” video and all visible elements are comprised of captured frames from the scene. To do so, an instance of [AVAssetWriterInputPixelBufferAdaptor](https://developer.apple.com/documentation/avfoundation/avassetwriterinputpixelbufferadaptor) is used to append image (of type [CVPixelBuffer](https://developer.apple.com/documentation/corevideo/cvpixelbuffer)) to AVAssetWriterInput.
+
+Third, export session tries to maintain concurrency. UI update such as executing events and updating progress bars are exclusively done on UI thread. Capturing and rendering the image into CVPixelBuffer is done in a worker thread. Appending the captured image from export queue to AVAssetWriter is done in another thread. Writing audio asset data into the writer is done in yet another thread. [RecordExportSession.markAsFinished(completionHandler:)](https://github.com/lsylove/ShaDai/blob/master/ShaDai/RecordExportSession.swift#L283) is run in *another* worker thread and checks termination conditions for all those worker threads (excluding itself. meh)
+
+Some note on ImageRenderer: Although the class offers various functions to render an image object into another object, the only (effectively) used method in the project is [render(shapeView:playerView:)](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ImageRenderer.swift#L123) method. The method signature might look a bit weird in that it receives “optionals”. The reasoning behind can be inferred from the [calling point](https://github.com/lsylove/ShaDai/blob/master/ShaDai/RecordExportSession.swift#L266).
+
+```swift
+switch targetType {
+case .any: buffer = self.renderer.render(shapeView: view, playerView: playerView)
+case .shape: buffer = self.renderer.render(shapeView: view, playerView: nil)
+case .player: buffer = self.renderer.render(shapeView: nil, playerView: playerView)
+}
+```
+
+The reason it receives optionals is to encourage caching; when only the state regarding the shape is changed (e.g. new shape, shape resized, etc), only ShapeView superview layer is rendered again to update itself to newer frame. Similarly, when only the state regarding the video is changed (e.g. frame change), only PlayerView layer is rendered again. Either case, the other party who is not changed does not need to be rendered again. After each layer is rendered and ready as CVPixelBuffer, they are composited using CISourceOverCompositing filter (please see [CIImage.compositingOver(_:)](https://developer.apple.com/documentation/coreimage/ciimage/1437837-composited)).
+
+![Editor](/doc/images/exp14.png)
+
+Most of the other processes are simple and straightforward, provided that it heavily uses asynchronous operations to try to be efficient.
+
+Similar to Profile One functionality, Editor exports the video to camera roll.
