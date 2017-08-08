@@ -320,7 +320,7 @@ Compared to all the other projects in the compilation, Editor project is very la
 
 * [EditorViewController](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EditorViewController.swift): View controller responsible for main scene, whose responsibilities include handling various control responses, forwarding data to and receiving data as delegate from ColorPickerViewController, managing record sessions, etc.
 
-* PlayerView: Implemented using AVPlayer and AVPlayerLayer, the class has been used throughout the project, making nothing so special about it.
+* [PlayerView](https://github.com/lsylove/ShaDai/blob/master/ShaDai/PlayerView.swift): Implemented using AVPlayer and AVPlayerLayer, the class has been used throughout the project, making nothing so special about it.
 
 * [ShapeView](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ShapeView.swift): View object representing each shape. It has basic shape information like appearance, size, and color. Also, it handles panning (dragging) events and resulting resize/translate by itself. Because of such responsibility, it also stores data for its own boundary and its position within it.
 
@@ -374,3 +374,143 @@ Check this example with the same point tapped, but different shape (<2>) is chos
 The function also handles other situations like when no shape is eligible, no shape is currently picked, tapped area does not contain currently picked shape, etc. You can check the code.
 
 In the meantime, when the user changes color using HSBColorPicker, currently picked shape also changes color. This is trivial. One shortcoming is that the user cannot change multiple shapes’ color at the same time this way (or, in fact, in any other way).
+
+### Recording and Playback
+
+Recording is implemented with RecordSession. RecordSession records the state using events; for example, whenever the user changes the playing speed, it is recorded. The same thing happens when the user drags the slider to change play position, presses controls to put a new shape, drags the shape to resize, and so forth. 
+
+To record events real-time, EditorViewController calls [RecordSession.record(entity:)](https://github.com/lsylove/ShaDai/blob/master/ShaDai/RecordSession.swift#L73) everywhere from control event handlers to delegate responses to record start/finish points. One notable feature is ShapeView’s [ShapeViewGestureRecognitionDelegate](https://github.com/lsylove/ShaDai/blob/master/ShaDai/ShapeView.swift#L11). While most of view state changes are handled in EditorViewController, shape resize/panning is handled in ShapeView so that RecordSession cannot record such changes (ShapeView and RecordSession has no relation; see class diagram above). ShapeViewGestureRecognitionDelegate is, although clunky, added to ShapeView to send response to the delegate (in this case, EditorViewController) so that shape change events could be recorded, too.
+
+All these events are recorded and kept with time information: when each event occurred. Time information has a unit of “ticks” (rather than real time) to ease the calculation. To save events, [EventEntity](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EventEntity.swift) and its subclass implementations are used depending on nature of the event; for instance, [FrameEvent](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EventEntity.swift#L57) for frame change, [ShapeRelatedEvent](https://github.com/lsylove/ShaDai/blob/master/ShaDai/EventEntity.swift#L154) for shape change, and so on. RecordSession’s `events` dictionary achieves “heterogeneous container polymorphism”.
+
+For playback on UI scene, RecordSession calculates back play time period between each events (it converts tick time back into real time differences) and executes each event back in sequence. Managing execution with time period is implemented using [DispatchQueue.asyncAfter(deadline:execute:)](https://developer.apple.com/documentation/dispatch/dispatchqueue/2300020-asyncafter).
+
+```swift
+let keysSorted = self.events.keys.sorted()
+let seq = zip(keysSorted, keysSorted.dropFirst())
+            
+for (curr, next) in seq {
+        let diff = Double(next - curr)
+        executionBarrier.wait()
+                
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(diff * 1000.0 / self.frequency))) {
+                executionBarrier.signal()
+                for entity in self.events[next]! {
+                        entity.execute(player: playerView.player!, superView: superView, metadata: &self.metadata)
+                        }
+                }
+        }
+        DispatchQueue.main.async {
+                completionHandler?()
+        }
+}
+```
+
+Playback is mostly straightforward. However, one issue made playback much more complicated than it should. It is mainly due to how shapes are handled.
+
+In my implementation, for playback and exporting, existing ShapeView objects are reused rather than recreated. This makes everything complex because, comparing before and after recording session, there are shapes deleted during the session and those created during the session. Some shapes are even created and deleted during the session!
+
+Consider the following example.
+
+![Editor](/doc/images/exp6.png)
+
+During the recording, shapes change position, are added, and/or are removed from the screen. Each shape-related event (ShapeRelatedEvent and PanningEvent) has an associated shape. The sequence of events (in respect to time windows) and the relationship between objects are implemented this way.
+
+![Editor](/doc/images/exp7.png)
+
+Meanwhile, EditorViewController itself tracks currently visible ShapeViews to determine which shape to “select” when user presses the screen. Note that EditorViewController only has a list of shapes on the scene. In our scenario, it should look like this.
+
+![Editor](/doc/images/exp8.png)
+
+The implementation reuses ShapeView objects. To achieve this, EventEntity objects as well as EditorViewController have a strong reference to associated ShapeView object. Without continued reference, the view controller could not restore, for example, ShapeView <2> and ShapeView <4> because they are removed from the view controller. In short, all shapes that appeared during recording has their reference kept by EventEntity objects.
+
+![Editor](/doc/images/exp9.png)
+
+It should be noted that EventEntity objects do not have information regarding “initial” position of each ShapeView object. For example, in this recording session, it is only known for ShapeView <1> that it moved to right side and it became larger. It is never saved on these events that the shape was on the upper left corner. This can lead to confusion because ShapeView objects are reused. When the shape is on the center, video playback will result in the shape being moved further right and becoming even larger.
+
+![Editor](/doc/images/exp7.png)
+
+Only PanningEvent is saved, not initial location and such.
+
+This implies that proper state save and restore functionality is required. For this, EditorViewController keeps record for state of all shapes at the time of record start so that these shapes are set to previous state at the start of playback. This container keeps the reference of each shape at the time and its position, size, and other state information as a key-value. This object is named `previous` instance variable.
+
+![Editor](/doc/images/exp10.png)
+
+At the start of playback, all visible objects are initialized to state when the recording started. Such initialization is done using the information in `previous` container. Starting from initialized state, the playback can be performed exactly the same as the time when the recording took place.
+
+However, there are more issues to consider. The user might have drawn more shapes, removed some of them, etc. after recording is finished. It is definitely possible for a user to edit shape between the end of recording session and the playback. Therefore, there are actually three, not two, states information to consider.
+
+![Editor](/doc/images/exp11.png)
+
+Therefore, not only that the shapes should return to previous state at the beginning of playback, but also that the shapes should return to the state at the time of pressing the “playback” button from the state at the end of playback. These state transitions can be divided into three.
+
+![Editor](/doc/images/exp12.png)
+
+EditorViewController is responsible for transition (1) and (3). The former is to position the shapes to the state at the beginning of playback and the latter is to position the shapes back to the state at the time of pressing the “playback” button. Transition (2) is automatically performed through EventEntity execution.
+
+The procedure can be summarized as follows.
+
+![Editor](/doc/images/exp13.png)
+
+* When “start/finish” button is pressed to start the recording session, all visible shapes’ data are saved to `self.previous`. (a, b, f, g)
+
+* When “start/finish” button is pressed again to finish the recording session, all visible shapes’ references are saved to `self.inter`. (b, c, d, g) Unlike `self.previous`, `self.inter` does not have to save individual shape’s position and other data. The reason could be this.
+
+	- for c, d: They didn’t exist at the time of recording start: They are created during the session. When entering the view, all ShapeView object are initialized at the same position.
+
+	- for b, g: They existed at the time of recording start. Data in `self.previous` is sufficient to initialize their position for playback.
+
+* When “playback” is pressed, initialization takes place before the actual playback. However, before initialization, current shape information should be saved for transition (3). The data is saved in `futureSnapshot` local variable in playback() method. The snapshot has a copy of all (d, e, f, g) shapes at the time of playback.\*
+
+\*: Not “all” of them is necessary, for example, for “e” hiding might be sufficient. Maybe simplicity was key concern at the time of implementation.
+
+```swift
+var futureSnapshot: [ShapeView: ShapeView] = [:]
+zip(shapes, shapes.map{ $0.copy() as! ShapeView }).forEach { futureSnapshot[$0.0] = $0.1 }
+```
+
+* Transition (1): First, hide all of currently visible shapes (d, e, f, g) and initialize shapes’ state with `self.previous`. Previous shapes (a, b, f, g) are also marked visible.
+
+```swift
+for shape in shapes {
+        returnShapeToOriginalPosition(shape)
+        shape.removeFromSuperview()
+}
+for (curr, prev) in previous {
+        curr.absA = prev.absA
+        curr.absB = prev.absB
+        curr.c = prev.c
+                    
+        if (prev.isSelected) {
+                curr.isSelected = true
+        } else {
+                curr.isSelected = false
+        }
+                    
+        playerView.addSubview(curr)
+        curr.setNeedsDisplay()
+}
+```
+
+* Start executing RecordSession [Transition (2)].
+
+* Transition (3): Hide and set to initial position all of shapes in `self.inter` (b, c, d, g) and restore shapes in `futureSnapshot` (d, e, f, g).
+
+```swift
+for shape in self.inter {
+        returnShapeToOriginalPosition(shape)
+        shape.removeFromSuperview()
+}
+for (curr, future) in futureSnapshot {
+        curr.absA = future.absA
+        curr.absB = future.absB
+        curr.c = future.c
+                    
+        if (future.isSelected) {
+                curr.isSelected = true
+        }
+                    
+        self.playerView.addSubview(curr)
+        curr.setNeedsDisplay()
+}
+```
