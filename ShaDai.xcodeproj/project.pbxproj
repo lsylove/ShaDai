@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0368EB77AB3A88CB689324F0 /* libPods-ShaDai.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4946891E0AF2F0125BD53F62 /* libPods-ShaDai.a */; };
+		3B21ABF31F32E07C00E4D4FE /* OpenCV.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B21ABF21F32E07C00E4D4FE /* OpenCV.storyboard */; };
+		3B21ABF51F32E08E00E4D4FE /* OpenCVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B21ABF41F32E08E00E4D4FE /* OpenCVViewController.swift */; };
+		3B21ABF81F32E1F900E4D4FE /* OpenCVWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3B21ABF71F32E1F900E4D4FE /* OpenCVWrapper.mm */; };
+		3B21ABFB1F33082400E4D4FE /* test1.JPG in Resources */ = {isa = PBXBuildFile; fileRef = 3B21ABFA1F33082400E4D4FE /* test1.JPG */; };
+		3B21ABFD1F330BE100E4D4FE /* haarcascade_frontalface_alt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 3B21ABFC1F330BE100E4D4FE /* haarcascade_frontalface_alt.xml */; };
+		3B21ABFF1F330C3E00E4D4FE /* test2.png in Resources */ = {isa = PBXBuildFile; fileRef = 3B21ABFE1F330C3E00E4D4FE /* test2.png */; };
 		3B431A1A1F2AC9B4008E8B05 /* VoiceRecorder.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B431A191F2AC9B4008E8B05 /* VoiceRecorder.storyboard */; };
 		3B431A1C1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B431A1B1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift */; };
 		3B4B05EB1F0E1086006EE5F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B4B05EA1F0E1086006EE5F1 /* AppDelegate.swift */; };
@@ -15,6 +22,8 @@
 		3B4B05F21F0E1086006EE5F1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B4B05F11F0E1086006EE5F1 /* Assets.xcassets */; };
 		3B4B05F51F0E1086006EE5F1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3B4B05F31F0E1086006EE5F1 /* LaunchScreen.storyboard */; };
 		3B9F7F891F206563002A6B21 /* BarIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B9F7F881F206563002A6B21 /* BarIndicatorView.swift */; };
+		3BA533171F331577000BAA00 /* test3.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BA533161F331577000BAA00 /* test3.png */; };
+		3BA533191F331B87000BAA00 /* test4.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BA533181F331B87000BAA00 /* test4.png */; };
 		67147E351F25881E0069F24D /* EditorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67147E341F25881E0069F24D /* EditorViewController.swift */; };
 		67147E371F2588280069F24D /* Editor.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 67147E361F2588280069F24D /* Editor.storyboard */; };
 		6719F7211F1708D80071A5E8 /* proj.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6719F7201F1708D80071A5E8 /* proj.mp4 */; };
@@ -65,6 +74,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3B21ABF21F32E07C00E4D4FE /* OpenCV.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = OpenCV.storyboard; sourceTree = "<group>"; };
+		3B21ABF41F32E08E00E4D4FE /* OpenCVViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenCVViewController.swift; sourceTree = "<group>"; };
+		3B21ABF61F32E1F900E4D4FE /* OpenCVWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCVWrapper.h; sourceTree = "<group>"; };
+		3B21ABF71F32E1F900E4D4FE /* OpenCVWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCVWrapper.mm; sourceTree = "<group>"; };
+		3B21ABFA1F33082400E4D4FE /* test1.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test1.JPG; sourceTree = "<group>"; };
+		3B21ABFC1F330BE100E4D4FE /* haarcascade_frontalface_alt.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = haarcascade_frontalface_alt.xml; sourceTree = "<group>"; };
+		3B21ABFE1F330C3E00E4D4FE /* test2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test2.png; sourceTree = "<group>"; };
 		3B431A191F2AC9B4008E8B05 /* VoiceRecorder.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = VoiceRecorder.storyboard; sourceTree = "<group>"; };
 		3B431A1B1F2AC9C2008E8B05 /* VoiceRecorderViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoiceRecorderViewController.swift; sourceTree = "<group>"; };
 		3B4B05E71F0E1086006EE5F1 /* ShaDai.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShaDai.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,6 +92,10 @@
 		3B4B05F61F0E1086006EE5F1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B9F7F881F206563002A6B21 /* BarIndicatorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BarIndicatorView.swift; sourceTree = "<group>"; };
 		3B9F7F8A1F2066DB002A6B21 /* ShaDaiTest.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = ShaDaiTest.playground; sourceTree = "<group>"; };
+		3BA533161F331577000BAA00 /* test3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test3.png; sourceTree = "<group>"; };
+		3BA533181F331B87000BAA00 /* test4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = test4.png; sourceTree = "<group>"; };
+		415ECC7051DDBA46FE87F208 /* Pods-ShaDai.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShaDai.release.xcconfig"; path = "Pods/Target Support Files/Pods-ShaDai/Pods-ShaDai.release.xcconfig"; sourceTree = "<group>"; };
+		4946891E0AF2F0125BD53F62 /* libPods-ShaDai.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ShaDai.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		67147E341F25881E0069F24D /* EditorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorViewController.swift; sourceTree = "<group>"; };
 		67147E361F2588280069F24D /* Editor.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Editor.storyboard; sourceTree = "<group>"; };
 		6719F7201F1708D80071A5E8 /* proj.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = proj.mp4; sourceTree = SOURCE_ROOT; };
@@ -125,6 +145,7 @@
 		67E779471F25B5E600C29CE5 /* ColorPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ColorPickerViewController.swift; sourceTree = "<group>"; };
 		67E779491F25E75900C29CE5 /* RecordSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordSession.swift; sourceTree = "<group>"; };
 		67E7794B1F25E76300C29CE5 /* EventEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventEntity.swift; sourceTree = "<group>"; };
+		77C7E49952B6459CAD0E0162 /* Pods-ShaDai.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShaDai.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ShaDai/Pods-ShaDai.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,12 +153,34 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0368EB77AB3A88CB689324F0 /* libPods-ShaDai.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3B21ABF11F32E05800E4D4FE /* OpenCV */ = {
+			isa = PBXGroup;
+			children = (
+				3B21ABF21F32E07C00E4D4FE /* OpenCV.storyboard */,
+				3B21ABF41F32E08E00E4D4FE /* OpenCVViewController.swift */,
+			);
+			name = OpenCV;
+			sourceTree = "<group>";
+		};
+		3B21ABF91F32EDB100E4D4FE /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				3B21ABFC1F330BE100E4D4FE /* haarcascade_frontalface_alt.xml */,
+				3B21ABFE1F330C3E00E4D4FE /* test2.png */,
+				3BA533161F331577000BAA00 /* test3.png */,
+				3B21ABFA1F33082400E4D4FE /* test1.JPG */,
+				3BA533181F331B87000BAA00 /* test4.png */,
+			);
+			name = Resource;
+			sourceTree = "<group>";
+		};
 		3B431A181F2AC99A008E8B05 /* VoiceRecorder */ = {
 			isa = PBXGroup;
 			children = (
@@ -151,8 +194,11 @@
 			isa = PBXGroup;
 			children = (
 				3B9F7F8A1F2066DB002A6B21 /* ShaDaiTest.playground */,
+				3B21ABF91F32EDB100E4D4FE /* Resource */,
 				3B4B05E91F0E1086006EE5F1 /* ShaDai */,
 				3B4B05E81F0E1086006EE5F1 /* Products */,
+				519132F8F05270E77F320736 /* Pods */,
+				9930EA87C32FB9C169785252 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -181,8 +227,18 @@
 				676C4A3D1F2734EF00D7BBF8 /* Square */,
 				3B431A181F2AC99A008E8B05 /* VoiceRecorder */,
 				67636ECE1F3C205A0087B036 /* ProfileTwo */,
+				3B21ABF11F32E05800E4D4FE /* OpenCV */,
 			);
 			path = ShaDai;
+			sourceTree = "<group>";
+		};
+		519132F8F05270E77F320736 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				77C7E49952B6459CAD0E0162 /* Pods-ShaDai.debug.xcconfig */,
+				415ECC7051DDBA46FE87F208 /* Pods-ShaDai.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 		67147E2A1F2584F90069F24D /* Common */ = {
@@ -310,6 +366,8 @@
 				6749B1621F31A891007ABE5E /* ObjC.h */,
 				6749B1641F31A8B7007ABE5E /* ObjC.m */,
 				6749B1631F31A8B6007ABE5E /* ShaDai-Bridging-Header.h */,
+				3B21ABF61F32E1F900E4D4FE /* OpenCVWrapper.h */,
+				3B21ABF71F32E1F900E4D4FE /* OpenCVWrapper.mm */,
 			);
 			name = ObjC;
 			sourceTree = "<group>";
@@ -332,6 +390,14 @@
 			name = Square;
 			sourceTree = "<group>";
 		};
+		9930EA87C32FB9C169785252 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				4946891E0AF2F0125BD53F62 /* libPods-ShaDai.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -339,9 +405,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B4B05F91F0E1086006EE5F1 /* Build configuration list for PBXNativeTarget "ShaDai" */;
 			buildPhases = (
+				34C41F3B62357EF85237FA84 /* [CP] Check Pods Manifest.lock */,
 				3B4B05E31F0E1086006EE5F1 /* Sources */,
 				3B4B05E41F0E1086006EE5F1 /* Frameworks */,
 				3B4B05E51F0E1086006EE5F1 /* Resources */,
+				844B144BD4B9301892F5EBF3 /* [CP] Embed Pods Frameworks */,
+				A02327AA601C9C1FC22D3E41 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -364,7 +433,7 @@
 				TargetAttributes = {
 					3B4B05E61F0E1086006EE5F1 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = 9N2GXJ9SUF;
+						DevelopmentTeam = RB73NXNMA7;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
@@ -406,13 +475,17 @@
 				67636EC51F3BEAC40087B036 /* field3.mp4 in Resources */,
 				67636EC41F3BEAC40087B036 /* field2.mp4 in Resources */,
 				3B4B05F21F0E1086006EE5F1 /* Assets.xcassets in Resources */,
+				3B21ABFF1F330C3E00E4D4FE /* test2.png in Resources */,
 				3B4B05F01F0E1086006EE5F1 /* Main.storyboard in Resources */,
 				672555FB1F131B99008D88C2 /* nasmo.mp4 in Resources */,
+				3B21ABFB1F33082400E4D4FE /* test1.JPG in Resources */,
 				674B77701F189CA400DF9D3E /* ProfileOne.storyboard in Resources */,
 				676C4A411F27351700D7BBF8 /* Square.storyboard in Resources */,
+				3BA533191F331B87000BAA00 /* test4.png in Resources */,
 				672667A11F18613A001541B2 /* Tracer.storyboard in Resources */,
 				6765EB031F1EF7EA0010D115 /* two.mp4 in Resources */,
 				6765EB021F1EF7EA0010D115 /* oldman.mp4 in Resources */,
+				3B21ABFD1F330BE100E4D4FE /* haarcascade_frontalface_alt.xml in Resources */,
 				672555FF1F131BF2008D88C2 /* Nasmo.storyboard in Resources */,
 				3B431A1A1F2AC9B4008E8B05 /* VoiceRecorder.storyboard in Resources */,
 				671BBF111F0E29720088B84C /* video.mp4 in Resources */,
@@ -420,10 +493,60 @@
 				67636ECD1F3C20370087B036 /* swin4.m4v in Resources */,
 				675775501F0F069D00270E3F /* ShaDai2.storyboard in Resources */,
 				67147E371F2588280069F24D /* Editor.storyboard in Resources */,
+				3B21ABF31F32E07C00E4D4FE /* OpenCV.storyboard in Resources */,
+				3BA533171F331577000BAA00 /* test3.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		34C41F3B62357EF85237FA84 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		844B144BD4B9301892F5EBF3 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ShaDai/Pods-ShaDai-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A02327AA601C9C1FC22D3E41 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ShaDai/Pods-ShaDai-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3B4B05E31F0E1086006EE5F1 /* Sources */ = {
@@ -442,6 +565,8 @@
 				671BBF0B1F0E154F0088B84C /* String+.swift in Sources */,
 				672555FD1F131BBF008D88C2 /* NasmoController.swift in Sources */,
 				67C0F0B71F1DA6E100578029 /* GraphView.swift in Sources */,
+				3B21ABF81F32E1F900E4D4FE /* OpenCVWrapper.mm in Sources */,
+				3B21ABF51F32E08E00E4D4FE /* OpenCVViewController.swift in Sources */,
 				6749B1651F31A8B7007ABE5E /* ObjC.m in Sources */,
 				674B77721F189CB600DF9D3E /* ProfileOneViewController.swift in Sources */,
 				67E7794A1F25E75900C29CE5 /* RecordSession.swift in Sources */,
@@ -580,14 +705,17 @@
 		};
 		3B4B05FA1F0E1086006EE5F1 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 77C7E49952B6459CAD0E0162 /* Pods-ShaDai.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = RB73NXNMA7;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ShaDai/ShaDai-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -596,14 +724,17 @@
 		};
 		3B4B05FB1F0E1086006EE5F1 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 415ECC7051DDBA46FE87F208 /* Pods-ShaDai.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 9N2GXJ9SUF;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = RB73NXNMA7;
 				INFOPLIST_FILE = ShaDai/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.golfzon.ShaDai;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ShaDai/ShaDai-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
