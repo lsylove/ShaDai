@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Xe2-X3-jSC">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Profile Two View Controller-->
+        <scene sceneID="RLr-H3-QZ2">
+            <objects>
+                <viewController id="Xe2-X3-jSC" customClass="ProfileTwoViewController" customModule="ShaDai" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="m01-GS-kE9"/>
+                        <viewControllerLayoutGuide type="bottom" id="kVc-pB-xRE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="PQv-R9-nXN">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gW4-7Z-2IQ" customClass="PlayerView" customModule="ShaDai" customModuleProvider="target">
+                                <rect key="frame" x="16" y="191" width="343" height="266"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <slider opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="iPg-VY-Hpz">
+                                <rect key="frame" x="34" y="557" width="193" height="31"/>
+                                <connections>
+                                    <action selector="playSlider:" destination="Xe2-X3-jSC" eventType="valueChanged" id="wKB-iW-dLN"/>
+                                </connections>
+                            </slider>
+                            <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="uWG-cL-7qD">
+                                <rect key="frame" x="245" y="557" width="94" height="29"/>
+                                <connections>
+                                    <action selector="playStepper:" destination="Xe2-X3-jSC" eventType="valueChanged" id="doQ-co-8nU"/>
+                                </connections>
+                            </stepper>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="swin4.m4v" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8Yu-o8-uUT">
+                                <rect key="frame" x="36" y="60" width="195" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lJw-IQ-NGJ">
+                                <rect key="frame" x="251" y="60" width="34" height="30"/>
+                                <state key="normal" title="Load"/>
+                                <connections>
+                                    <action selector="loadButton:" destination="Xe2-X3-jSC" eventType="touchUpInside" id="21i-xo-7cD"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="38d-G3-V3Z">
+                                <rect key="frame" x="305" y="60" width="34" height="30"/>
+                                <state key="normal" title="Save"/>
+                                <connections>
+                                    <action selector="saveButton:" destination="Xe2-X3-jSC" eventType="touchUpInside" id="AVS-we-WHU"/>
+                                </connections>
+                            </button>
+                            <view hidden="YES" alpha="0.5" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VwC-zS-GTT">
+                                <rect key="frame" x="10" y="10" width="10" height="10"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="X8h-ro-UFd">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem title="Mark" id="OEY-w1-bF2">
+                                        <connections>
+                                            <action selector="markButton:" destination="Xe2-X3-jSC" id="mmW-1p-5gN"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Mark a Flying Ball's Path" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="agO-u3-NKM">
+                                <rect key="frame" x="95" y="140" width="185" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dhb-NW-v1F">
+                                <rect key="frame" x="197.5" y="477" width="37" height="30"/>
+                                <state key="normal" title="Done"/>
+                                <connections>
+                                    <action selector="doneButton:" destination="Xe2-X3-jSC" eventType="touchUpInside" id="vlq-Tt-Mvf"/>
+                                </connections>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="4Cn-CB-9dA">
+                                <rect key="frame" x="187.5" y="487" width="0.0" height="10"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="10" id="bTv-bc-RRZ"/>
+                                    <constraint firstAttribute="width" id="pZn-cu-eu2"/>
+                                </constraints>
+                            </view>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kvA-Dp-Zzx">
+                                <rect key="frame" x="141.5" y="477" width="36" height="30"/>
+                                <state key="normal" title="Clear"/>
+                                <connections>
+                                    <action selector="clearButton:" destination="Xe2-X3-jSC" eventType="touchUpInside" id="xso-Oc-RP1"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="38d-G3-V3Z" firstAttribute="leading" secondItem="lJw-IQ-NGJ" secondAttribute="trailing" constant="20" id="A6I-GS-NI9"/>
+                            <constraint firstItem="kvA-Dp-Zzx" firstAttribute="centerY" secondItem="4Cn-CB-9dA" secondAttribute="centerY" id="F5E-Ds-A8V"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="38d-G3-V3Z" secondAttribute="trailing" constant="20" id="FaP-7M-817"/>
+                            <constraint firstItem="iPg-VY-Hpz" firstAttribute="centerY" secondItem="uWG-cL-7qD" secondAttribute="centerY" id="Fny-hQ-sbs"/>
+                            <constraint firstItem="lJw-IQ-NGJ" firstAttribute="leading" secondItem="8Yu-o8-uUT" secondAttribute="trailing" constant="20" id="H4J-Po-g93"/>
+                            <constraint firstAttribute="leadingMargin" secondItem="gW4-7Z-2IQ" secondAttribute="leading" id="HHV-gI-M5K"/>
+                            <constraint firstItem="iPg-VY-Hpz" firstAttribute="top" secondItem="4Cn-CB-9dA" secondAttribute="bottom" constant="60" id="Ihj-FS-FuK"/>
+                            <constraint firstItem="agO-u3-NKM" firstAttribute="centerX" secondItem="PQv-R9-nXN" secondAttribute="centerX" id="P1K-8P-4lR"/>
+                            <constraint firstItem="gW4-7Z-2IQ" firstAttribute="top" secondItem="agO-u3-NKM" secondAttribute="bottom" constant="30" id="Rgf-NX-zrv"/>
+                            <constraint firstItem="Dhb-NW-v1F" firstAttribute="leading" secondItem="4Cn-CB-9dA" secondAttribute="trailing" constant="10" id="TLE-bC-Oht"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="gW4-7Z-2IQ" secondAttribute="trailing" id="Vn8-Xl-aYx"/>
+                            <constraint firstItem="4Cn-CB-9dA" firstAttribute="centerX" secondItem="PQv-R9-nXN" secondAttribute="centerX" id="adQ-Od-R5h"/>
+                            <constraint firstItem="8Yu-o8-uUT" firstAttribute="top" secondItem="m01-GS-kE9" secondAttribute="bottom" constant="40" id="bhq-qD-VVv"/>
+                            <constraint firstItem="iPg-VY-Hpz" firstAttribute="leading" secondItem="PQv-R9-nXN" secondAttribute="leadingMargin" constant="20" id="gxc-8h-t83"/>
+                            <constraint firstItem="4Cn-CB-9dA" firstAttribute="leading" secondItem="kvA-Dp-Zzx" secondAttribute="trailing" constant="10" id="nFz-W3-zrb"/>
+                            <constraint firstItem="8Yu-o8-uUT" firstAttribute="leading" secondItem="PQv-R9-nXN" secondAttribute="leadingMargin" constant="20" id="olS-7f-pav"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="uWG-cL-7qD" secondAttribute="trailing" constant="20" id="p4k-fF-yAO"/>
+                            <constraint firstItem="38d-G3-V3Z" firstAttribute="centerY" secondItem="8Yu-o8-uUT" secondAttribute="centerY" id="qgx-g9-c9p"/>
+                            <constraint firstItem="kVc-pB-xRE" firstAttribute="top" secondItem="iPg-VY-Hpz" secondAttribute="bottom" constant="80" id="qlS-J6-cvR"/>
+                            <constraint firstItem="lJw-IQ-NGJ" firstAttribute="centerY" secondItem="8Yu-o8-uUT" secondAttribute="centerY" id="sUa-Cj-Wbj"/>
+                            <constraint firstItem="agO-u3-NKM" firstAttribute="top" secondItem="8Yu-o8-uUT" secondAttribute="bottom" constant="50" id="sak-9n-5yi"/>
+                            <constraint firstItem="4Cn-CB-9dA" firstAttribute="top" secondItem="gW4-7Z-2IQ" secondAttribute="bottom" constant="30" id="vwC-J6-fNh"/>
+                            <constraint firstItem="Dhb-NW-v1F" firstAttribute="centerY" secondItem="4Cn-CB-9dA" secondAttribute="centerY" id="x4z-aF-rJl"/>
+                            <constraint firstItem="uWG-cL-7qD" firstAttribute="leading" secondItem="iPg-VY-Hpz" secondAttribute="trailing" constant="20" id="xHg-DR-sTJ"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="clearButton" destination="kvA-Dp-Zzx" id="liy-kF-YRc"/>
+                        <outlet property="doneButton" destination="Dhb-NW-v1F" id="0sG-tg-eqV"/>
+                        <outlet property="hindrance" destination="VwC-zS-GTT" id="1WU-qU-1Sp"/>
+                        <outlet property="loadButton" destination="lJw-IQ-NGJ" id="ihQ-30-sSd"/>
+                        <outlet property="markLabel" destination="agO-u3-NKM" id="GOn-Bk-cih"/>
+                        <outlet property="playSlider" destination="iPg-VY-Hpz" id="9DV-jF-tUd"/>
+                        <outlet property="playStepper" destination="uWG-cL-7qD" id="kY8-nZ-vSm"/>
+                        <outlet property="playerView" destination="gW4-7Z-2IQ" id="uJ0-LS-Vg4"/>
+                        <outlet property="saveButton" destination="38d-G3-V3Z" id="AtZ-fd-Mh0"/>
+                        <outlet property="textField" destination="8Yu-o8-uUT" id="bO5-yI-ppc"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="P9f-eP-Gsd" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-58.399999999999999" y="-139.880059970015"/>
+        </scene>
+    </scenes>
+</document>
