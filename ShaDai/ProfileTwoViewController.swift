@@ -45,7 +45,8 @@ class ProfileTwoViewController: UIViewController {
         if (valueDiff > 0.0002 || valueDiff < -0.0002) {
             let diff = valueDiff * fps * duration
             updateControlPosition(value: diff, stepper: playStepper)
-            updatePlayPosition(value: Int(diff))
+            updatePlayPositionAbsolute(value: Double(sender.value))
+//            updatePlayPosition(value: Int(diff))
         }
         
         sliderPrev = Double(sender.value)
@@ -107,11 +108,9 @@ class ProfileTwoViewController: UIViewController {
     
     // >_< -> properties reserved for extensions
     
-    var pathLayer = CAShapeLayer()
+    var pathLayer = CALayer()
     
     var path = UIBezierPath()
-    
-    var pathPoint = CGPoint()
     
 }
 
@@ -129,34 +128,67 @@ extension ProfileTwoViewController {
         
         pathLayer.frame = hindrance.bounds
         hindrance.layer.mask = pathLayer
-
-        pathLayer.backgroundColor = UIColor.white.cgColor
-        pathLayer.fillColor = UIColor.white.cgColor
-        pathLayer.strokeColor = UIColor.clear.cgColor
-        pathLayer.lineWidth = 8
-
-        pathLayer.path = path.cgPath
+        
+        path.lineWidth = 16
+        
+        updatePathDrawing()
     }
     
     func onHindranceTouch(recognizer: UIGestureRecognizer) {
-        print(recognizer.location(in: hindrance))
+        let point = recognizer.location(in: hindrance)
+        
+        if let panRecognizer = recognizer as? UIPanGestureRecognizer {
+            switch panRecognizer.state {
+            case .began: path.move(to: point)
+            case .changed, .ended: path.addLine(to: point); updatePathDrawing()
+            default: break
+            }
+            
+        } else {
+            path.move(to: point)
+            path.addLine(to: CGPoint(x: point.x + 16.0, y: point.y))
+            updatePathDrawing()
+        }
     }
     
     func startMarkEditing() {
         
-        [saveButton, playSlider, playStepper].forEach { $0.isEnabled = false }
+        saveButton.isEnabled = false
         [hindrance, markLabel, clearButton, doneButton].forEach { $0.isHidden = false }
     }
     
     func endMarkEditing() {
         
-        [saveButton, playSlider, playStepper].forEach { $0.isEnabled = true }
+        saveButton.isEnabled = true
         [hindrance, markLabel, clearButton, doneButton].forEach { $0.isHidden = true }
     }
     
     func destroyPath() {
         path = UIBezierPath()
-        pathLayer.path = path.cgPath
+        path.lineWidth = 16
+        
+        updatePathDrawing()
+    }
+    
+    func updatePathDrawing() {
+        UIGraphicsBeginImageContext(pathLayer.bounds.size)
+        
+        UIColor.white.setFill()
+        UIColor.black.setStroke()
+        
+        UIRectFill(pathLayer.bounds)
+        path.stroke()
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()!
+        UIGraphicsEndImageContext()
+        
+        let ciimage = CIImage(image: image)
+        let filter = CIFilter(name: "CIMaskToAlpha")!
+        filter.setValue(ciimage, forKey: "inputImage")
+        let filtered = filter.outputImage!
+        
+        let cgimage = CIContext().createCGImage(filtered, from: filtered.extent)
+        pathLayer.contents = cgimage
     }
     
 }
@@ -208,6 +240,7 @@ extension ProfileTwoViewController {
         playStepper.isEnabled = true
     }
     
+    // value: # of frames changed
     func updateControlPosition(value: Double, slider: UISlider? = nil, stepper: UIStepper? = nil) {
         slider?.value += Float(value / fps / duration)
         stepper?.value += value
@@ -215,8 +248,17 @@ extension ProfileTwoViewController {
         stepperPrev = stepper?.value ?? stepperPrev
     }
     
+    // value: # of frames changed
     func updatePlayPosition(value: Int) {
         playerView.player!.currentItem!.step(byCount: value)
+    }
+    
+    // value: absolute position (between 0 and 1)
+    func updatePlayPositionAbsolute(value: Double) {
+        let val = CMTime(seconds: value * duration, preferredTimescale: 1000)
+        let mil = CMTime(seconds: 0.001, preferredTimescale: 1000)
+        
+        playerView.player!.seek(to: val, toleranceBefore: mil, toleranceAfter: mil)
     }
     
 }
