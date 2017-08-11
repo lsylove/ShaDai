@@ -38,6 +38,8 @@ class ProfileTwoViewController: UIViewController {
     var sliderPrev = 0.0
     
     var stepperPrev = 0.0
+    
+    let renderer = ImageRenderer()
 
     @IBAction func playSlider(_ sender: UISlider) {
         let valueDiff = Double(sender.value) - sliderPrev
@@ -112,6 +114,8 @@ class ProfileTwoViewController: UIViewController {
     
     var path = UIBezierPath()
     
+    let capture = ImageSequenceVideoCapture()
+    
 }
 
 extension ProfileTwoViewController {
@@ -171,26 +175,37 @@ extension ProfileTwoViewController {
     }
     
     func updatePathDrawing() {
-        UIGraphicsBeginImageContext(pathLayer.bounds.size)
+        let image = drawPath(path: path, extent: pathLayer.bounds)!
+        let ciimage = CIImage(image: image)!
         
-        UIColor.white.setFill()
-        UIColor.black.setStroke()
-        
-        UIRectFill(pathLayer.bounds)
-        path.stroke()
-        
-        let image = UIGraphicsGetImageFromCurrentImageContext()!
-        UIGraphicsEndImageContext()
-        
-        let ciimage = CIImage(image: image)
-        let filter = CIFilter(name: "CIMaskToAlpha")!
-        filter.setValue(ciimage, forKey: "inputImage")
-        let filtered = filter.outputImage!
-        
-        let cgimage = CIContext().createCGImage(filtered, from: filtered.extent)
+        let cgimage = applyAlphaFilter(image: ciimage)!
         pathLayer.contents = cgimage
     }
     
+    func drawPath(path: UIBezierPath, extent: CGRect, fill: UIColor = .white, stroke: UIColor = .black) -> UIImage? {
+        UIGraphicsBeginImageContext(extent.size)
+        
+        fill.setFill()
+        stroke.setStroke()
+        
+        UIRectFill(extent)
+        path.stroke()
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image
+    }
+    
+    func applyAlphaFilter(image: CIImage) -> CGImage? {
+        let filter = CIFilter(name: "CIMaskToAlpha")!
+        filter.setValue(image, forKey: "inputImage")
+        let filtered = filter.outputImage!
+        
+        let cgimage = CIContext().createCGImage(filtered, from: filtered.extent)
+        return cgimage
+        
+    }
 }
 
 extension ProfileTwoViewController {
@@ -266,7 +281,72 @@ extension ProfileTwoViewController {
 extension ProfileTwoViewController {
     
     func save() {
+        DispatchQueue.global().async {
+           self.test()
+        }
+    }
+    
+}
+
+extension ProfileTwoViewController {
+    
+    func test() {
+        let playerItem = playerView.player!.currentItem!
         
+        let image = drawPath(path: path, extent: pathLayer.bounds)!
+        let ciimage = CIImage(image: image)!
+        
+        let cgimage = applyAlphaFilter(image: ciimage)!
+        
+//        playerItem.step(byCount: -10)
+        
+        for _ in 1...10 {
+            let snapshot = renderer.renderSnapshot(playerItem: playerItem)!
+            let bottomLayer = CIImage(cgImage: snapshot)
+            
+            let resizedDrawing = renderer.resize(image: cgimage, extent: CGSize(width: snapshot.width, height: snapshot.height))!
+            let topLayer = CIImage(cgImage: resizedDrawing)
+            
+//            let composite = topLayer.compositingOverImage(bottomLayer)
+//            let compositeImage = CIContext().createCGImage(composite, from: composite.extent)!
+            
+//            capture.append(compositeImage, width: composite.extent.width, height: composite.extent.height)
+            
+            capture.append(snapshot, width: CGFloat(snapshot.width), height: CGFloat(snapshot.height))
+            
+            if (playerItem.canStepForward) {
+                playerItem.step(byCount: 1)
+                
+            } else {
+                break
+                
+            }
+        }
+        
+        var resultArray = [CGImage]()
+        
+        capture.registerCallback { image in
+            if let image = image {
+                resultArray.append(image)
+            } else {
+                print("[debug] where is image?")
+            }
+        }
+        
+        let group = DispatchGroup()
+        group.enter()
+        capture.startWorking {
+            group.leave()
+        }
+        group.wait()
+        
+        for image in resultArray {
+            let uiimage = UIImage(cgImage: image)
+            let imageview = UIImageView(image: uiimage)
+            imageview.frame = self.view.frame
+            
+            self.view.addSubview(imageview)
+        }
     }
     
 }

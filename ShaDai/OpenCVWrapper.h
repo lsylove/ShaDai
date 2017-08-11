@@ -12,6 +12,5 @@
 
 + (UIImage*)detectFace:(UIImage*)image;
 + (UIImage*)detactSkeleton:(UIImage*)image;
-+ (UIImage*)detactSkeleton:(UIImage*)image;
 
 @end

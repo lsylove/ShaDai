@@ -19,3 +19,4 @@
 
 #import "ObjC.h"
 #import "OpenCVWrapper.h"
+#import "ImageSequenceVideoCapture.h"
