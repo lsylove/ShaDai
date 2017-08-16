@@ -16,6 +16,9 @@ using namespace cv;
 void ImageSequenceProcessor::backgroundRoutine() {
     Mat fgmask, dst;
     Ptr<BackgroundSubtractorMOG2> model = createBackgroundSubtractorMOG2();
+    model->setBackgroundRatio(0.0001);
+    model->setDetectShadows(false);
+    model->setVarThresholdGen(90000);
     
     while (true) {
         if (!sequence.empty()) {
