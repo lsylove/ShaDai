@@ -39,6 +39,7 @@
 		6725560D1F136E17008D88C2 /* Export.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6725560C1F136E17008D88C2 /* Export.storyboard */; };
 		672667A11F18613A001541B2 /* Tracer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 672667A01F18613A001541B2 /* Tracer.storyboard */; };
 		672667A31F18614D001541B2 /* TracerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 672667A21F18614D001541B2 /* TracerViewController.swift */; };
+		672700C21F43CC9D0099CB3C /* ImageSequenceProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 672700C01F43CC9D0099CB3C /* ImageSequenceProcessor.cpp */; };
 		67316BBC1F160EBF001B4BFD /* AVAnimationComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */; };
 		67367B561F2AFB6000C0A097 /* RecordExportSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67367B551F2AFB6000C0A097 /* RecordExportSession.swift */; };
 		6743D6471F303C8E00EE574B /* three.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6743D6461F303C8E00EE574B /* three.mp4 */; };
@@ -115,6 +116,8 @@
 		6725560C1F136E17008D88C2 /* Export.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Export.storyboard; sourceTree = "<group>"; };
 		672667A01F18613A001541B2 /* Tracer.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Tracer.storyboard; sourceTree = "<group>"; };
 		672667A21F18614D001541B2 /* TracerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TracerViewController.swift; sourceTree = "<group>"; };
+		672700C01F43CC9D0099CB3C /* ImageSequenceProcessor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageSequenceProcessor.cpp; sourceTree = "<group>"; };
+		672700C11F43CC9D0099CB3C /* ImageSequenceProcessor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ImageSequenceProcessor.hpp; sourceTree = "<group>"; };
 		67316BBB1F160EBF001B4BFD /* AVAnimationComposer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AVAnimationComposer.swift; sourceTree = "<group>"; };
 		67367B551F2AFB6000C0A097 /* RecordExportSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordExportSession.swift; sourceTree = "<group>"; };
 		6743D6461F303C8E00EE574B /* three.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = three.mp4; sourceTree = SOURCE_ROOT; };
@@ -219,6 +222,7 @@
 		3B4B05E91F0E1086006EE5F1 /* ShaDai */ = {
 			isa = PBXGroup;
 			children = (
+				672700BE1F43CB0D0099CB3C /* C++ */,
 				6749B1611F31A87D007ABE5E /* ObjC */,
 				67147E2B1F2585BE0069F24D /* Resources */,
 				67147E2A1F2584F90069F24D /* Common */,
@@ -364,6 +368,15 @@
 				67147E361F2588280069F24D /* Editor.storyboard */,
 			);
 			name = Editor;
+			sourceTree = "<group>";
+		};
+		672700BE1F43CB0D0099CB3C /* C++ */ = {
+			isa = PBXGroup;
+			children = (
+				672700C11F43CC9D0099CB3C /* ImageSequenceProcessor.hpp */,
+				672700C01F43CC9D0099CB3C /* ImageSequenceProcessor.cpp */,
+			);
+			name = "C++";
 			sourceTree = "<group>";
 		};
 		6749B1611F31A87D007ABE5E /* ObjC */ = {
@@ -595,6 +608,7 @@
 				67E779481F25B5E600C29CE5 /* ColorPickerViewController.swift in Sources */,
 				67147E351F25881E0069F24D /* EditorViewController.swift in Sources */,
 				671BBF131F0E35590088B84C /* PlayerView.swift in Sources */,
+				672700C21F43CC9D0099CB3C /* ImageSequenceProcessor.cpp in Sources */,
 				6765EAFF1F1EE2D20010D115 /* SwingConfigViewController.swift in Sources */,
 				672667A31F18614D001541B2 /* TracerViewController.swift in Sources */,
 				3B4B05EB1F0E1086006EE5F1 /* AppDelegate.swift in Sources */,

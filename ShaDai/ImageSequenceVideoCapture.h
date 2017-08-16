@@ -18,7 +18,9 @@
 
 - (void) registerCallback: (void(^)(CGImageRef)) callback;
 
-- (void) startWorking: (void(^)()) callback;
+- (void) startSession;
+
+- (void) endSession: (void(^)()) callback;
 
 @end
 

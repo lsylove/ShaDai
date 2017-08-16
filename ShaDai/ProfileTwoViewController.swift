@@ -114,8 +114,6 @@ class ProfileTwoViewController: UIViewController {
     
     var path = UIBezierPath()
     
-    let capture = ImageSequenceVideoCapture()
-    
 }
 
 extension ProfileTwoViewController {
@@ -291,6 +289,8 @@ extension ProfileTwoViewController {
 extension ProfileTwoViewController {
     
     func test() {
+        let capture = ImageSequenceVideoCapture()
+        
         let playerItem = playerView.player!.currentItem!
         
         let image = drawPath(path: path, extent: pathLayer.bounds)!
@@ -298,9 +298,22 @@ extension ProfileTwoViewController {
         
         let cgimage = applyAlphaFilter(image: ciimage)!
         
-//        playerItem.step(byCount: -10)
+        var resultArray = [CGImage]()
         
-        for _ in 1...10 {
+        capture.registerCallback { image in
+            if let image = image {
+                resultArray.append(image)
+            } else {
+                print("[debug] where is image?")
+            }
+            print("image processed: \(resultArray.count) / 20")
+        }
+        
+        capture.startSession()
+        
+        playerItem.step(byCount: -10)
+        
+        for _ in 1...20 {
             let snapshot = renderer.renderSnapshot(playerItem: playerItem)!
             let bottomLayer = CIImage(cgImage: snapshot)
             
@@ -323,24 +336,12 @@ extension ProfileTwoViewController {
             }
         }
         
-        var resultArray = [CGImage]()
-        
-        capture.registerCallback { image in
-            if let image = image {
-                resultArray.append(image)
-            } else {
-                print("[debug] where is image?")
-            }
-        }
-        
         let group = DispatchGroup()
         group.enter()
-        capture.startWorking {
-            group.leave()
-        }
+        capture.endSession({ group.leave() })
         group.wait()
         
-        for image in resultArray {
+        for image in resultArray[10..<resultArray.count] {
             let uiimage = UIImage(cgImage: image)
             let imageview = UIImageView(image: uiimage)
             imageview.frame = self.view.frame
